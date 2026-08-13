@@ -1,0 +1,6 @@
+{
+  "name": "Enterprise Accounting Audit Studio",
+  "description": "Full-stack Enterprise Double-Entry Accounting Platform with CSV/JSON Transaction Uploads, Multi-Tenant Auditing, and Multi-Standard Tax Compliance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
