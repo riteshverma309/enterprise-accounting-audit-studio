@@ -472,6 +472,31 @@ API Authentication & Headers:
 • Tenant Context Header: X-Tenant-ID: <tenant_id> (e.g., t-acme-us)
 • Response Format: Standard JSON with success boolean, status code, metadata, and structured data payloads.`,
     },
+    {
+      id: 'sec-15',
+      title: '15. Dynamic Customer Attributes, Invoice Templates & Bulk Invoicing Engine',
+      icon: <Layers className="w-4 h-4 text-pink-400" />,
+      content: `A high-throughput bulk billing and customer segmentation engine for Housing Societies, Property Management, SaaS Subscriptions, and Professional Services:
+
+1. Dynamic Customer Attributes (EAV Schema):
+• Schema Definitions: Register custom typed attributes (BOOLEAN, NUMBER, TEXT, SELECT, DATE) per tenant without database migrations.
+• Boolean Flags: Attributes like 'is_commercial' or 'is_tax_exempt' partition customer lists into binary segments (True vs False).
+• Numeric Multipliers: Attributes like 'carpet_area_sqft', 'seat_count', or 'patient_cohort_size' dynamically scale base rates (e.g., 2,400 sq ft × $3.25/sqft).
+
+2. Reusable Invoice Templates:
+• Define standard line items, product codes, unit prices, tax rates (0%, 5%, 12%, 18%), default revenue accounts (e.g. Acc 4010), and payment terms.
+• Supports specialized templates (e.g., Commercial HOA Maintenance with HVAC surcharge vs. Standard Residential Flat Sinking Fund).
+
+3. 4-Step Bulk Invoicing Wizard:
+• Step 1: Attribute Segmentation - Pick an attribute key to dynamically generate target customer groups.
+• Step 2: Template Mapping - Map distinct invoice templates, dates, and dynamic multiplier fields per group.
+• Step 3: Pre-Flight Validation - Review computed line items, tax liabilities, customer totals, and export preview to CSV.
+• Step 4: Atomic General Ledger Commit - Concurrently generates individual customer invoices and posts balanced double-entry vouchers (Debit 1100 AR, Credit 4010 Revenue, Credit 2110 Tax Payable).
+
+4. Audit Trail & Reversal Rollback:
+• Immutable audit log of every batch run, group breakdown, and generated invoice count.
+• One-click Rollback capability to safely void batch runs and post reversal journal entries if tariffs change.`,
+    },
   ];
 
   const filteredManualSections = manualSections.filter(sec => {

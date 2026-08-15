@@ -1,13 +1,14 @@
 import React from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { Building2, ShieldCheck, UserCheck, Scale, Globe2, ChevronDown, Plus } from 'lucide-react';
+import { Building2, ShieldCheck, UserCheck, Scale, Globe2, ChevronDown, Plus, BookOpen, HelpCircle } from 'lucide-react';
 import { Role } from '../types';
 
 interface HeaderProps {
   onOpenCreateTenantModal: () => void;
+  onOpenHelpCenter?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenCreateTenantModal }) => {
+export const Header: React.FC<HeaderProps> = ({ onOpenCreateTenantModal, onOpenHelpCenter }) => {
   const {
     tenants,
     activeTenant,
@@ -174,6 +175,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCreateTenantModal }) => {
           <div className="hidden xl:flex items-center gap-2 bg-slate-950/80 px-3 py-1 rounded-md border border-slate-800 font-mono text-[10px] text-slate-400">
             <span className="text-indigo-400">x-tenant-id:</span> {activeTenant.id}
           </div>
+
+          {/* Help Center Quick Access Button */}
+          {onOpenHelpCenter && (
+            <button
+              onClick={onOpenHelpCenter}
+              title="Open Application Help Center & User Guide"
+              className="flex items-center gap-1.5 px-3 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
+              <span>User Guide</span>
+            </button>
+          )}
         </div>
 
       </div>

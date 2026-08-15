@@ -30,6 +30,21 @@ import {
   CustomRoleDefinition,
   TenantAccessScope,
   PermissionKey,
+  CustomerContact,
+  VendorContact,
+  CustomAttributeDefinition,
+  IndustryPresetType,
+  ProductServiceItem,
+  ItemType,
+  PriceChangeHistoryEntry,
+  InvoiceTemplate,
+  CustomerPaymentReceipt,
+  CustomerOpeningBalanceRecord,
+  CustomerLedgerTransaction,
+  PaymentMethodType,
+  InvoicePaymentAllocation,
+  BulkInvoiceBatchRun,
+  CustomerStatementData,
 } from '../types';
 import {
   INITIAL_TENANTS,
@@ -47,7 +62,16 @@ import {
   INITIAL_TAX_JURISDICTIONS,
   INITIAL_ENTERPRISE_USERS,
   INITIAL_CUSTOM_ROLES,
+  INITIAL_PAYMENT_RECEIPTS,
+  INITIAL_OPENING_BALANCES,
+  INITIAL_BULK_BATCHES,
   FX_RATES,
+  mockCustomAttributeDefinitions,
+  mockCustomerContacts,
+  mockVendorContacts,
+  mockProductServices,
+  mockPriceChangeHistory,
+  mockInvoiceTemplates,
 } from '../mockData';
 
 interface AccountingContextType {
@@ -82,6 +106,60 @@ interface AccountingContextType {
   taxJurisdictions: TaxJurisdiction[];
   enterpriseUsers: EnterpriseUser[];
   customRoles: CustomRoleDefinition[];
+  customers: CustomerContact[];
+  vendors: VendorContact[];
+  customAttributeDefinitions: CustomAttributeDefinition[];
+  productsServices: ProductServiceItem[];
+  priceChangeHistory: PriceChangeHistoryEntry[];
+
+  // Entity Master & Custom Dynamic Attributes Management
+  createCustomer: (customerData: Omit<CustomerContact, 'id' | 'createdAt'>) => { success: boolean; customer?: CustomerContact; error?: string };
+  updateCustomer: (id: string, updates: Partial<CustomerContact>) => { success: boolean; error?: string };
+  deleteCustomer: (id: string) => { success: boolean; error?: string };
+  batchCreateCustomers: (
+    customersList: Array<Omit<CustomerContact, 'id' | 'createdAt'>>,
+    strategy?: 'append' | 'upsert'
+  ) => { success: boolean; createdCount: number; updatedCount: number; skippedCount: number; errors: string[] };
+  createVendor: (vendorData: Omit<VendorContact, 'id' | 'createdAt'>) => { success: boolean; vendor?: VendorContact; error?: string };
+  updateVendor: (id: string, updates: Partial<VendorContact>) => { success: boolean; error?: string };
+  deleteVendor: (id: string) => { success: boolean; error?: string };
+  createCustomAttribute: (attrData: Omit<CustomAttributeDefinition, 'id'>) => { success: boolean; attribute?: CustomAttributeDefinition; error?: string };
+  deleteCustomAttribute: (id: string) => { success: boolean; error?: string };
+  applyIndustryPresetAttributes: (preset: IndustryPresetType, tenantId: string) => { success: boolean; count: number };
+
+  // Products & Services Catalog Management
+  createProductService: (data: Omit<ProductServiceItem, 'id' | 'createdAt'>) => { success: boolean; item?: ProductServiceItem; error?: string };
+  updateProductService: (id: string, updates: Partial<ProductServiceItem>, reason?: string) => { success: boolean; error?: string };
+  updateProductPrice: (itemId: string, newPrice: number, reason: string, effectiveDate?: string, notes?: string) => { success: boolean; historyEntry?: PriceChangeHistoryEntry; error?: string };
+  deleteProductService: (id: string) => { success: boolean; error?: string };
+  applyIndustryPresetProducts: (preset: IndustryPresetType, tenantId: string) => { success: boolean; count: number };
+
+  // Invoice Templates Management Engine
+  invoiceTemplates: InvoiceTemplate[];
+  createInvoiceTemplate: (templateData: Omit<InvoiceTemplate, 'id' | 'createdAt' | 'usageCount'>) => { success: boolean; template?: InvoiceTemplate; error?: string };
+  updateInvoiceTemplate: (id: string, updates: Partial<InvoiceTemplate>) => { success: boolean; error?: string };
+  deleteInvoiceTemplate: (id: string) => { success: boolean; error?: string };
+  duplicateInvoiceTemplate: (id: string) => { success: boolean; template?: InvoiceTemplate; error?: string };
+  incrementTemplateUsage: (templateId: string) => void;
+
+  // Bulk Invoice Generation & Batch Operations Engine
+  bulkInvoiceBatches: BulkInvoiceBatchRun[];
+  batchCreateInvoices: (params: {
+    title: string;
+    groupingAttributeKey: string;
+    groupingAttributeName: string;
+    invoicesData: Omit<CustomerInvoice, 'id' | 'invoiceNumber' | 'amountPaid' | 'status'>[];
+    groupBreakdowns: {
+      groupId: string;
+      groupName: string;
+      templateCode: string;
+      templateName: string;
+      customerCount: number;
+      groupTotalAmount: number;
+    }[];
+    templateIdsUsed: string[];
+  }) => { success: boolean; batchRun?: BulkInvoiceBatchRun; createdInvoicesCount: number; error?: string };
+  rollbackInvoiceBatch: (batchId: string, reason?: string) => { success: boolean; error?: string };
 
   // User Access & Provisioning Engine
   createEnterpriseUser: (userData: Omit<EnterpriseUser, 'id' | 'createdAt' | 'lastLogin' | 'apiTokenCount'>) => { success: boolean; error?: string };
@@ -101,6 +179,49 @@ interface AccountingContextType {
   receiveInvoicePayment: (invoiceId: string, paymentAmount: number, bankAccountId: string) => { success: boolean; error?: string };
   createVendorBill: (billData: Omit<VendorBill, 'id' | 'billNumber' | 'amountPaid' | 'status'>) => { success: boolean; error?: string };
   payVendorBill: (billId: string, paymentAmount: number, bankAccountId: string) => { success: boolean; error?: string };
+
+  // Advanced Customer AR, Payment Receipts & Opening Balances Engine
+  paymentReceipts: CustomerPaymentReceipt[];
+  openingBalances: CustomerOpeningBalanceRecord[];
+  recordCustomerPaymentReceipt: (params: {
+    customerId: string;
+    paymentDate: string;
+    paymentMethod: PaymentMethodType;
+    bankAccountId: string;
+    referenceNumber?: string;
+    totalAmountReceived: number;
+    allocations: { invoiceId: string; invoiceNumber: string; allocatedAmount: number; discountAmount?: number; writeOffAmount?: number }[];
+    notes?: string;
+  }) => { success: boolean; receipt?: CustomerPaymentReceipt; error?: string };
+  voidPaymentReceipt: (receiptId: string, reason?: string) => { success: boolean; error?: string };
+  recordOpeningBalanceInvoice: (params: {
+    customerId: string;
+    fiscalYear: string;
+    asOfDate: string;
+    originalInvoiceNumber: string;
+    originalInvoiceDate: string;
+    dueDate: string;
+    openingAmount: number;
+    balanceType?: 'DR' | 'CR';
+    offsetAccountCode?: string;
+    notes?: string;
+  }) => { success: boolean; invoice?: CustomerInvoice; openingRecord?: CustomerOpeningBalanceRecord; error?: string };
+  batchImportOpeningBalances: (records: {
+    customerId?: string;
+    customerCode?: string;
+    customerName?: string;
+    fiscalYear?: string;
+    asOfDate?: string;
+    originalInvoiceNumber?: string;
+    originalInvoiceDate?: string;
+    dueDate?: string;
+    openingAmount: number;
+    balanceType?: 'DR' | 'CR';
+    creditDebitFlag?: string;
+    offsetAccountCode?: string;
+    notes?: string;
+  }[]) => { success: boolean; count: number; error?: string };
+  getCustomerStatementData: (customerId: string, dateRange?: { startDate?: string; endDate?: string }) => CustomerStatementData;
 
   // Period Lock & Fiscal Year Close
   toggleFiscalPeriodStatus: (periodId: string, newStatus: 'OPEN' | 'LOCKED' | 'CLOSED') => void;
@@ -161,6 +282,15 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [taxJurisdictions, setTaxJurisdictions] = useState<TaxJurisdiction[]>(INITIAL_TAX_JURISDICTIONS);
   const [enterpriseUsers, setEnterpriseUsers] = useState<EnterpriseUser[]>(INITIAL_ENTERPRISE_USERS);
   const [customRoles] = useState<CustomRoleDefinition[]>(INITIAL_CUSTOM_ROLES);
+  const [customers, setCustomers] = useState<CustomerContact[]>(mockCustomerContacts);
+  const [vendors, setVendors] = useState<VendorContact[]>(mockVendorContacts);
+  const [customAttributeDefinitions, setCustomAttributeDefinitions] = useState<CustomAttributeDefinition[]>(mockCustomAttributeDefinitions);
+  const [productsServices, setProductsServices] = useState<ProductServiceItem[]>(mockProductServices);
+  const [priceChangeHistory, setPriceChangeHistory] = useState<PriceChangeHistoryEntry[]>(mockPriceChangeHistory);
+  const [invoiceTemplates, setInvoiceTemplates] = useState<InvoiceTemplate[]>(mockInvoiceTemplates);
+  const [bulkInvoiceBatches, setBulkInvoiceBatches] = useState<BulkInvoiceBatchRun[]>(INITIAL_BULK_BATCHES);
+  const [paymentReceipts, setPaymentReceipts] = useState<CustomerPaymentReceipt[]>(INITIAL_PAYMENT_RECEIPTS);
+  const [openingBalances, setOpeningBalances] = useState<CustomerOpeningBalanceRecord[]>(INITIAL_OPENING_BALANCES);
 
   // Active Tenant object
   const activeTenant = useMemo(() => {
@@ -1705,6 +1835,1438 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return false;
   };
 
+  // --- Entity Master & Dynamic Attributes Management ---
+  const createCustomer = (customerData: Omit<CustomerContact, 'id' | 'createdAt'>) => {
+    const newCust: CustomerContact = {
+      ...customerData,
+      id: `cust-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+
+    setCustomers((prev) => [newCust, ...prev]);
+
+    addAuditLog({
+      action: 'INVOICE_CREATE',
+      tenantId: customerData.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Created Customer Profile: ${newCust.name} (${newCust.code}) - Category: ${newCust.category || 'General'}`,
+      status: 'SUCCESS',
+      payloadSummary: `Custom Attributes: ${Object.keys(newCust.customAttributes || {}).length} configured`,
+    });
+
+    return { success: true, customer: newCust };
+  };
+
+  const updateCustomer = (id: string, updates: Partial<CustomerContact>) => {
+    setCustomers((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updates } : c))
+    );
+    const target = customers.find((c) => c.id === id);
+    if (target) {
+      addAuditLog({
+        action: 'CUSTOMER_UPDATE',
+        tenantId: target.tenantId || activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Updated Customer Profile: ${target.name} (${target.code})`,
+        status: 'SUCCESS',
+        payloadSummary: `Updated fields: ${Object.keys(updates).join(', ')}`,
+      });
+    }
+    return { success: true };
+  };
+
+  const deleteCustomer = (id: string) => {
+    const target = customers.find((c) => c.id === id);
+    if (target) {
+      addAuditLog({
+        action: 'CUSTOMER_DELETE',
+        tenantId: target.tenantId || activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Deleted Customer Profile: ${target.name} (${target.code})`,
+        status: 'SUCCESS',
+      });
+    }
+    setCustomers((prev) => prev.filter((c) => c.id !== id));
+    return { success: true };
+  };
+
+  const batchCreateCustomers = (
+    customersList: Array<Omit<CustomerContact, 'id' | 'createdAt'>>,
+    strategy: 'append' | 'upsert' = 'upsert'
+  ) => {
+    let createdCount = 0;
+    let updatedCount = 0;
+    let skippedCount = 0;
+    const errors: string[] = [];
+    const today = new Date().toISOString().split('T')[0];
+
+    setCustomers((prev) => {
+      let currentList = [...prev];
+
+      customersList.forEach((incoming, idx) => {
+        const existingIdx = currentList.findIndex(
+          (c) => c.code.toLowerCase() === incoming.code.toLowerCase()
+        );
+
+        if (existingIdx !== -1) {
+          if (strategy === 'upsert') {
+            currentList[existingIdx] = {
+              ...currentList[existingIdx],
+              ...incoming,
+              customAttributes: {
+                ...currentList[existingIdx].customAttributes,
+                ...incoming.customAttributes,
+              },
+            };
+            updatedCount++;
+          } else {
+            skippedCount++;
+          }
+        } else {
+          const newCust: CustomerContact = {
+            ...incoming,
+            id: `cust-imp-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 5)}`,
+            createdAt: today,
+          };
+          currentList.push(newCust);
+          createdCount++;
+        }
+      });
+
+      return currentList;
+    });
+
+    addAuditLog({
+      action: 'CUSTOMER_BATCH_UPLOAD',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Customer Batch Upload (${strategy.toUpperCase()} mode): ${createdCount} Created, ${updatedCount} Updated, ${skippedCount} Skipped`,
+      status: 'SUCCESS',
+      payloadSummary: `Total Batch Rows Processed: ${customersList.length}`,
+    });
+
+    return {
+      success: true,
+      createdCount,
+      updatedCount,
+      skippedCount,
+      errors,
+    };
+  };
+
+  const createVendor = (vendorData: Omit<VendorContact, 'id' | 'createdAt'>) => {
+    const newVend: VendorContact = {
+      ...vendorData,
+      id: `vend-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      createdAt: new Date().toISOString().split('T')[0],
+    };
+
+    setVendors((prev) => [newVend, ...prev]);
+
+    addAuditLog({
+      action: 'BILL_CREATE',
+      tenantId: vendorData.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Created Vendor Profile: ${newVend.name} (${newVend.code}) - Category: ${newVend.category || 'General'}`,
+      status: 'SUCCESS',
+      payloadSummary: `Expense Account: ${newVend.defaultExpenseAccountCode || 'Default'}`,
+    });
+
+    return { success: true, vendor: newVend };
+  };
+
+  const updateVendor = (id: string, updates: Partial<VendorContact>) => {
+    setVendors((prev) =>
+      prev.map((v) => (v.id === id ? { ...v, ...updates } : v))
+    );
+    return { success: true };
+  };
+
+  const deleteVendor = (id: string) => {
+    setVendors((prev) => prev.filter((v) => v.id !== id));
+    return { success: true };
+  };
+
+  const createCustomAttribute = (attrData: Omit<CustomAttributeDefinition, 'id'>) => {
+    const newAttr: CustomAttributeDefinition = {
+      ...attrData,
+      id: `attr-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    };
+
+    setCustomAttributeDefinitions((prev) => [...prev, newAttr]);
+
+    addAuditLog({
+      action: 'ATTRIBUTE_CREATE',
+      tenantId: attrData.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Registered Custom Schema Attribute on the fly: "${newAttr.name}" (${newAttr.dataType})`,
+      status: 'SUCCESS',
+      payloadSummary: `Key: ${newAttr.key} | Target: ${newAttr.targetEntity} | Required: ${newAttr.isRequired ? 'Yes' : 'No'} | Unit: ${newAttr.unitOrSuffix || 'None'}`,
+    });
+
+    return { success: true, attribute: newAttr };
+  };
+
+  const deleteCustomAttribute = (id: string) => {
+    const target = customAttributeDefinitions.find((a) => a.id === id);
+    if (target) {
+      addAuditLog({
+        action: 'ATTRIBUTE_DELETE',
+        tenantId: target.tenantId || activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Deleted Custom Schema Attribute: "${target.name}" (${target.key})`,
+        status: 'SUCCESS',
+      });
+    }
+    setCustomAttributeDefinitions((prev) => prev.filter((a) => a.id !== id));
+    return { success: true };
+  };
+
+  const applyIndustryPresetAttributes = (preset: IndustryPresetType, tenantId: string) => {
+    const presetDefinitions = mockCustomAttributeDefinitions.filter(
+      (a) => a.industryPreset === preset
+    );
+
+    let count = 0;
+    setCustomAttributeDefinitions((prev) => {
+      const existingKeys = new Set(prev.map((a) => a.key));
+      const additions = presetDefinitions
+        .filter((a) => !existingKeys.has(a.key))
+        .map((a) => ({
+          ...a,
+          id: `attr-${preset.toLowerCase()}-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+          tenantId,
+        }));
+      count = additions.length;
+      return [...prev, ...additions];
+    });
+
+    return { success: true, count };
+  };
+
+  // --- Products & Services Catalog Management ---
+  const createProductService = (data: Omit<ProductServiceItem, 'id' | 'createdAt'>) => {
+    const newId = `prod-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const today = new Date().toISOString().split('T')[0];
+    const initialPriceHistory: PriceChangeHistoryEntry = {
+      id: `pch-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      itemId: newId,
+      itemCode: data.code,
+      itemName: data.name,
+      tenantId: data.tenantId || activeTenant.id,
+      oldPrice: 0,
+      newPrice: data.unitPrice,
+      currency: activeTenant.currency,
+      changeDate: new Date().toISOString(),
+      effectiveDate: today,
+      changedBy: userEmail,
+      changedRole: activeRole,
+      reason: 'Initial item creation & base price configuration',
+      changePercentage: 100,
+      notes: 'Initial catalog creation',
+    };
+
+    const newItem: ProductServiceItem = {
+      ...data,
+      id: newId,
+      createdAt: today,
+      lastPriceUpdatedAt: today,
+      lastPriceUpdatedBy: userEmail,
+      lastPriceChangeReason: 'Initial item creation & base price configuration',
+      priceHistory: [initialPriceHistory],
+    };
+
+    setProductsServices((prev) => [newItem, ...prev]);
+    setPriceChangeHistory((prev) => [initialPriceHistory, ...prev]);
+
+    addAuditLog({
+      action: 'PRODUCT_CREATE',
+      tenantId: data.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Created Catalog ${newItem.type}: "${newItem.name}" (${newItem.code}) - Base Price: ${activeTenant.currency} ${newItem.unitPrice.toFixed(2)} / ${newItem.unitOfMeasure || 'unit'}`,
+      status: 'SUCCESS',
+      payloadSummary: `Category: ${newItem.category} | Default Tax: ${newItem.defaultTaxRate || 0}% | Account: ${newItem.defaultRevenueAccountCode || '4010'}`,
+    });
+
+    return { success: true, item: newItem };
+  };
+
+  const updateProductPrice = (
+    itemId: string,
+    newPrice: number,
+    reason: string,
+    effectiveDate?: string,
+    notes?: string
+  ) => {
+    const item = productsServices.find((p) => p.id === itemId);
+    if (!item) {
+      return { success: false, error: 'Product or Service not found' };
+    }
+
+    if (newPrice < 0 || isNaN(newPrice)) {
+      return { success: false, error: 'Price must be a valid non-negative number' };
+    }
+
+    const oldPrice = item.unitPrice;
+    const changeDate = new Date().toISOString();
+    const effective = effectiveDate || new Date().toISOString().split('T')[0];
+    const changePercentage = oldPrice > 0 ? ((newPrice - oldPrice) / oldPrice) * 100 : 0;
+
+    const historyEntry: PriceChangeHistoryEntry = {
+      id: `pch-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      itemId: item.id,
+      itemCode: item.code,
+      itemName: item.name,
+      tenantId: item.tenantId || activeTenant.id,
+      oldPrice,
+      newPrice,
+      currency: activeTenant.currency,
+      changeDate,
+      effectiveDate: effective,
+      changedBy: userEmail,
+      changedRole: activeRole,
+      reason: reason || 'Standard catalog price revision',
+      changePercentage: Number(changePercentage.toFixed(2)),
+      notes: notes || undefined,
+    };
+
+    // Update in-memory price history
+    setPriceChangeHistory((prev) => [historyEntry, ...prev]);
+
+    // Update product item
+    setProductsServices((prev) =>
+      prev.map((p) => {
+        if (p.id !== itemId) return p;
+        const currentHist = p.priceHistory || [];
+        return {
+          ...p,
+          unitPrice: newPrice,
+          lastPriceUpdatedAt: effective,
+          lastPriceUpdatedBy: userEmail,
+          lastPriceChangeReason: reason,
+          priceHistory: [historyEntry, ...currentHist],
+        };
+      })
+    );
+
+    const deltaSign = newPrice >= oldPrice ? '+' : '';
+    const diff = Math.abs(newPrice - oldPrice).toFixed(2);
+    const diffPct = changePercentage.toFixed(1);
+
+    addAuditLog({
+      action: 'PRODUCT_PRICE_UPDATE',
+      tenantId: item.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Price Revision for [${item.code}] "${item.name}": ${activeTenant.currency} ${oldPrice.toFixed(2)} → ${activeTenant.currency} ${newPrice.toFixed(2)} (${deltaSign}${activeTenant.currency}${diff}, ${deltaSign}${diffPct}%)`,
+      status: 'SUCCESS',
+      payloadSummary: `Reason: ${reason} | Effective: ${effective} | Authorized By: ${userEmail} (${activeRole}) ${notes ? `| Notes: ${notes}` : ''}`,
+    });
+
+    return { success: true, historyEntry };
+  };
+
+  const updateProductService = (id: string, updates: Partial<ProductServiceItem>, reason?: string) => {
+    const existing = productsServices.find((p) => p.id === id);
+    if (!existing) return { success: false, error: 'Item not found' };
+
+    // If unit price has changed, trigger price update workflow
+    if (updates.unitPrice !== undefined && updates.unitPrice !== existing.unitPrice) {
+      updateProductPrice(
+        id,
+        updates.unitPrice,
+        reason || 'Direct catalog item specification update',
+        undefined,
+        'Updated via item details editor'
+      );
+    }
+
+    setProductsServices((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, ...updates } : p))
+    );
+
+    addAuditLog({
+      action: 'PRODUCT_UPDATE',
+      tenantId: existing.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated Catalog Item details: "${existing.name}" (${existing.code})`,
+      status: 'SUCCESS',
+      payloadSummary: `Updated fields: ${Object.keys(updates).join(', ')} | User: ${userEmail}`,
+    });
+
+    return { success: true };
+  };
+
+  const deleteProductService = (id: string) => {
+    const existing = productsServices.find((p) => p.id === id);
+    if (existing) {
+      addAuditLog({
+        action: 'PRODUCT_DELETE',
+        tenantId: existing.tenantId || activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Archived/Deleted Catalog Item: "${existing.name}" (${existing.code})`,
+        status: 'SUCCESS',
+        payloadSummary: `Type: ${existing.type} | Category: ${existing.category} | Final Price: ${activeTenant.currency} ${existing.unitPrice}`,
+      });
+    }
+    setProductsServices((prev) => prev.filter((p) => p.id !== id));
+    return { success: true };
+  };
+
+  const applyIndustryPresetProducts = (preset: IndustryPresetType, tenantId: string) => {
+    let presetItems: ProductServiceItem[] = [];
+    if (preset === 'HOUSING_SOCIETY') {
+      presetItems = mockProductServices.filter((p) => p.category.includes('HOA') || p.category.includes('Amenities') || p.category.includes('Utilities'));
+    } else if (preset === 'SCHOOL') {
+      presetItems = mockProductServices.filter((p) => p.category.includes('Education') || p.category.includes('Student') || p.category.includes('Lab') || p.category.includes('Uniform'));
+    } else if (preset === 'HOSPITAL') {
+      presetItems = mockProductServices.filter((p) => p.category.includes('Medical') || p.category.includes('Room') || p.category.includes('Diagnostics') || p.category.includes('Pharma'));
+    } else {
+      // SAAS or GENERIC / CUSTOM
+      presetItems = mockProductServices.filter((p) => p.category.includes('Software') || p.category.includes('Professional') || p.category.includes('Advisory'));
+    }
+
+    let count = 0;
+    setProductsServices((prev) => {
+      const existingCodes = new Set(prev.map((p) => p.code));
+      const additions = presetItems
+        .filter((p) => !existingCodes.has(p.code))
+        .map((p) => ({
+          ...p,
+          id: `prod-${preset.toLowerCase()}-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+          tenantId,
+        }));
+      count = additions.length;
+      return [...prev, ...additions];
+    });
+
+    return { success: true, count };
+  };
+
+  // --- Invoice Templates Management Engine ---
+  const createInvoiceTemplate = (
+    templateData: Omit<InvoiceTemplate, 'id' | 'createdAt' | 'usageCount'>
+  ) => {
+    const newId = `tmpl-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const now = new Date().toISOString();
+
+    const newTemplate: InvoiceTemplate = {
+      ...templateData,
+      id: newId,
+      code: templateData.code.trim().toUpperCase(),
+      createdAt: now,
+      updatedAt: now,
+      usageCount: 0,
+      items: templateData.items.map((item, idx) => ({
+        ...item,
+        id: item.id || `tmpl-item-${Date.now()}-${idx}`,
+        amount: Math.round(item.quantity * item.unitPrice * 100) / 100,
+      })),
+    };
+
+    setInvoiceTemplates((prev) => [newTemplate, ...prev]);
+
+    addAuditLog({
+      action: 'TEMPLATE_CREATE',
+      tenantId: templateData.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Created reusable Invoice Template: "${newTemplate.name}" (${newTemplate.code}) with ${newTemplate.items.length} pre-configured line items.`,
+      status: 'SUCCESS',
+      payloadSummary: `Category: ${newTemplate.category} | Terms: Net ${newTemplate.defaultPaymentTermsDays || 30} Days | Revenue Account: ${newTemplate.defaultRevenueAccountCode || '4010'}`,
+    });
+
+    return { success: true, template: newTemplate };
+  };
+
+  const updateInvoiceTemplate = (id: string, updates: Partial<InvoiceTemplate>) => {
+    const existing = invoiceTemplates.find((t) => t.id === id);
+    if (!existing) return { success: false, error: 'Invoice template not found' };
+
+    const now = new Date().toISOString();
+    const updatedItems = updates.items
+      ? updates.items.map((item, idx) => ({
+          ...item,
+          id: item.id || `tmpl-item-${Date.now()}-${idx}`,
+          amount: Math.round(item.quantity * item.unitPrice * 100) / 100,
+        }))
+      : existing.items;
+
+    setInvoiceTemplates((prev) =>
+      prev.map((t) =>
+        t.id === id
+          ? {
+              ...t,
+              ...updates,
+              code: updates.code ? updates.code.trim().toUpperCase() : t.code,
+              items: updatedItems,
+              updatedAt: now,
+            }
+          : t
+      )
+    );
+
+    addAuditLog({
+      action: 'TEMPLATE_UPDATE',
+      tenantId: existing.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated Invoice Template: "${existing.name}" (${existing.code})`,
+      status: 'SUCCESS',
+      payloadSummary: `Updated fields: ${Object.keys(updates).join(', ')}`,
+    });
+
+    return { success: true };
+  };
+
+  const deleteInvoiceTemplate = (id: string) => {
+    const existing = invoiceTemplates.find((t) => t.id === id);
+    if (existing) {
+      addAuditLog({
+        action: 'TEMPLATE_DELETE',
+        tenantId: existing.tenantId || activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Deleted/Archived Invoice Template: "${existing.name}" (${existing.code})`,
+        status: 'SUCCESS',
+        payloadSummary: `Category: ${existing.category} | Prior Usage Count: ${existing.usageCount}`,
+      });
+    }
+    setInvoiceTemplates((prev) => prev.filter((t) => t.id !== id));
+    return { success: true };
+  };
+
+  const duplicateInvoiceTemplate = (id: string) => {
+    const existing = invoiceTemplates.find((t) => t.id === id);
+    if (!existing) return { success: false, error: 'Template not found to duplicate' };
+
+    const newId = `tmpl-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const now = new Date().toISOString();
+    const duplicated: InvoiceTemplate = {
+      ...existing,
+      id: newId,
+      code: `${existing.code}-COPY`,
+      name: `${existing.name} (Copy)`,
+      createdAt: now,
+      updatedAt: now,
+      usageCount: 0,
+      items: existing.items.map((item, idx) => ({
+        ...item,
+        id: `tmpl-item-copy-${Date.now()}-${idx}`,
+      })),
+    };
+
+    setInvoiceTemplates((prev) => [duplicated, ...prev]);
+
+    addAuditLog({
+      action: 'TEMPLATE_CREATE',
+      tenantId: existing.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Duplicated Invoice Template: "${existing.name}" → "${duplicated.name}" (${duplicated.code})`,
+      status: 'SUCCESS',
+      payloadSummary: `Cloned ${duplicated.items.length} line items from source template ${existing.id}`,
+    });
+
+    return { success: true, template: duplicated };
+  };
+
+  const incrementTemplateUsage = (templateId: string) => {
+    setInvoiceTemplates((prev) =>
+      prev.map((t) => (t.id === templateId ? { ...t, usageCount: (t.usageCount || 0) + 1 } : t))
+    );
+  };
+
+  // Bulk Invoice Generation & Batch Operations Engine
+  const batchCreateInvoices = (params: {
+    title: string;
+    groupingAttributeKey: string;
+    groupingAttributeName: string;
+    invoicesData: Omit<CustomerInvoice, 'id' | 'invoiceNumber' | 'amountPaid' | 'status'>[];
+    groupBreakdowns: {
+      groupId: string;
+      groupName: string;
+      templateCode: string;
+      templateName: string;
+      customerCount: number;
+      groupTotalAmount: number;
+    }[];
+    templateIdsUsed: string[];
+  }) => {
+    const {
+      title,
+      groupingAttributeKey,
+      groupingAttributeName,
+      invoicesData,
+      groupBreakdowns,
+      templateIdsUsed,
+    } = params;
+
+    if (!invoicesData || invoicesData.length === 0) {
+      return { success: false, createdInvoicesCount: 0, error: 'No invoices provided to generate in batch' };
+    }
+
+    const currentYear = new Date().getFullYear();
+    const batchId = `bat-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const batchNumber = `BAT-${currentYear}-${String(bulkInvoiceBatches.length + 1).padStart(3, '0')}`;
+
+    let lastNum = invoices.length;
+    const newInvoices: CustomerInvoice[] = [];
+    const generatedInvoiceIds: string[] = [];
+    let totalBatchAmount = 0;
+    let totalTaxAmount = 0;
+
+    invoicesData.forEach((invData) => {
+      lastNum += 1;
+      const invId = `inv-batch-${Date.now()}-${lastNum}-${Math.random().toString(36).substring(2, 4)}`;
+      const invNumber = `INV-${currentYear}-${String(lastNum).padStart(4, '0')}`;
+
+      const newInv: CustomerInvoice = {
+        ...invData,
+        id: invId,
+        invoiceNumber: invNumber,
+        amountPaid: 0,
+        status: 'UNPAID',
+      };
+
+      newInvoices.push(newInv);
+      generatedInvoiceIds.push(invId);
+      totalBatchAmount += newInv.totalAmount;
+      totalTaxAmount += (newInv.taxTotal || 0);
+
+      // Post Balanced Journal Entry into General Ledger for Subledger consistency
+      const issueDate = newInv.issueDate || new Date().toISOString().split('T')[0];
+      const revAccCode = newInv.revenueAccountCode || '4010';
+      const arAcc = accounts.find((a) => a.code === '1100') || accounts[0];
+      const revAcc = accounts.find((a) => a.code === revAccCode) || accounts[1] || arAcc;
+      const taxAcc = accounts.find((a) => a.code === '2110') || accounts[2] || arAcc;
+
+      const lines: JournalLine[] = [
+        {
+          id: `jl-ar-${invId}`,
+          accountId: arAcc.id,
+          accountCode: arAcc.code,
+          accountName: arAcc.name,
+          debit: newInv.totalAmount,
+          credit: 0,
+          memo: `Batch Invoice ${invNumber} for ${newInv.customerName} (${batchNumber})`,
+        },
+        {
+          id: `jl-rev-${invId}`,
+          accountId: revAcc.id,
+          accountCode: revAcc.code,
+          accountName: revAcc.name,
+          debit: 0,
+          credit: newInv.subtotal,
+          memo: `Revenue from ${invNumber} (${batchNumber})`,
+        },
+      ];
+
+      if (newInv.taxTotal && newInv.taxTotal > 0) {
+        lines.push({
+          id: `jl-tax-${invId}`,
+          accountId: taxAcc.id,
+          accountCode: taxAcc.code,
+          accountName: taxAcc.name,
+          debit: 0,
+          credit: newInv.taxTotal,
+          memo: `Tax on Batch Invoice ${invNumber}`,
+        });
+      }
+
+      postJournalEntry({
+        tenantId: newInv.tenantId || activeTenant.id,
+        organizationId: activeOrgId || undefined,
+        branchId: activeBranchId || undefined,
+        date: issueDate,
+        description: `Batch AR Invoice: ${invNumber} - ${newInv.customerName} [${title}]`,
+        reference: invNumber,
+        pluginId: activeTenant.pluginId,
+        lines,
+      });
+    });
+
+    // Update Invoices state
+    setInvoices((prev) => [...newInvoices, ...prev]);
+
+    // Increment usage for templates used
+    templateIdsUsed.forEach((tid) => {
+      incrementTemplateUsage(tid);
+    });
+
+    const newBatchRun: BulkInvoiceBatchRun = {
+      id: batchId,
+      batchNumber,
+      tenantId: activeTenant.id,
+      title,
+      createdAt: new Date().toISOString(),
+      createdBy: userEmail,
+      groupingAttributeKey,
+      groupingAttributeName,
+      groupsCount: groupBreakdowns.length,
+      totalCustomers: invoicesData.length,
+      totalInvoicesGenerated: newInvoices.length,
+      totalBatchAmount: Math.round(totalBatchAmount * 100) / 100,
+      totalTaxAmount: Math.round(totalTaxAmount * 100) / 100,
+      generatedInvoiceIds,
+      status: 'COMMITTED',
+      groupBreakdowns,
+    };
+
+    setBulkInvoiceBatches((prev) => [newBatchRun, ...prev]);
+
+    addAuditLog({
+      action: 'INVOICE_BATCH_GENERATE',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Generated Bulk Invoicing Batch ${batchNumber} (${title}). Generated ${newInvoices.length} invoices across ${groupBreakdowns.length} customer groups.`,
+      status: 'SUCCESS',
+      payloadSummary: `Total Batch Amount: ${activeTenant.currency} ${totalBatchAmount.toFixed(2)} | Groups: ${groupBreakdowns.map((g) => `${g.groupName} (${g.customerCount})`).join(', ')}`,
+    });
+
+    return {
+      success: true,
+      batchRun: newBatchRun,
+      createdInvoicesCount: newInvoices.length,
+    };
+  };
+
+  const rollbackInvoiceBatch = (batchId: string, reason: string = 'User batch rollback request') => {
+    const targetBatch = bulkInvoiceBatches.find((b) => b.id === batchId);
+    if (!targetBatch) {
+      return { success: false, error: 'Batch run not found' };
+    }
+
+    if (targetBatch.status === 'ROLLED_BACK') {
+      return { success: false, error: 'Batch has already been rolled back' };
+    }
+
+    const idsToRollback = new Set(targetBatch.generatedInvoiceIds);
+
+    // 1. Mark target invoices as VOID or filter them
+    setInvoices((prev) =>
+      prev.map((inv) => (idsToRollback.has(inv.id) ? { ...inv, status: 'VOID' as any } : inv))
+    );
+
+    // 2. Update batch status to ROLLED_BACK
+    setBulkInvoiceBatches((prev) =>
+      prev.map((b) => (b.id === batchId ? { ...b, status: 'ROLLED_BACK' as const } : b))
+    );
+
+    addAuditLog({
+      action: 'INVOICE_BATCH_ROLLBACK',
+      tenantId: targetBatch.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Rolled back Bulk Invoicing Batch ${targetBatch.batchNumber} (${targetBatch.title}). Voided ${targetBatch.totalInvoicesGenerated} invoices. Reason: ${reason}`,
+      status: 'SUCCESS',
+      payloadSummary: `Reversed Batch Value: ${activeTenant.currency} ${targetBatch.totalBatchAmount.toFixed(2)} | Invoice IDs: ${targetBatch.generatedInvoiceIds.slice(0, 5).join(', ')}...`,
+    });
+
+    return { success: true };
+  };
+
+  // Advanced Customer AR, Payment Receipts & Opening Balances Engine
+  const recordCustomerPaymentReceipt = (params: {
+    customerId: string;
+    paymentDate: string;
+    paymentMethod: PaymentMethodType;
+    bankAccountId: string;
+    referenceNumber?: string;
+    totalAmountReceived: number;
+    allocations: { invoiceId: string; invoiceNumber: string; allocatedAmount: number; discountAmount?: number; writeOffAmount?: number }[];
+    notes?: string;
+  }) => {
+    const {
+      customerId,
+      paymentDate,
+      paymentMethod,
+      bankAccountId,
+      referenceNumber,
+      totalAmountReceived,
+      allocations,
+      notes,
+    } = params;
+
+    const customer = customers.find((c) => c.id === customerId);
+    const customerName = customer?.name || 'Customer';
+    const customerEmail = customer?.email || '';
+
+    const allocatedSum = allocations.reduce((sum, a) => sum + (Number(a.allocatedAmount) || 0), 0);
+    const discountSum = allocations.reduce((sum, a) => sum + (Number(a.discountAmount) || 0), 0);
+    const unallocatedCreditAmount = Math.max(0, totalAmountReceived - allocatedSum);
+
+    const receiptId = `rct-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const receiptNumber = `RCT-${new Date().getFullYear()}-${String(paymentReceipts.length + 1).padStart(3, '0')}`;
+
+    // 1. Update Invoices state
+    setInvoices((prev) =>
+      prev.map((inv) => {
+        const alloc = allocations.find((a) => a.invoiceId === inv.id);
+        if (!alloc) return inv;
+        const addPaid = (Number(alloc.allocatedAmount) || 0) + (Number(alloc.discountAmount) || 0);
+        const updatedPaid = inv.amountPaid + addPaid;
+        const updatedStatus = updatedPaid >= inv.totalAmount ? 'PAID' : 'PARTIALLY_PAID';
+        return {
+          ...inv,
+          amountPaid: updatedPaid,
+          status: updatedStatus,
+        };
+      })
+    );
+
+    // 2. Update Opening Balances if allocated
+    setOpeningBalances((prev) =>
+      prev.map((opb) => {
+        const alloc = allocations.find((a) => a.invoiceId === opb.invoiceId);
+        if (!alloc) return opb;
+        const addPaid = (Number(alloc.allocatedAmount) || 0) + (Number(alloc.discountAmount) || 0);
+        const updatedPaid = opb.amountPaid + addPaid;
+        const currentBal = Math.max(0, opb.originalAmount - updatedPaid);
+        return {
+          ...opb,
+          amountPaid: updatedPaid,
+          currentBalance: currentBal,
+        };
+      })
+    );
+
+    // 3. Post GL Journal Entry
+    const currentAccs = accountsMap[activeTenant.id] || [];
+    const bankAcc = currentAccs.find((a) => a.id === bankAccountId || a.code === '1010') || currentAccs.find((a) => a.type === 'ASSET');
+    const arAcc = currentAccs.find((a) => a.code === '1100') || currentAccs.find((a) => a.type === 'ASSET');
+    const discountAcc = currentAccs.find((a) => a.code === '4090' || a.code === '5010') || currentAccs.find((a) => a.type === 'EXPENSE');
+    const advanceLiabilityAcc = currentAccs.find((a) => a.code === '2150' || a.code === '2010') || currentAccs.find((a) => a.type === 'LIABILITY');
+
+    const lines: JournalLine[] = [];
+    if (bankAcc && totalAmountReceived > 0) {
+      lines.push({
+        id: `jl-rct-bank-${Date.now()}`,
+        accountId: bankAcc.id,
+        accountCode: bankAcc.code,
+        accountName: bankAcc.name,
+        debit: totalAmountReceived,
+        credit: 0,
+        memo: `Payment Receipt #${receiptNumber} from ${customerName}`,
+      });
+    }
+
+    if (discountSum > 0 && discountAcc) {
+      lines.push({
+        id: `jl-rct-disc-${Date.now()}`,
+        accountId: discountAcc.id,
+        accountCode: discountAcc.code,
+        accountName: discountAcc.name,
+        debit: discountSum,
+        credit: 0,
+        memo: `Early Payment Discount (${customerName})`,
+      });
+    }
+
+    const totalArCredit = allocatedSum + discountSum;
+    if (arAcc && totalArCredit > 0) {
+      lines.push({
+        id: `jl-rct-ar-${Date.now()}`,
+        accountId: arAcc.id,
+        accountCode: arAcc.code,
+        accountName: arAcc.name,
+        debit: 0,
+        credit: totalArCredit,
+        memo: `Clear AR for ${allocations.map((a) => a.invoiceNumber).join(', ') || 'Invoices'}`,
+      });
+    }
+
+    if (unallocatedCreditAmount > 0 && advanceLiabilityAcc) {
+      lines.push({
+        id: `jl-rct-adv-${Date.now()}`,
+        accountId: advanceLiabilityAcc.id,
+        accountCode: advanceLiabilityAcc.code,
+        accountName: advanceLiabilityAcc.name,
+        debit: 0,
+        credit: unallocatedCreditAmount,
+        memo: `Customer Advance / Excess Deposit for ${customerName}`,
+      });
+    }
+
+    let postedJournalId: string | undefined;
+    if (lines.length > 0) {
+      const jeRes = postJournalEntry({
+        tenantId: activeTenant.id,
+        organizationId: activeOrganization?.id,
+        branchId: activeBranch?.id,
+        date: paymentDate,
+        description: `Customer Payment Receipt #${receiptNumber} - ${customerName} (${paymentMethod})`,
+        reference: referenceNumber || receiptNumber,
+        pluginId: activePlugin,
+        lines,
+      });
+      postedJournalId = jeRes.entryId;
+    }
+
+    const newReceipt: CustomerPaymentReceipt = {
+      id: receiptId,
+      receiptNumber,
+      tenantId: activeTenant.id,
+      customerId,
+      customerName,
+      customerEmail,
+      paymentDate,
+      paymentMethod,
+      bankAccountId,
+      bankAccountName: bankAcc?.name || 'Operating Bank Account',
+      referenceNumber,
+      totalAmountReceived,
+      allocatedAmount: allocatedSum,
+      unallocatedCreditAmount,
+      allocations,
+      discountTotal: discountSum,
+      notes,
+      createdAt: new Date().toISOString(),
+      journalEntryId: postedJournalId,
+      status: 'POSTED',
+    };
+
+    setPaymentReceipts((prev) => [newReceipt, ...prev]);
+
+    addAuditLog({
+      action: 'PAYMENT_RECEIPT_CREATE',
+      tenantId: activeTenant.id,
+      organizationId: activeOrganization?.id,
+      branchId: activeBranch?.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Recorded Customer Payment Receipt #${receiptNumber} for ${customerName} (${totalAmountReceived} ${activeTenant.currency}) via ${paymentMethod}`,
+      status: 'SUCCESS',
+      payloadSummary: `Allocated: ${allocatedSum} | Advance Credit: ${unallocatedCreditAmount} | Invoices: ${allocations.map((a) => a.invoiceNumber).join(', ') || 'Advance Only'}`,
+    });
+
+    return { success: true, receipt: newReceipt };
+  };
+
+  const voidPaymentReceipt = (receiptId: string, reason?: string) => {
+    const rct = paymentReceipts.find((r) => r.id === receiptId);
+    if (!rct) return { success: false, error: 'Payment receipt not found.' };
+    if (rct.status === 'VOIDED') return { success: false, error: 'Receipt is already voided.' };
+
+    // Reverse invoice paid amounts
+    setInvoices((prev) =>
+      prev.map((inv) => {
+        const alloc = rct.allocations.find((a) => a.invoiceId === inv.id);
+        if (!alloc) return inv;
+        const deductPaid = (Number(alloc.allocatedAmount) || 0) + (Number(alloc.discountAmount) || 0);
+        const updatedPaid = Math.max(0, inv.amountPaid - deductPaid);
+        const updatedStatus = updatedPaid === 0 ? 'UNPAID' : updatedPaid >= inv.totalAmount ? 'PAID' : 'PARTIALLY_PAID';
+        return {
+          ...inv,
+          amountPaid: updatedPaid,
+          status: updatedStatus,
+        };
+      })
+    );
+
+    // Reverse opening balance paid amounts
+    setOpeningBalances((prev) =>
+      prev.map((opb) => {
+        const alloc = rct.allocations.find((a) => a.invoiceId === opb.invoiceId);
+        if (!alloc) return opb;
+        const deductPaid = (Number(alloc.allocatedAmount) || 0) + (Number(alloc.discountAmount) || 0);
+        const updatedPaid = Math.max(0, opb.amountPaid - deductPaid);
+        const currentBal = Math.max(0, opb.originalAmount - updatedPaid);
+        return {
+          ...opb,
+          amountPaid: updatedPaid,
+          currentBalance: currentBal,
+        };
+      })
+    );
+
+    setPaymentReceipts((prev) =>
+      prev.map((r) =>
+        r.id === receiptId
+          ? {
+              ...r,
+              status: 'VOIDED',
+              notes: `${r.notes || ''} [VOIDED: ${reason || 'User voided'}]`,
+            }
+          : r
+      )
+    );
+
+    if (rct.journalEntryId) {
+      reverseJournalEntry(rct.journalEntryId, `Reversal of voided Payment Receipt #${rct.receiptNumber} (${reason || 'Voided'})`);
+    }
+
+    addAuditLog({
+      action: 'PAYMENT_RECEIPT_VOID',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Voided Customer Payment Receipt #${rct.receiptNumber} for ${rct.customerName} (${rct.totalAmountReceived} ${activeTenant.currency})`,
+      status: 'SUCCESS',
+      payloadSummary: `Reason: ${reason || 'Voided by user'}`,
+    });
+
+    return { success: true };
+  };
+
+  const recordOpeningBalanceInvoice = (params: {
+    customerId: string;
+    fiscalYear: string;
+    asOfDate: string;
+    originalInvoiceNumber: string;
+    originalInvoiceDate: string;
+    dueDate: string;
+    openingAmount: number;
+    balanceType?: 'DR' | 'CR';
+    offsetAccountCode?: string;
+    notes?: string;
+  }) => {
+    const {
+      customerId,
+      fiscalYear,
+      asOfDate,
+      originalInvoiceNumber,
+      originalInvoiceDate,
+      dueDate,
+      openingAmount,
+      balanceType: explicitBalanceType,
+      offsetAccountCode = '3010',
+      notes,
+    } = params;
+
+    const customer = customers.find((c) => c.id === customerId);
+    if (!customer) return { success: false, error: 'Customer not found in master records.' };
+
+    const rawAmt = Number(openingAmount) || 0;
+    const absAmount = Math.abs(rawAmt);
+    if (absAmount === 0) {
+      return { success: false, error: 'Opening balance amount must be non-zero.' };
+    }
+
+    // Identify if Debit (Customer owes money) or Credit (Customer overpaid / Advance deposit)
+    const isCredit =
+      explicitBalanceType === 'CR' ||
+      rawAmt < 0 ||
+      (explicitBalanceType && explicitBalanceType.toUpperCase().startsWith('C'));
+    const balanceType: 'DR' | 'CR' = isCredit ? 'CR' : 'DR';
+
+    const invoiceId = `inv-op-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const cleanNum = (originalInvoiceNumber || `OPN-${customer.code || customer.id}`).trim();
+    const invoiceNumber = cleanNum.startsWith('OPN-') || cleanNum.startsWith('INV-') || cleanNum.startsWith('ADV-')
+      ? cleanNum
+      : `OPN-${cleanNum}`;
+
+    const newInvoice: CustomerInvoice = {
+      id: invoiceId,
+      invoiceNumber,
+      tenantId: activeTenant.id,
+      customerId,
+      customerName: customer.name,
+      customerEmail: customer.email,
+      issueDate: originalInvoiceDate || asOfDate,
+      dueDate: dueDate || asOfDate,
+      currency: activeTenant.currency,
+      items: [
+        {
+          description: isCredit
+            ? `Opening FY ${fiscalYear} Overpayment / Advance Credit Carryforward (#${cleanNum})`
+            : `Opening FY ${fiscalYear} Outstanding Receivable Carryforward (#${cleanNum})`,
+          quantity: 1,
+          unitPrice: absAmount,
+          amount: absAmount,
+          taxRate: 0,
+        },
+      ],
+      subtotal: absAmount,
+      taxTotal: 0,
+      totalAmount: absAmount,
+      amountPaid: isCredit ? absAmount : 0,
+      status: isCredit ? 'PAID' : 'UNPAID',
+      revenueAccountCode: offsetAccountCode,
+      isOpeningBalance: true,
+      balanceType,
+      fiscalYearOpening: fiscalYear,
+      offsetAccountCode,
+      notes: notes || (isCredit
+        ? `Opening customer advance / overpayment credit as of ${asOfDate} for ${fiscalYear}.`
+        : `Opening AR receivable balance carryforward as of ${asOfDate} for ${fiscalYear}.`),
+    };
+
+    const newOpeningRecord: CustomerOpeningBalanceRecord = {
+      id: `opb-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      tenantId: activeTenant.id,
+      customerId,
+      customerName: customer.name,
+      customerCode: customer.code,
+      fiscalYear,
+      asOfDate,
+      originalInvoiceNumber: cleanNum,
+      originalInvoiceDate: originalInvoiceDate || asOfDate,
+      dueDate: dueDate || asOfDate,
+      originalAmount: absAmount,
+      amountPaid: isCredit ? absAmount : 0,
+      currentBalance: isCredit ? -absAmount : absAmount,
+      balanceType,
+      offsetAccountCode,
+      invoiceId,
+      notes,
+      createdAt: new Date().toISOString(),
+    };
+
+    // If Credit (Customer Overpaid/Advance), also register an unallocated customer credit receipt
+    if (isCredit) {
+      const newCreditReceipt: CustomerPaymentReceipt = {
+        id: `rct-opb-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+        receiptNumber: invoiceNumber.startsWith('OPN-') ? invoiceNumber.replace('OPN-', 'ADV-OPN-') : `ADV-${invoiceNumber}`,
+        tenantId: activeTenant.id,
+        customerId,
+        customerName: customer.name,
+        customerEmail: customer.email,
+        paymentDate: asOfDate,
+        paymentMethod: 'OTHER',
+        bankAccountId: 'acc-1010-us',
+        bankAccountName: 'Opening Balance Equity Offset',
+        referenceNumber: cleanNum,
+        totalAmountReceived: absAmount,
+        allocatedAmount: 0,
+        unallocatedCreditAmount: absAmount,
+        allocations: [],
+        notes: notes || `Opening FY ${fiscalYear} advance credit balance / customer overpayment carryforward.`,
+        createdAt: new Date().toISOString(),
+        status: 'POSTED',
+      };
+      setPaymentReceipts((prev) => [newCreditReceipt, ...prev]);
+    }
+
+    setInvoices((prev) => [newInvoice, ...prev]);
+    setOpeningBalances((prev) => [newOpeningRecord, ...prev]);
+
+    // Post opening balance GL Journal Entry:
+    // If DR: Debit AR (1100), Credit Opening Balance Equity (3010)
+    // If CR: Debit Opening Balance Equity (3010), Credit AR / Advance Liability (1100/2030)
+    const currentAccs = accountsMap[activeTenant.id] || [];
+    const arAcc = currentAccs.find((a) => a.code === '1100') || currentAccs.find((a) => a.type === 'ASSET');
+    const equityAcc =
+      currentAccs.find((a) => a.code === offsetAccountCode) ||
+      currentAccs.find((a) => a.code === '3010' || a.code === '3200') ||
+      currentAccs.find((a) => a.type === 'EQUITY');
+
+    if (arAcc && equityAcc) {
+      if (!isCredit) {
+        postJournalEntry({
+          tenantId: activeTenant.id,
+          organizationId: activeOrganization?.id,
+          branchId: activeBranch?.id,
+          date: asOfDate,
+          description: `Opening FY ${fiscalYear} Outstanding Receivable: ${customer.name} (Ref #${cleanNum})`,
+          reference: invoiceNumber,
+          pluginId: activePlugin,
+          lines: [
+            {
+              id: `jl-opb-ar-${Date.now()}`,
+              accountId: arAcc.id,
+              accountCode: arAcc.code,
+              accountName: arAcc.name,
+              debit: absAmount,
+              credit: 0,
+              memo: `Opening AR for ${customer.name}`,
+            },
+            {
+              id: `jl-opb-eq-${Date.now()}`,
+              accountId: equityAcc.id,
+              accountCode: equityAcc.code,
+              accountName: equityAcc.name,
+              debit: 0,
+              credit: absAmount,
+              memo: `Offset to ${equityAcc.name}`,
+            },
+          ],
+        });
+      } else {
+        postJournalEntry({
+          tenantId: activeTenant.id,
+          organizationId: activeOrganization?.id,
+          branchId: activeBranch?.id,
+          date: asOfDate,
+          description: `Opening FY ${fiscalYear} Customer Overpayment / Credit: ${customer.name} (Ref #${cleanNum})`,
+          reference: invoiceNumber,
+          pluginId: activePlugin,
+          lines: [
+            {
+              id: `jl-opb-eq-${Date.now()}`,
+              accountId: equityAcc.id,
+              accountCode: equityAcc.code,
+              accountName: equityAcc.name,
+              debit: absAmount,
+              credit: 0,
+              memo: `Opening Equity Offset for Overpayment - ${customer.name}`,
+            },
+            {
+              id: `jl-opb-ar-${Date.now()}`,
+              accountId: arAcc.id,
+              accountCode: arAcc.code,
+              accountName: arAcc.name,
+              debit: 0,
+              credit: absAmount,
+              memo: `Opening Credit Balance / Advance for ${customer.name}`,
+            },
+          ],
+        });
+      }
+    }
+
+    addAuditLog({
+      action: 'OPENING_BALANCE_CREATE',
+      tenantId: activeTenant.id,
+      organizationId: activeOrganization?.id,
+      branchId: activeBranch?.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Established Opening FY Balance of ${absAmount} ${activeTenant.currency} (${balanceType}) for ${customer.name} (${fiscalYear})`,
+      status: 'SUCCESS',
+      payloadSummary: `Invoice: ${invoiceNumber} | Flag: ${balanceType} | Offset Account: ${offsetAccountCode}`,
+    });
+
+    return { success: true, invoice: newInvoice, openingRecord: newOpeningRecord };
+  };
+
+  const batchImportOpeningBalances = (records: {
+    customerId?: string;
+    customerCode?: string;
+    customerName?: string;
+    fiscalYear?: string;
+    asOfDate?: string;
+    originalInvoiceNumber?: string;
+    originalInvoiceDate?: string;
+    dueDate?: string;
+    openingAmount: number;
+    balanceType?: 'DR' | 'CR';
+    creditDebitFlag?: string;
+    offsetAccountCode?: string;
+    notes?: string;
+  }[]) => {
+    let successCount = 0;
+    records.forEach((rec) => {
+      let custId = rec.customerId;
+      if (!custId && rec.customerCode) {
+        const found = customers.find((c) => c.code?.toLowerCase().trim() === rec.customerCode?.toLowerCase().trim());
+        if (found) custId = found.id;
+      }
+      if (!custId && rec.customerName) {
+        const found = customers.find((c) => c.name.toLowerCase().trim() === rec.customerName?.toLowerCase().trim());
+        if (found) custId = found.id;
+      }
+      if (!custId) return;
+
+      const amt = Number(rec.openingAmount) || 0;
+      if (amt === 0) return; // Safely skip rows left at 0 or empty
+
+      let balanceType: 'DR' | 'CR' = 'DR';
+      const flagUpper = (rec.creditDebitFlag || rec.balanceType || '').toUpperCase().trim();
+      if (flagUpper === 'CR' || flagUpper === 'CREDIT' || flagUpper === 'C' || amt < 0) {
+        balanceType = 'CR';
+      }
+
+      const res = recordOpeningBalanceInvoice({
+        customerId: custId,
+        fiscalYear: rec.fiscalYear || 'FY 2026-2027',
+        asOfDate: rec.asOfDate || '2026-04-01',
+        originalInvoiceNumber: rec.originalInvoiceNumber || `OPN-${rec.customerCode || '2026'}`,
+        originalInvoiceDate: rec.originalInvoiceDate || rec.asOfDate || '2026-03-25',
+        dueDate: rec.dueDate || '2026-04-30',
+        openingAmount: Math.abs(amt),
+        balanceType,
+        offsetAccountCode: rec.offsetAccountCode || '3010',
+        notes: rec.notes || (balanceType === 'CR'
+          ? 'Prior FY customer overpayment / advance deposit carryforward.'
+          : 'Prior FY closing receivable carryforward.'),
+      });
+
+      if (res.success) successCount++;
+    });
+
+    addAuditLog({
+      action: 'OPENING_BALANCE_BATCH',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Batch established ${successCount} opening customer balances for financial year start.`,
+      status: 'SUCCESS',
+      payloadSummary: `Total records processed: ${records.length} | Created: ${successCount}`,
+    });
+
+    return { success: true, count: successCount };
+  };
+
+  const getCustomerStatementData = (customerId: string, dateRange?: { startDate?: string; endDate?: string }): CustomerStatementData => {
+    const customer = customers.find((c) => c.id === customerId);
+    
+    // Invoices for this customer & tenant
+    const custInvoices = invoices.filter((i) => {
+      const matchCustomer = i.customerId === customerId || (customer && i.customerName.toLowerCase().trim() === customer.name.toLowerCase().trim());
+      const matchTenant = i.tenantId === activeTenant.id;
+      if (!matchCustomer || !matchTenant) return false;
+      if (dateRange?.startDate && i.issueDate < dateRange.startDate) return false;
+      if (dateRange?.endDate && i.issueDate > dateRange.endDate) return false;
+      return true;
+    });
+
+    // Payment Receipts for this customer & tenant
+    const custReceipts = paymentReceipts.filter((r) => {
+      const matchCustomer = r.customerId === customerId || (customer && r.customerName.toLowerCase().trim() === customer.name.toLowerCase().trim());
+      const matchTenant = r.tenantId === activeTenant.id;
+      if (!matchCustomer || !matchTenant) return false;
+      if (dateRange?.startDate && r.paymentDate < dateRange.startDate) return false;
+      if (dateRange?.endDate && r.paymentDate > dateRange.endDate) return false;
+      return true;
+    });
+
+    // Opening balances
+    const custOpening = openingBalances.filter((o) => {
+      const matchCustomer = o.customerId === customerId || (customer && o.customerName.toLowerCase().trim() === customer.name.toLowerCase().trim());
+      return matchCustomer && o.tenantId === activeTenant.id;
+    });
+
+    // Build chronological transaction stream
+    const rawTx: Omit<CustomerLedgerTransaction, 'runningBalance'>[] = [];
+
+    custInvoices.forEach((inv) => {
+      const isCreditBalance = inv.isOpeningBalance && inv.balanceType === 'CR';
+      rawTx.push({
+        id: `tx-inv-${inv.id}`,
+        date: inv.issueDate,
+        type: inv.isOpeningBalance ? 'OPENING_BALANCE' : 'INVOICE',
+        referenceNumber: inv.invoiceNumber,
+        description: inv.isOpeningBalance
+          ? (inv.notes || (isCreditBalance
+              ? `Opening FY Overpayment / Advance Credit (${inv.fiscalYearOpening || 'Carryforward'})`
+              : `Opening FY Receivable Balance (${inv.fiscalYearOpening || 'Carryforward'})`))
+          : (inv.items?.map((it) => it.description).join(', ') || 'Sales Invoice'),
+        dueDate: inv.dueDate,
+        debit: isCreditBalance ? 0 : inv.totalAmount,
+        credit: isCreditBalance ? inv.totalAmount : 0,
+        balanceType: inv.balanceType || (isCreditBalance ? 'CR' : 'DR'),
+        documentId: inv.id,
+        status: inv.status,
+      });
+    });
+
+    custReceipts.forEach((rct) => {
+      if (rct.status === 'VOIDED') return;
+      // If this receipt is an opening advance credit and already represented, avoid duplicate counting if attached to an invoice
+      const isOpeningAdvance = rct.receiptNumber.startsWith('ADV-OPN-');
+      if (isOpeningAdvance && custInvoices.some((i) => i.isOpeningBalance && i.balanceType === 'CR')) {
+        return; // Already represented in ledger stream above
+      }
+
+      const targetInvs = rct.allocations.map((a) => a.invoiceNumber).join(', ');
+      rawTx.push({
+        id: `tx-rct-${rct.id}`,
+        date: rct.paymentDate,
+        type: 'PAYMENT',
+        referenceNumber: rct.receiptNumber,
+        description: `Payment Receipt via ${rct.paymentMethod}${rct.referenceNumber ? ` (${rct.referenceNumber})` : ''}${targetInvs ? ` - Applied to: ${targetInvs}` : ' (Advance Credit)'}`,
+        debit: 0,
+        credit: rct.allocatedAmount || rct.totalAmountReceived,
+        documentId: rct.id,
+        status: rct.status,
+        paymentMethod: rct.paymentMethod,
+        allocations: rct.allocations,
+      });
+    });
+
+    // Sort by date ascending
+    rawTx.sort((a, b) => {
+      if (a.date !== b.date) return a.date.localeCompare(b.date);
+      const priority: Record<string, number> = { OPENING_BALANCE: 1, INVOICE: 2, CREDIT_MEMO: 3, PAYMENT: 4 };
+      return (priority[a.type] || 5) - (priority[b.type] || 5);
+    });
+
+    let running = 0;
+    const transactions: CustomerLedgerTransaction[] = rawTx.map((tx) => {
+      running += (tx.debit - tx.credit);
+      return {
+        ...tx,
+        runningBalance: Math.round(running * 100) / 100,
+      };
+    });
+
+    const standardInvoices = custInvoices.filter((i) => !(i.isOpeningBalance && i.balanceType === 'CR'));
+    const totalInvoiced = standardInvoices.reduce((sum, i) => sum + i.totalAmount, 0);
+    const totalPaid = standardInvoices.reduce((sum, i) => sum + i.amountPaid, 0);
+    
+    // Net balance can be negative (customer has overpaid / credit balance)
+    const netBalance = Math.round(running * 100) / 100;
+    const isCreditBalance = netBalance < -0.01;
+    const netOutstanding = isCreditBalance ? 0 : Math.max(0, netBalance);
+    
+    // Total advance credits includes unallocated payment credits + opening credit balances
+    const unallocatedCredits = custReceipts.reduce((sum, r) => sum + (r.unallocatedCreditAmount || 0), 0);
+    const openingCredits = custOpening.filter((o) => o.balanceType === 'CR').reduce((sum, o) => sum + o.originalAmount, 0);
+    const totalAdvanceCredits = Math.round((unallocatedCredits + (isCreditBalance ? Math.abs(netBalance) : openingCredits)) * 100) / 100;
+
+    // Aging calculation (as of 2026-08-13 or today)
+    const asOfTimestamp = new Date('2026-08-13').getTime();
+    let current = 0;
+    let days1To30 = 0;
+    let days31To60 = 0;
+    let days61To90 = 0;
+    let days90Plus = 0;
+    let overdueAmount = 0;
+
+    standardInvoices.forEach((inv) => {
+      const unpaid = inv.totalAmount - inv.amountPaid;
+      if (unpaid > 0.001) {
+        const dueTimestamp = new Date(inv.dueDate).getTime();
+        const diffDays = Math.floor((asOfTimestamp - dueTimestamp) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 0) {
+          current += unpaid;
+        } else {
+          overdueAmount += unpaid;
+          if (diffDays <= 30) days1To30 += unpaid;
+          else if (diffDays <= 60) days31To60 += unpaid;
+          else if (diffDays <= 90) days61To90 += unpaid;
+          else days90Plus += unpaid;
+        }
+      }
+    });
+
+    return {
+      customer,
+      invoices: custInvoices,
+      paymentReceipts: custReceipts,
+      openingBalances: custOpening,
+      transactions,
+      metrics: {
+        totalInvoiced: Math.round(totalInvoiced * 100) / 100,
+        totalPaid: Math.round(totalPaid * 100) / 100,
+        netOutstanding: Math.round(netOutstanding * 100) / 100,
+        netBalance,
+        isCreditBalance,
+        totalAdvanceCredits,
+        overdueAmount: Math.round(overdueAmount * 100) / 100,
+        aging: {
+          current: Math.round(current * 100) / 100,
+          days1To30: Math.round(days1To30 * 100) / 100,
+          days31To60: Math.round(days31To60 * 100) / 100,
+          days61To90: Math.round(days61To90 * 100) / 100,
+          days90Plus: Math.round(days90Plus * 100) / 100,
+        },
+      },
+    };
+  };
+
   return (
     <AccountingContext.Provider
       value={{
@@ -1734,6 +3296,47 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         taxJurisdictions,
         enterpriseUsers,
         customRoles,
+        customers,
+        vendors,
+        customAttributeDefinitions,
+        productsServices,
+        priceChangeHistory,
+        invoiceTemplates,
+        bulkInvoiceBatches,
+        paymentReceipts,
+        openingBalances,
+
+        createCustomer,
+        updateCustomer,
+        deleteCustomer,
+        batchCreateCustomers,
+        createVendor,
+        updateVendor,
+        deleteVendor,
+        createCustomAttribute,
+        deleteCustomAttribute,
+        applyIndustryPresetAttributes,
+
+        createProductService,
+        updateProductService,
+        updateProductPrice,
+        deleteProductService,
+        applyIndustryPresetProducts,
+
+        createInvoiceTemplate,
+        updateInvoiceTemplate,
+        deleteInvoiceTemplate,
+        duplicateInvoiceTemplate,
+        incrementTemplateUsage,
+
+        batchCreateInvoices,
+        rollbackInvoiceBatch,
+
+        recordCustomerPaymentReceipt,
+        voidPaymentReceipt,
+        recordOpeningBalanceInvoice,
+        batchImportOpeningBalances,
+        getCustomerStatementData,
 
         createEnterpriseUser,
         updateUserStatus,

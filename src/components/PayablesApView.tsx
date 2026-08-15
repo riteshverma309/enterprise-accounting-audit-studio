@@ -1,6 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { Plus, CreditCard, DollarSign, AlertCircle, CheckCircle2, Building, Calendar, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  Plus,
+  CreditCard,
+  DollarSign,
+  AlertCircle,
+  CheckCircle2,
+  Building,
+  Calendar,
+  Trash2,
+  ChevronDown,
+  ChevronUp,
+  User,
+  SlidersHorizontal,
+  FileSpreadsheet,
+} from 'lucide-react';
+import { VendorContact } from '../types';
 
 interface BillLineItemRow {
   id: string;
@@ -9,19 +24,35 @@ interface BillLineItemRow {
   expenseAccountCode: string;
 }
 
-export const PayablesApView: React.FC = () => {
-  const { activeTenant, vendorBills, createVendorBill, payVendorBill, accounts } = useAccounting();
-  const [showCreateModal, setShowCreateModal] = useState(false);
+export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null }> = ({
+  preSelectedVendor,
+}) => {
+  const {
+    activeTenant,
+    vendorBills,
+    vendors,
+    customAttributeDefinitions,
+    createVendorBill,
+    payVendorBill,
+    accounts,
+  } = useAccounting();
+
+  const [showCreateModal, setShowCreateModal] = useState(Boolean(preSelectedVendor));
   const [payModalBill, setPayModalBill] = useState<string | null>(null);
   const [expandedBillId, setExpandedBillId] = useState<string | null>(null);
 
   // Form State for New Vendor Bill
-  const [vendorName, setVendorName] = useState('');
+  const [selectedVendorId, setSelectedVendorId] = useState<string>(preSelectedVendor?.id || '');
+  const [vendorName, setVendorName] = useState(preSelectedVendor?.name || '');
   const [dueDate, setDueDate] = useState('2026-08-25');
+  const [billNotes, setBillNotes] = useState('');
+  const [vendorAttributesSnapshot, setVendorAttributesSnapshot] = useState<Record<string, any>>(
+    preSelectedVendor?.customAttributes || {}
+  );
 
   // Dynamic Line Items State
   const [billLineItems, setBillLineItems] = useState<BillLineItemRow[]>([
-    { id: 'bitem-1', description: 'Data Cloud Infrastructure Hosting', amount: 18500, expenseAccountCode: '5010' },
+    { id: 'bitem-1', description: 'Facility AMC & Infrastructure Service', amount: 8500, expenseAccountCode: '5010' },
   ]);
 
   // Form State for Payment Disbursement
@@ -30,8 +61,47 @@ export const PayablesApView: React.FC = () => {
 
   const tenantBills = vendorBills.filter((b) => b.tenantId === activeTenant.id);
 
+  // Available vendors for current tenant
+  const availableVendors = useMemo(() => {
+    return vendors.filter(
+      (v) => !v.tenantId || v.tenantId === activeTenant.id || v.tenantId === 't-acme-us'
+    );
+  }, [vendors, activeTenant.id]);
+
+  // When selected vendor changes from dropdown
+  const handleSelectVendor = (vendId: string) => {
+    setSelectedVendorId(vendId);
+    if (!vendId) {
+      setVendorAttributesSnapshot({});
+      return;
+    }
+    const vend = availableVendors.find((v) => v.id === vendId);
+    if (vend) {
+      setVendorName(vend.name);
+      const attrs = vend.customAttributes || {};
+      setVendorAttributesSnapshot(attrs);
+
+      // Auto-compute payment due date based on payment terms
+      const days = vend.paymentTermsDays || 30;
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + days);
+      setDueDate(targetDate.toISOString().split('T')[0]);
+
+      // Set default expense GL code
+      const expCode = vend.defaultExpenseAccountCode || '5010';
+      setBillLineItems([
+        {
+          id: `bitem-${Date.now()}`,
+          description: `${vend.name} - Service Invoicing`,
+          amount: 5000,
+          expenseAccountCode: expCode,
+        },
+      ]);
+    }
+  };
+
   // Bill Calculations
-  const calculatedBillTotal = billLineItems.reduce((acc, curr) => acc + (Math.max(0, curr.amount || 0)), 0);
+  const calculatedBillTotal = billLineItems.reduce((acc, curr) => acc + Math.max(0, curr.amount || 0), 0);
 
   const addBillLineItem = () => {
     setBillLineItems((prev) => [
@@ -63,6 +133,7 @@ export const PayablesApView: React.FC = () => {
 
     createVendorBill({
       tenantId: activeTenant.id,
+      vendorId: selectedVendorId || undefined,
       vendorName,
       billDate: new Date().toISOString().split('T')[0],
       dueDate,
@@ -73,12 +144,17 @@ export const PayablesApView: React.FC = () => {
         expenseAccountCode: item.expenseAccountCode || '5010',
       })),
       totalAmount: calculatedBillTotal,
+      notes: billNotes,
+      vendorAttributesSnapshot: Object.keys(vendorAttributesSnapshot).length > 0 ? vendorAttributesSnapshot : undefined,
     });
 
     setShowCreateModal(false);
+    setSelectedVendorId('');
     setVendorName('');
+    setVendorAttributesSnapshot({});
+    setBillNotes('');
     setBillLineItems([
-      { id: `bitem-${Date.now()}`, description: 'Data Cloud Infrastructure Hosting', amount: 18500, expenseAccountCode: '5010' },
+      { id: `bitem-${Date.now()}`, description: 'Facility AMC & Infrastructure Service', amount: 8500, expenseAccountCode: '5010' },
     ]);
   };
 
@@ -101,12 +177,17 @@ export const PayablesApView: React.FC = () => {
             Accounts Payable (AP) & Vendor Bills
           </h1>
           <p className="text-xs text-slate-400">
-            Track vendor liability bills, schedule payments, and execute disbursements with double-entry GL ledger updates for {activeTenant.name}.
+            Track vendor liability bills linked to Vendor Master profiles, capture contract SLA terms, and execute disbursements with double-entry GL ledger updates.
           </p>
         </div>
         <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg text-xs shadow-md shadow-purple-600/20 transition"
+          onClick={() => {
+            setShowCreateModal(true);
+            if (availableVendors.length > 0 && !selectedVendorId) {
+              handleSelectVendor(availableVendors[0].id);
+            }
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg text-xs shadow-md shadow-purple-600/20 transition cursor-pointer"
         >
           <Plus className="w-4 h-4" />
           Enter Vendor Bill
@@ -181,6 +262,8 @@ export const PayablesApView: React.FC = () => {
                 tenantBills.map((bill) => {
                   const isUnpaid = bill.status !== 'PAID';
                   const isExpanded = expandedBillId === bill.id;
+                  const snap = bill.vendorAttributesSnapshot || {};
+
                   return (
                     <React.Fragment key={bill.id}>
                       <tr className="hover:bg-slate-800/40 transition">
@@ -198,7 +281,7 @@ export const PayablesApView: React.FC = () => {
                           </span>
                         </td>
                         <td className="p-3 font-sans font-medium text-slate-200">
-                          {bill.vendorName}
+                          <div>{bill.vendorName}</div>
                           <div className="text-[10px] text-slate-500">
                             {bill.items && bill.items.length > 0
                               ? bill.items.map((i) => i.description).join(', ')
@@ -248,18 +331,36 @@ export const PayablesApView: React.FC = () => {
                         <tr className="bg-slate-950/90 border-b border-slate-800">
                           <td colSpan={8} className="p-4 space-y-2">
                             <div className="text-xs font-bold text-purple-300 flex items-center justify-between">
-                              <span>Bill #{bill.billNumber} — Itemized Expense Lines</span>
+                              <span>Vendor Bill #{bill.billNumber} — Itemized Expense Allocation</span>
                               <span className="text-[10px] text-slate-400 font-mono">
-                                Total Bill Liability: {bill.currency} {bill.totalAmount.toLocaleString()}
+                                Total Liability: {bill.currency} {bill.totalAmount.toLocaleString()}
                               </span>
                             </div>
+
+                            {/* Snapshot of Custom Attributes */}
+                            {Object.keys(snap).length > 0 && (
+                              <div className="bg-slate-900/90 border border-slate-800 p-2.5 rounded-lg flex items-center gap-2 flex-wrap text-xs">
+                                <span className="text-[10px] uppercase font-bold text-purple-400 tracking-wider">
+                                  Captured Vendor Contract Snapshot:
+                                </span>
+                                {Object.entries(snap).map(([k, v]) => (
+                                  <span
+                                    key={k}
+                                    className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 text-[11px] font-mono"
+                                  >
+                                    <strong className="text-slate-400">{k}:</strong> {String(v)}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
                             <div className="overflow-x-auto rounded-lg border border-slate-800">
                               <table className="w-full text-left text-[11px] text-slate-300">
                                 <thead className="bg-slate-900 text-slate-400 uppercase font-mono text-[9px]">
                                   <tr>
                                     <th className="p-2">#</th>
                                     <th className="p-2">Expense Line Description</th>
-                                    <th className="p-2 font-mono">Account Code</th>
+                                    <th className="p-2">GL Expense Account</th>
                                     <th className="p-2 text-right">Line Amount</th>
                                   </tr>
                                 </thead>
@@ -269,14 +370,16 @@ export const PayablesApView: React.FC = () => {
                                       <tr key={idx}>
                                         <td className="p-2 text-slate-500">{idx + 1}</td>
                                         <td className="p-2 text-slate-200 font-sans">{item.description}</td>
-                                        <td className="p-2 font-mono text-purple-300">{item.expenseAccountCode || '5010'}</td>
-                                        <td className="p-2 text-right font-bold text-slate-100">{bill.currency} {item.amount.toLocaleString()}</td>
+                                        <td className="p-2 text-indigo-400">{item.expenseAccountCode}</td>
+                                        <td className="p-2 text-right font-bold text-slate-100">
+                                          {bill.currency} {item.amount?.toLocaleString()}
+                                        </td>
                                       </tr>
                                     ))
                                   ) : (
                                     <tr>
                                       <td colSpan={4} className="p-2 text-center text-slate-500">
-                                        Single summary bill expense
+                                        Single summary item
                                       </td>
                                     </tr>
                                   )}
@@ -295,17 +398,19 @@ export const PayablesApView: React.FC = () => {
         </div>
       </div>
 
-      {/* Create Bill Modal */}
+      {/* Create Vendor Bill Modal */}
       {showCreateModal && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-3xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
                   <CreditCard className="w-5 h-5 text-purple-400" />
-                  Record Vendor Liability Bill
+                  Enter New Vendor Liability Bill
                 </h3>
-                <p className="text-xs text-slate-400">Add any number of expense lines with dedicated GL account codes.</p>
+                <p className="text-xs text-slate-400">
+                  Select from Vendor Directory or enter supplier details with line item GL distribution.
+                </p>
               </div>
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -316,42 +421,84 @@ export const PayablesApView: React.FC = () => {
             </div>
 
             <form onSubmit={handleCreateBill} className="space-y-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Vendor / Supplier Name</label>
-                  <div className="relative">
-                    <Building className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+              {/* Vendor Selection from Directory */}
+              <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                    <User className="w-4 h-4" />
+                    Vendor Directory Selector
+                  </label>
+                  <span className="text-[11px] text-slate-400">
+                    {availableVendors.length} master suppliers available
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <select
+                      value={selectedVendorId}
+                      onChange={(e) => handleSelectVendor(e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 font-semibold focus:outline-none focus:border-purple-500"
+                    >
+                      <option value="">-- Manual / Custom Vendor --</option>
+                      {availableVendors.map((v) => (
+                        <option key={v.id} value={v.id}>
+                          [{v.code}] {v.name} ({v.category || 'Supplier'})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
                     <input
                       type="text"
                       required
+                      placeholder="Vendor / Supplier Name"
                       value={vendorName}
                       onChange={(e) => setVendorName(e.target.value)}
-                      placeholder="e.g. Amazon Web Services or Snowflake"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500"
+                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500"
                     />
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Payment Due Date</label>
-                  <input
-                    type="date"
-                    required
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500 font-mono"
-                  />
-                </div>
+                {/* Vendor Attributes Snapshot */}
+                {Object.keys(vendorAttributesSnapshot).length > 0 && (
+                  <div className="pt-2 border-t border-slate-800/80 flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      Contract & SLA Snapshot:
+                    </span>
+                    {Object.entries(vendorAttributesSnapshot).map(([k, v]) => (
+                      <span
+                        key={k}
+                        className="text-[11px] px-2 py-0.5 rounded bg-purple-950/60 border border-purple-800/60 text-purple-200 font-mono flex items-center gap-1"
+                      >
+                        <span className="text-slate-400">{k}:</span>
+                        <span className="font-bold">{String(v)}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
 
-              {/* DYNAMIC EXPENSE LINE ITEMS SECTION */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">Bill Payment Due Date</label>
+                <input
+                  type="date"
+                  required
+                  value={dueDate}
+                  onChange={(e) => setDueDate(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500 font-mono"
+                />
+              </div>
+
+              {/* DYNAMIC LINE ITEMS SECTION */}
               <div className="space-y-3 pt-2 border-t border-slate-800">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                      Bill Expense Lines ({billLineItems.length})
+                      Bill Expense Allocation Lines ({billLineItems.length})
                     </h4>
-                    <p className="text-[11px] text-slate-400">Specify item description, amount, and expense GL code.</p>
+                    <p className="text-[11px] text-slate-400">Allocate expenses to specific General Ledger accounts.</p>
                   </div>
                   <button
                     type="button"
@@ -380,7 +527,7 @@ export const PayablesApView: React.FC = () => {
                             <input
                               type="text"
                               required
-                              placeholder={`Expense line #${index + 1} description`}
+                              placeholder={`Expense #${index + 1} details`}
                               value={item.description}
                               onChange={(e) => updateBillLineItem(item.id, 'description', e.target.value)}
                               className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-100 focus:outline-none focus:border-purple-500"
@@ -392,16 +539,17 @@ export const PayablesApView: React.FC = () => {
                               onChange={(e) => updateBillLineItem(item.id, 'expenseAccountCode', e.target.value)}
                               className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-purple-500"
                             >
-                              <option value="5010">5010 - Hosting & Infra</option>
-                              <option value="5020">5020 - Engineering Staff</option>
-                              <option value="5030">5030 - Office & Equipment</option>
+                              <option value="5010">5010 - Hosting & Infrastructure</option>
+                              <option value="5020">5020 - Engineering Staff & Personnel</option>
+                              <option value="5030">5030 - Office, Transport & Facilities</option>
+                              <option value="5040">5040 - Professional Legal & Advisory</option>
                             </select>
                           </td>
                           <td className="py-2 px-1">
                             <input
                               type="number"
                               step="any"
-                              min="0"
+                              min="0.01"
                               required
                               value={item.amount}
                               onChange={(e) => updateBillLineItem(item.id, 'amount', parseFloat(e.target.value) || 0)}
@@ -430,8 +578,8 @@ export const PayablesApView: React.FC = () => {
                 </div>
 
                 {/* TOTAL SUMMARY */}
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono">
-                  <span className="text-slate-400 font-bold">Total Bill Liability Amount:</span>
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono">
+                  <span className="text-slate-400">Total Vendor Payable Liability:</span>
                   <span className="text-purple-400 font-bold text-sm">
                     {activeTenant.currency} {calculatedBillTotal.toLocaleString()}
                   </span>
@@ -439,7 +587,7 @@ export const PayablesApView: React.FC = () => {
               </div>
 
               <div className="p-3 bg-purple-950/30 border border-purple-800/40 rounded-xl text-[11px] text-purple-300">
-                <span className="font-semibold">Automated Double-Entry Posting:</span> Debit Expense Account(s), Credit Accounts Payable (2010).
+                <span className="font-semibold">Automated Double-Entry Posting:</span> Debit Selected Expense Accounts, Credit Accounts Payable (2010).
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
@@ -467,7 +615,7 @@ export const PayablesApView: React.FC = () => {
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-purple-400" />
+              <DollarSign className="w-5 h-5 text-emerald-400" />
               Disburse Payment for Vendor Bill
             </h3>
 
@@ -478,43 +626,50 @@ export const PayablesApView: React.FC = () => {
                 </label>
                 <input
                   type="number"
+                  step="any"
                   required
                   value={paymentAmount}
                   onChange={(e) => setPaymentAmount(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500 font-mono"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Disburse From Bank Account</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Disburse From Bank Account
+                </label>
                 <select
                   value={bankAccountId}
                   onChange={(e) => setBankAccountId(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500 font-mono"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500 font-mono"
                 >
                   {accounts
-                    .filter((a) => a.type === 'ASSET')
+                    .filter((a) => a.type === 'ASSET' && a.code.startsWith('10'))
                     .map((a) => (
                       <option key={a.id} value={a.id}>
-                        {a.code} - {a.name} ({a.currency})
+                        {a.code} - {a.name} ({activeTenant.currency} {a.balance.toLocaleString()})
                       </option>
                     ))}
                 </select>
               </div>
 
-              <div className="flex justify-end gap-2 pt-2">
+              <div className="p-3 bg-purple-950/30 border border-purple-800/40 rounded-xl text-[11px] text-purple-300">
+                <span className="font-semibold">Automated Double-Entry Posting:</span> Debit Accounts Payable (2010), Credit Selected Bank Account.
+              </div>
+
+              <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setPayModalBill(null)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium"
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold shadow"
+                  className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/20 cursor-pointer"
                 >
-                  Confirm Disbursement
+                  Disburse & Post Payment
                 </button>
               </div>
             </form>

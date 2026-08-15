@@ -3,6 +3,7 @@ import {
   LayoutDashboard,
   UploadCloud,
   BookOpenCheck,
+  BookOpen,
   FileSpreadsheet,
   FileCheck2,
   Landmark,
@@ -19,11 +20,14 @@ import {
   Globe,
   Users,
   Terminal,
+  Package,
 } from 'lucide-react';
 
 export type TabType =
   | 'dashboard'
   | 'batch_upload'
+  | 'entity_master'
+  | 'products_services'
   | 'ledger'
   | 'invoicing_ar'
   | 'payables_ap'
@@ -40,6 +44,7 @@ export type TabType =
   | 'consolidation'
   | 'audit_trail'
   | 'ai_copilot'
+  | 'help_center'
   | 'api_manual';
 
 interface SidebarProps {
@@ -51,6 +56,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   const menuItems: { id: TabType; label: string; icon: React.ReactNode; badge?: string }[] = [
     { id: 'dashboard', label: 'Executive Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
     { id: 'batch_upload', label: 'Bulk Upload Transactions', icon: <UploadCloud className="w-4 h-4" />, badge: 'CSV / JSON' },
+    { id: 'entity_master', label: 'Customers & Vendors', icon: <Users className="w-4 h-4" />, badge: 'EAV Master' },
+    { id: 'products_services', label: 'Products & Services', icon: <Package className="w-4 h-4" />, badge: 'Pricing' },
     { id: 'ledger', label: 'General Ledger & CoA', icon: <BookOpenCheck className="w-4 h-4" /> },
     { id: 'invoicing_ar', label: 'Accounts Receivable (AR)', icon: <Receipt className="w-4 h-4" />, badge: 'Invoicing' },
     { id: 'payables_ap', label: 'Accounts Payable (AP)', icon: <CreditCard className="w-4 h-4" />, badge: 'Bills' },
@@ -67,6 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'consolidation', label: 'Global Consolidation', icon: <Globe2 className="w-4 h-4" />, badge: 'Multi-Tenant' },
     { id: 'audit_trail', label: 'System Audit Logs', icon: <ShieldAlert className="w-4 h-4" /> },
     { id: 'ai_copilot', label: 'AI Audit Copilot', icon: <Sparkles className="w-4 h-4" />, badge: 'Gemini' },
+    { id: 'help_center', label: 'Help Center & User Guide', icon: <BookOpen className="w-4 h-4" />, badge: 'Guide & Sim' },
     { id: 'api_manual', label: 'REST API & User Manual', icon: <Terminal className="w-4 h-4" />, badge: 'OpenAPI 3.0' },
   ];
 
