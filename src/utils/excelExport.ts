@@ -1,4 +1,4 @@
-import { CustomerContact, CustomerInvoice, CustomerPaymentReceipt, CustomerStatementData, Tenant } from '../types';
+import { Account, CustomerContact, CustomerInvoice, CustomerPaymentReceipt, CustomerStatementData, Tenant } from '../types';
 
 /**
  * Escapes XML strings for Microsoft Excel 2003 XML format.
@@ -947,4 +947,117 @@ export function downloadCustomerOpeningBalanceTemplateCsv(params: {
   const safeDate = new Date().toISOString().split('T')[0];
   downloadCsvFile(`Customer_FY_Opening_Balances_${sanitizedTenantName}_${safeDate}`, headers, rows);
 }
+
+/**
+ * Exports complete Chart of Accounts to structured Microsoft Excel Workbook.
+ */
+export function exportChartOfAccountsExcel(params: {
+  tenant: Tenant;
+  accounts: Account[];
+  industryPresetName?: string;
+}) {
+  const { tenant, accounts, industryPresetName } = params;
+  const safeDate = new Date().toISOString().split('T')[0];
+  const sanitizedTenantName = tenant.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  const totalAssets = accounts.filter((a) => a.type === 'ASSET').length;
+  const totalLiabilities = accounts.filter((a) => a.type === 'LIABILITY').length;
+  const totalEquity = accounts.filter((a) => a.type === 'EQUITY').length;
+  const totalRevenue = accounts.filter((a) => a.type === 'REVENUE').length;
+  const totalExpenses = accounts.filter((a) => a.type === 'EXPENSE').length;
+  const netBalanceSum = accounts.reduce((sum, a) => sum + (a.balance || 0), 0);
+
+  const sheets = [
+    {
+      name: 'Chart of Accounts',
+      rows: [
+        [{ value: `${tenant.name} - Chart of Accounts Master`, type: 'String' as const, styleId: 'HeaderTitle' }],
+        [{ value: `Accounting Standard: ${tenant.pluginId.toUpperCase()} | Base Currency: ${tenant.currency} | Sector: ${industryPresetName || 'Configured General'} | Exported: ${safeDate}`, type: 'String' as const, styleId: 'SubHeader' }],
+        [{ value: '', type: 'String' as const }],
+        // Summary row
+        [
+          { value: `Total Accounts: ${accounts.length}`, type: 'String' as const, styleId: 'MetricCell' },
+          { value: `Assets: ${totalAssets}`, type: 'String' as const, styleId: 'MetricCell' },
+          { value: `Liabilities: ${totalLiabilities}`, type: 'String' as const, styleId: 'MetricCell' },
+          { value: `Equity: ${totalEquity}`, type: 'String' as const, styleId: 'MetricCell' },
+          { value: `Revenue: ${totalRevenue}`, type: 'String' as const, styleId: 'MetricCell' },
+          { value: `Expenses: ${totalExpenses}`, type: 'String' as const, styleId: 'MetricCell' },
+          { value: `Net Ledger Balance: ${tenant.currency} ${netBalanceSum.toLocaleString(undefined, { minimumFractionDigits: 2 })}`, type: 'String' as const, styleId: 'MetricCell' },
+        ],
+        [{ value: '', type: 'String' as const }],
+        // Table Header
+        [
+          { value: 'Account Code', type: 'String' as const, styleId: 'TableHeader' },
+          { value: 'Account Name', type: 'String' as const, styleId: 'TableHeader' },
+          { value: 'Account Type', type: 'String' as const, styleId: 'TableHeader' },
+          { value: 'Sub-Category / Group', type: 'String' as const, styleId: 'TableHeader' },
+          { value: 'Normal Balance', type: 'String' as const, styleId: 'TableHeader' },
+          { value: 'Currency', type: 'String' as const, styleId: 'TableHeader' },
+          { value: `Current Balance (${tenant.currency})`, type: 'String' as const, styleId: 'TableHeader' },
+          { value: 'Status', type: 'String' as const, styleId: 'TableHeader' },
+          { value: 'Account Description / Accounting Purpose', type: 'String' as const, styleId: 'TableHeader' },
+        ],
+        // Data Rows
+        ...accounts.map((acc, idx) => {
+          const isEven = idx % 2 === 0;
+          const bgStyle = isEven ? 'DataRow' : 'DataRowAlt';
+          const numStyle = isEven ? 'NumberCell' : 'NumberCellAlt';
+          const defaultNormal = (acc.type === 'ASSET' || acc.type === 'EXPENSE') ? 'DEBIT' : 'CREDIT';
+          const normalBal = acc.normalBalance || defaultNormal;
+
+          return [
+            { value: acc.code, type: 'String' as const, styleId: bgStyle },
+            { value: acc.name, type: 'String' as const, styleId: bgStyle },
+            { value: acc.type, type: 'String' as const, styleId: bgStyle },
+            { value: acc.subCategory || (acc.type === 'ASSET' ? 'Current Assets' : acc.type === 'LIABILITY' ? 'Current Liabilities' : acc.type === 'EQUITY' ? 'Equity Reserves' : acc.type === 'REVENUE' ? 'Operating Income' : 'Operating Expenses'), type: 'String' as const, styleId: bgStyle },
+            { value: normalBal, type: 'String' as const, styleId: bgStyle },
+            { value: acc.currency || tenant.currency, type: 'String' as const, styleId: bgStyle },
+            { value: Number((acc.balance || 0).toFixed(2)), type: 'Number' as const, styleId: numStyle },
+            { value: acc.isActive === false ? 'Archived' : 'Active', type: 'String' as const, styleId: bgStyle },
+            { value: acc.description || `Standard ${acc.type.toLowerCase()} account maintained in ${acc.currency || tenant.currency}`, type: 'String' as const, styleId: bgStyle },
+          ];
+        }),
+      ],
+    },
+  ];
+
+  downloadExcelXmlWorkbook(`Chart_of_Accounts_${sanitizedTenantName}_${safeDate}`, sheets);
+}
+
+/**
+ * Downloads Chart of Accounts as standard CSV file.
+ */
+export function downloadChartOfAccountsCsv(tenant: Tenant, accounts: Account[]) {
+  const headers = [
+    'AccountCode',
+    'AccountName',
+    'AccountType',
+    'SubCategory',
+    'NormalBalance',
+    'Currency',
+    'CurrentBalance',
+    'Status',
+    'Description',
+  ];
+
+  const rows = accounts.map((acc) => {
+    const defaultNormal = (acc.type === 'ASSET' || acc.type === 'EXPENSE') ? 'DEBIT' : 'CREDIT';
+    return [
+      acc.code,
+      acc.name,
+      acc.type,
+      acc.subCategory || (acc.type === 'ASSET' ? 'Current Assets' : acc.type === 'LIABILITY' ? 'Current Liabilities' : acc.type === 'EQUITY' ? 'Equity Reserves' : acc.type === 'REVENUE' ? 'Operating Income' : 'Operating Expenses'),
+      acc.normalBalance || defaultNormal,
+      acc.currency || tenant.currency,
+      (acc.balance || 0).toFixed(2),
+      acc.isActive === false ? 'INACTIVE' : 'ACTIVE',
+      acc.description || '',
+    ];
+  });
+
+  const sanitizedTenantName = tenant.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+  const safeDate = new Date().toISOString().split('T')[0];
+  downloadCsvFile(`Chart_of_Accounts_${sanitizedTenantName}_${safeDate}`, headers, rows);
+}
+
 

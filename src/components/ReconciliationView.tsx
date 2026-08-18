@@ -21,6 +21,9 @@ import {
   DollarSign,
   Zap,
   Info,
+  Radio,
+  Unplug,
+  Link2,
 } from 'lucide-react';
 import { UPLOAD_TEMPLATES, downloadCsvFile } from '../utils/templateGenerator';
 
@@ -35,12 +38,24 @@ export const ReconciliationView: React.FC = () => {
     accounts,
     journalEntries,
     activeRole,
+    connectedBankFeeds,
+    connectBankFeed,
+    syncBankFeed,
+    disconnectBankFeed,
   } = useAccounting();
 
   // Search & Filter state
-  const [activeTab, setActiveTab] = useState<'ALL' | 'PENDING' | 'RECONCILED'>('PENDING');
+  const [activeTab, setActiveTab] = useState<'ALL' | 'PENDING' | 'RECONCILED' | 'FEEDS'>('PENDING');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAccountId, setSelectedAccountId] = useState('1010');
+
+  // Connect Bank Modal
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [institutionName, setInstitutionName] = useState('Chase Commercial Treasury');
+  const [accountName, setAccountName] = useState('Operating Checking');
+  const [accountNumberMasked, setAccountNumberMasked] = useState('•••• 9042');
+  const [initialBalance, setInitialBalance] = useState<number>(125000);
+  const [syncingFeedId, setSyncingFeedId] = useState<string | null>(null);
 
   // Multi-select state
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -59,6 +74,7 @@ export const ReconciliationView: React.FC = () => {
 
   // Filter bank statements for active tenant
   const tenantStatements = bankStatements.filter((b) => b.tenantId === activeTenant.id);
+  const tenantBankFeeds = connectedBankFeeds.filter((f) => f.tenantId === activeTenant.id);
 
   // Calculations for summary stats
   const reconciledCount = tenantStatements.filter((b) => b.reconciled).length;
@@ -72,6 +88,42 @@ export const ReconciliationView: React.FC = () => {
   const cashAcc = accounts.find((a) => a.code === selectedAccountId) || accounts[0];
   const glCashBalance = cashAcc ? cashAcc.balance : 0;
   const discrepancy = glCashBalance - totalBankFeedSum;
+
+  const handleSyncFeed = (feedId: string, instName: string) => {
+    setSyncingFeedId(feedId);
+    setTimeout(() => {
+      const res = syncBankFeed(feedId);
+      setSyncingFeedId(null);
+      if (res.success) {
+        setToastMessage({
+          type: 'success',
+          text: `Direct feed from ${instName} synchronized. Imported ${res.count} new pending bank transactions.`,
+        });
+        setTimeout(() => setToastMessage(null), 4000);
+      }
+    }, 700);
+  };
+
+  const handleConnectNewBank = (e: React.FormEvent) => {
+    e.preventDefault();
+    connectBankFeed({
+      tenantId: activeTenant.id,
+      institutionName,
+      accountName,
+      accountNumberMasked,
+      currency: activeTenant.currency,
+      balance: Number(initialBalance),
+      status: 'CONNECTED',
+      lastSyncedAt: new Date().toISOString(),
+      glAccountCode: selectedAccountId,
+    });
+    setIsConnectModalOpen(false);
+    setToastMessage({
+      type: 'success',
+      text: `Secure Open Banking feed established with ${institutionName} (${accountNumberMasked}).`,
+    });
+    setTimeout(() => setToastMessage(null), 4000);
+  };
 
   // Filtered rows for table
   const filteredStatements = tenantStatements.filter((line) => {
@@ -420,51 +472,141 @@ export const ReconciliationView: React.FC = () => {
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            All Statements ({tenantStatements.length})
+            All ({tenantStatements.length})
+          </button>
+
+          <button
+            onClick={() => setActiveTab('FEEDS')}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1.5 ${
+              activeTab === 'FEEDS'
+                ? 'bg-cyan-600 text-white shadow'
+                : 'text-cyan-400 hover:text-cyan-200 hover:bg-cyan-950/40'
+            }`}
+          >
+            <Radio className="w-3.5 h-3.5 animate-pulse" />
+            <span>Connected Bank Feeds ({tenantBankFeeds.length})</span>
           </button>
         </div>
 
         {/* SEARCH & ACCOUNT SELECTOR */}
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder="Search reference or payee..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="bg-slate-950 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none w-48 md:w-64"
-            />
-          </div>
+        {activeTab !== 'FEEDS' && (
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                placeholder="Search reference or payee..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="bg-slate-950 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none w-48 md:w-64"
+              />
+            </div>
 
-          <select
-            value={selectedAccountId}
-            onChange={(e) => setSelectedAccountId(e.target.value)}
-            className="bg-slate-950 text-slate-200 text-xs px-3 py-2 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none font-mono cursor-pointer"
-          >
-            {accounts
-              .filter((a) => a.type === 'ASSET' && (a.name.toLowerCase().includes('bank') || a.name.toLowerCase().includes('cash')))
-              .map((acc) => (
-                <option key={acc.id} value={acc.code}>
-                  {acc.code} - {acc.name}
-                </option>
-              ))}
-          </select>
-
-          {selectedIds.length > 0 && (
-            <button
-              onClick={handleBatchReconcile}
-              className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer"
+            <select
+              value={selectedAccountId}
+              onChange={(e) => setSelectedAccountId(e.target.value)}
+              className="bg-slate-950 text-slate-200 text-xs px-3 py-2 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none font-mono cursor-pointer"
             >
-              <Check className="w-3.5 h-3.5" />
-              <span>Reconcile Selected ({selectedIds.length})</span>
-            </button>
-          )}
-        </div>
+              {accounts
+                .filter((a) => a.type === 'ASSET' && (a.name.toLowerCase().includes('bank') || a.name.toLowerCase().includes('cash')))
+                .map((acc) => (
+                  <option key={acc.id} value={acc.code}>
+                    {acc.code} - {acc.name}
+                  </option>
+                ))}
+            </select>
 
+            {selectedIds.length > 0 && (
+              <button
+                onClick={handleBatchReconcile}
+                className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer"
+              >
+                <Check className="w-3.5 h-3.5" />
+                <span>Reconcile Selected ({selectedIds.length})</span>
+              </button>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'FEEDS' && (
+          <div>
+            <button
+              onClick={() => setIsConnectModalOpen(true)}
+              className="flex items-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Connect Open Banking Feed</span>
+            </button>
+          </div>
+        )}
       </div>
 
-      {/* BANK STATEMENT FEED LINES TABLE */}
+      {/* CONNECTED BANK FEEDS VIEW */}
+      {activeTab === 'FEEDS' ? (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tenantBankFeeds.map((feed) => {
+              const isSyncing = syncingFeedId === feed.id;
+              return (
+                <div key={feed.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4 relative">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+                        <Landmark className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-100">{feed.institutionName}</h4>
+                        <p className="text-xs text-slate-400">{feed.accountName} ({feed.accountNumberMasked})</p>
+                      </div>
+                    </div>
+
+                    <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold border border-emerald-500/20">
+                      <Radio className="w-2.5 h-2.5 animate-pulse" /> Live
+                    </span>
+                  </div>
+
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1 font-mono text-xs">
+                    <div className="flex justify-between text-slate-400">
+                      <span>Available Balance:</span>
+                      <span className="text-emerald-400 font-bold">
+                        ${feed.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} {feed.currency}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-slate-500 text-[10px]">
+                      <span>Mapped GL Account:</span>
+                      <span>{feed.glAccountCode || '1010'}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-500 text-[10px]">
+                      <span>Last Synced:</span>
+                      <span>{new Date(feed.lastSyncedAt).toLocaleTimeString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                    <button
+                      onClick={() => handleSyncFeed(feed.id, feed.institutionName)}
+                      disabled={isSyncing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 bg-cyan-600/20 hover:bg-cyan-600 text-cyan-300 hover:text-white rounded-lg text-xs font-semibold transition cursor-pointer disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+                      {isSyncing ? 'Syncing...' : 'Sync Now'}
+                    </button>
+
+                    <button
+                      onClick={() => disconnectBankFeed(feed.id)}
+                      className="p-1.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg transition"
+                      title="Disconnect Feed"
+                    >
+                      <Unplug className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : (
+        /* BANK STATEMENT FEED LINES TABLE */
       <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
@@ -594,6 +736,101 @@ export const ReconciliationView: React.FC = () => {
           </table>
         </div>
       </div>
+      )}
+
+      {/* CONNECT OPEN BANKING FEED MODAL */}
+      {isConnectModalOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Landmark className="w-5 h-5 text-cyan-400" />
+                <h3 className="text-sm font-bold text-white">Connect Open Banking Feed</h3>
+              </div>
+              <button
+                onClick={() => setIsConnectModalOpen(false)}
+                className="text-slate-400 hover:text-white cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleConnectNewBank} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">Financial Institution *</label>
+                <select
+                  value={institutionName}
+                  onChange={(e) => setInstitutionName(e.target.value)}
+                  className="w-full bg-slate-950 text-slate-100 p-2.5 rounded-xl border border-slate-800 focus:border-cyan-500 outline-none cursor-pointer"
+                >
+                  <option value="Chase Commercial Treasury">JPMorgan Chase Commercial Bank</option>
+                  <option value="Bank of America Corporate">Bank of America Merrill Lynch</option>
+                  <option value="Silicon Valley Bank (SVB)">Silicon Valley Bank Commercial</option>
+                  <option value="Citibank NA Treasury">Citibank Corporate Treasury</option>
+                  <option value="Wells Fargo Commercial">Wells Fargo Commercial Banking</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-slate-300 font-bold mb-1">Account Nickname *</label>
+                <input
+                  type="text"
+                  required
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="e.g. Operating Payroll Checking"
+                  className="w-full bg-slate-950 text-slate-100 p-2.5 rounded-xl border border-slate-800 focus:border-cyan-500 outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-slate-300 font-bold mb-1">Masked Number</label>
+                  <input
+                    type="text"
+                    value={accountNumberMasked}
+                    onChange={(e) => setAccountNumberMasked(e.target.value)}
+                    placeholder="•••• 9042"
+                    className="w-full bg-slate-950 text-slate-100 p-2.5 rounded-xl border border-slate-800 focus:border-cyan-500 outline-none font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-slate-300 font-bold mb-1">Starting Balance ($)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={initialBalance}
+                    onChange={(e) => setInitialBalance(parseFloat(e.target.value) || 0)}
+                    className="w-full bg-slate-950 text-slate-100 p-2.5 rounded-xl border border-slate-800 focus:border-cyan-500 outline-none font-mono font-bold"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 bg-cyan-950/20 border border-cyan-500/20 rounded-xl text-[11px] text-cyan-300 flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-cyan-400 shrink-0" />
+                <span>256-bit TLS encrypted direct read-only Open Banking connection.</span>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setIsConnectModalOpen(false)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-bold shadow-lg shadow-cyan-600/20 transition cursor-pointer flex items-center gap-1.5"
+                >
+                  <Link2 className="w-4 h-4" /> Establish Connection
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* QUICK CREATE GL ENTRY MODAL */}
       {quickPostStatementId && currentStatementForModal && (

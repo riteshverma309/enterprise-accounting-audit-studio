@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { Globe2, ArrowRightLeft, DollarSign, Layers, CheckCircle2 } from 'lucide-react';
+import { Globe2, ArrowRightLeft, DollarSign, Layers, CheckCircle2, DownloadCloud } from 'lucide-react';
 
 export const ConsolidationView: React.FC = () => {
-  const { consolidatedFinancials, tenants } = useAccounting();
+  const { consolidatedFinancials, tenants, downloadCompanyBackup } = useAccounting();
   const [applyEliminations, setApplyEliminations] = useState(true);
 
   const elimAmount = applyEliminations ? consolidatedFinancials.intercompanyEliminationAmount : 0;
@@ -98,6 +98,7 @@ export const ConsolidationView: React.FC = () => {
                 <th className="p-3 text-right">FX Rate to {consolidatedFinancials.presentationCurrency}</th>
                 <th className="p-3 text-right">Translated Revenue ({consolidatedFinancials.presentationCurrency})</th>
                 <th className="p-3 text-right">Translated Total Assets ({consolidatedFinancials.presentationCurrency})</th>
+                <th className="p-3 text-right">Action</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 font-mono">
@@ -115,6 +116,16 @@ export const ConsolidationView: React.FC = () => {
                   <td className="p-3 text-right text-emerald-400">
                     {consolidatedFinancials.presentationCurrency} {e.translatedAssets.toLocaleString()}
                   </td>
+                  <td className="p-3 text-right">
+                    <button
+                      onClick={() => downloadCompanyBackup({ tenantId: e.tenantId, scope: 'single_company' })}
+                      title={`Download 1-Click Backup for ${e.tenantName}`}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded text-[11px] font-sans font-medium transition cursor-pointer"
+                    >
+                      <DownloadCloud className="w-3 h-3 text-indigo-400" />
+                      <span>Backup</span>
+                    </button>
+                  </td>
                 </tr>
               ))}
               <tr className="bg-slate-950/80 font-bold">
@@ -125,6 +136,7 @@ export const ConsolidationView: React.FC = () => {
                 <td className="p-3 text-right text-emerald-300">
                   {consolidatedFinancials.presentationCurrency} {consolidatedFinancials.totalConsolidatedAssets.toLocaleString()}
                 </td>
+                <td></td>
               </tr>
               {applyEliminations && (
                 <tr className="bg-amber-950/20 text-amber-300 font-semibold">
@@ -133,6 +145,7 @@ export const ConsolidationView: React.FC = () => {
                     - {consolidatedFinancials.presentationCurrency} {consolidatedFinancials.intercompanyEliminationAmount.toLocaleString()}
                   </td>
                   <td className="p-3 text-right font-mono">$0.00</td>
+                  <td></td>
                 </tr>
               )}
               <tr className="bg-slate-950 text-slate-100 font-bold border-t-2 border-slate-700">
@@ -143,6 +156,7 @@ export const ConsolidationView: React.FC = () => {
                 <td className="p-3 text-right text-sm text-emerald-400 font-mono">
                   {consolidatedFinancials.presentationCurrency} {consolidatedFinancials.totalConsolidatedAssets.toLocaleString()}
                 </td>
+                <td></td>
               </tr>
             </tbody>
           </table>

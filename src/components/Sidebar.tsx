@@ -21,16 +21,31 @@ import {
   Users,
   Terminal,
   Package,
+  Car,
+  Repeat,
+  Boxes,
+  Banknote,
+  Database,
+  HardDriveDownload,
+  Webhook,
+  KeyRound,
+  Network,
 } from 'lucide-react';
 
 export type TabType =
   | 'dashboard'
+  | 'backup_restore'
   | 'batch_upload'
   | 'entity_master'
   | 'products_services'
   | 'ledger'
   | 'invoicing_ar'
+  | 'recurring_billing'
   | 'payables_ap'
+  | 'expenses'
+  | 'inventory'
+  | 'employees'
+  | 'payroll'
   | 'treasury'
   | 'fpa_budget'
   | 'approvals'
@@ -42,6 +57,9 @@ export type TabType =
   | 'assets_fx'
   | 'fiscal_close'
   | 'consolidation'
+  | 'integrations_hub'
+  | 'webhooks'
+  | 'api_keys'
   | 'audit_trail'
   | 'ai_copilot'
   | 'help_center'
@@ -55,12 +73,18 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
   const menuItems: { id: TabType; label: string; icon: React.ReactNode; badge?: string }[] = [
     { id: 'dashboard', label: 'Executive Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
+    { id: 'backup_restore', label: 'Backup & Data Restore', icon: <HardDriveDownload className="w-4 h-4" />, badge: '1-Click' },
     { id: 'batch_upload', label: 'Bulk Upload Transactions', icon: <UploadCloud className="w-4 h-4" />, badge: 'CSV / JSON' },
     { id: 'entity_master', label: 'Customers & Vendors', icon: <Users className="w-4 h-4" />, badge: 'EAV Master' },
     { id: 'products_services', label: 'Products & Services', icon: <Package className="w-4 h-4" />, badge: 'Pricing' },
     { id: 'ledger', label: 'General Ledger & CoA', icon: <BookOpenCheck className="w-4 h-4" /> },
     { id: 'invoicing_ar', label: 'Accounts Receivable (AR)', icon: <Receipt className="w-4 h-4" />, badge: 'Invoicing' },
+    { id: 'recurring_billing', label: 'Recurring Billing', icon: <Repeat className="w-4 h-4" />, badge: 'Schedules' },
     { id: 'payables_ap', label: 'Accounts Payable (AP)', icon: <CreditCard className="w-4 h-4" />, badge: 'Bills' },
+    { id: 'expenses', label: 'Expenses & Mileage', icon: <Car className="w-4 h-4" />, badge: 'Receipts' },
+    { id: 'inventory', label: 'Inventory & Stock', icon: <Boxes className="w-4 h-4" />, badge: 'Valuation' },
+    { id: 'employees', label: 'Employee Directory', icon: <Users className="w-4 h-4" />, badge: 'Staff 360°' },
+    { id: 'payroll', label: 'Payroll & Compensation', icon: <Banknote className="w-4 h-4" />, badge: 'Wages' },
     { id: 'treasury', label: 'Treasury & Cash Forecast', icon: <Wallet className="w-4 h-4" />, badge: 'IAS 7' },
     { id: 'fpa_budget', label: 'FP&A Budget vs Actuals', icon: <PieChart className="w-4 h-4" />, badge: 'Cost Center' },
     { id: 'approvals', label: 'Approvals & Governance', icon: <ShieldCheck className="w-4 h-4" />, badge: 'SOX 404' },
@@ -68,10 +92,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'users_access', label: 'User Provisioning & RBAC', icon: <Users className="w-4 h-4" />, badge: 'SOX 404' },
     { id: 'audit_reports', label: 'Financial Audit Reports', icon: <FileSpreadsheet className="w-4 h-4" /> },
     { id: 'regulatory', label: 'Regulatory Tax Filing', icon: <FileCheck2 className="w-4 h-4" />, badge: 'GST / GAAP / IFRS' },
-    { id: 'reconciliation', label: 'Bank Reconciliation', icon: <Landmark className="w-4 h-4" /> },
+    { id: 'reconciliation', label: 'Bank Feeds & Reconciliation', icon: <Landmark className="w-4 h-4" />, badge: 'Live Feeds' },
     { id: 'assets_fx', label: 'Fixed Assets & FX', icon: <Layers className="w-4 h-4" /> },
     { id: 'fiscal_close', label: 'Fiscal Close & Lock', icon: <Lock className="w-4 h-4" />, badge: 'Period Lock' },
     { id: 'consolidation', label: 'Global Consolidation', icon: <Globe2 className="w-4 h-4" />, badge: 'Multi-Tenant' },
+    { id: 'integrations_hub', label: 'Zapier / Make Connectors', icon: <Network className="w-4 h-4" />, badge: 'E-Comm' },
+    { id: 'webhooks', label: 'Webhooks Dispatcher', icon: <Webhook className="w-4 h-4" />, badge: 'Logs' },
+    { id: 'api_keys', label: 'API Keys & Developer Portal', icon: <KeyRound className="w-4 h-4" />, badge: 'Tokens' },
     { id: 'audit_trail', label: 'System Audit Logs', icon: <ShieldAlert className="w-4 h-4" /> },
     { id: 'ai_copilot', label: 'AI Audit Copilot', icon: <Sparkles className="w-4 h-4" />, badge: 'Gemini' },
     { id: 'help_center', label: 'Help Center & User Guide', icon: <BookOpen className="w-4 h-4" />, badge: 'Guide & Sim' },

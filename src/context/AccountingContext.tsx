@@ -6,6 +6,7 @@ import {
   Role,
   PluginId,
   Account,
+  AccountType,
   JournalEntry,
   JournalLine,
   BankStatementLine,
@@ -25,6 +26,7 @@ import {
   TreasuryAccount,
   DepartmentBudget,
   ApprovalItem,
+  ConfigurableApprovalRule,
   TaxJurisdiction,
   EnterpriseUser,
   CustomRoleDefinition,
@@ -45,6 +47,29 @@ import {
   InvoicePaymentAllocation,
   BulkInvoiceBatchRun,
   CustomerStatementData,
+  RecurringInvoiceSchedule,
+  RecurrenceFrequency,
+  ExpenseReceipt,
+  MileageLogEntry,
+  InventoryStockItem,
+  InventoryAdjustmentRecord,
+  PayrollEmployee,
+  PayrollRun,
+  PayrollRunEmployeeLine,
+  ConnectedBankFeed,
+  CompanyBackupPayload,
+  CompanyBackupMetadata,
+  BackupValidationResult,
+  CompanyBackupRecordCounts,
+  WebhookEndpoint,
+  WebhookDeliveryLog,
+  WebhookEventType,
+  ScopedApiKey,
+  ApiKeyPermissionScope,
+  IntegrationConnector,
+  ConnectorPlatform,
+  EntityAiConfig,
+  AiTokenUsageLog,
 } from '../types';
 import {
   INITIAL_TENANTS,
@@ -59,12 +84,27 @@ import {
   INITIAL_TREASURY_ACCOUNTS,
   INITIAL_DEPARTMENT_BUDGETS,
   INITIAL_APPROVAL_ITEMS,
+  INITIAL_APPROVAL_RULES,
   INITIAL_TAX_JURISDICTIONS,
   INITIAL_ENTERPRISE_USERS,
   INITIAL_CUSTOM_ROLES,
   INITIAL_PAYMENT_RECEIPTS,
   INITIAL_OPENING_BALANCES,
   INITIAL_BULK_BATCHES,
+  INITIAL_RECURRING_SCHEDULES,
+  INITIAL_EXPENSE_RECEIPTS,
+  INITIAL_MILEAGE_LOGS,
+  INITIAL_INVENTORY_ITEMS,
+  INITIAL_INVENTORY_ADJUSTMENTS,
+  INITIAL_PAYROLL_EMPLOYEES,
+  INITIAL_PAYROLL_RUNS,
+  INITIAL_CONNECTED_BANK_FEEDS,
+  INITIAL_WEBHOOK_ENDPOINTS,
+  INITIAL_WEBHOOK_LOGS,
+  INITIAL_SCOPED_API_KEYS,
+  INITIAL_INTEGRATION_CONNECTORS,
+  INITIAL_TENANT_AI_CONFIGS,
+  INITIAL_AI_USAGE_LOGS,
   FX_RATES,
   mockCustomAttributeDefinitions,
   mockCustomerContacts,
@@ -73,6 +113,7 @@ import {
   mockPriceChangeHistory,
   mockInvoiceTemplates,
 } from '../mockData';
+import { INDUSTRY_COA_PRESETS, IndustryCoaPreset } from '../data/industryCoaPresets';
 
 interface AccountingContextType {
   // Tenant & Context Headers State
@@ -161,6 +202,21 @@ interface AccountingContextType {
   }) => { success: boolean; batchRun?: BulkInvoiceBatchRun; createdInvoicesCount: number; error?: string };
   rollbackInvoiceBatch: (batchId: string, reason?: string) => { success: boolean; error?: string };
 
+  // Governance & Maker-Checker Approvals Engine
+  approvalRules: ConfigurableApprovalRule[];
+  createApprovalRule: (ruleData: Omit<ConfigurableApprovalRule, 'id'>) => { success: boolean; rule?: ConfigurableApprovalRule; error?: string };
+  updateApprovalRule: (id: string, updates: Partial<ConfigurableApprovalRule>) => { success: boolean; error?: string };
+  deleteApprovalRule: (id: string) => { success: boolean; error?: string };
+  toggleApprovalRule: (id: string) => { success: boolean; error?: string };
+  submitApprovalRequest: (item: Omit<ApprovalItem, 'id' | 'requestedDate' | 'status'>) => { success: boolean; item?: ApprovalItem; error?: string };
+  processApprovalDecision: (approvalId: string, decision: 'APPROVED' | 'REJECTED', comments?: string) => { success: boolean; error?: string };
+
+  // Custom Roles & Permissions Engine
+  createCustomRole: (roleData: Omit<CustomRoleDefinition, 'id' | 'isSystemRole'>) => { success: boolean; role?: CustomRoleDefinition; error?: string };
+  updateCustomRole: (id: string, updates: Partial<CustomRoleDefinition>) => { success: boolean; error?: string };
+  deleteCustomRole: (id: string) => { success: boolean; error?: string };
+  cloneCustomRole: (sourceRoleId: string, newName: string, newCode: string) => { success: boolean; role?: CustomRoleDefinition; error?: string };
+
   // User Access & Provisioning Engine
   createEnterpriseUser: (userData: Omit<EnterpriseUser, 'id' | 'createdAt' | 'lastLogin' | 'apiTokenCount'>) => { success: boolean; error?: string };
   updateUserStatus: (userId: string, status: 'ACTIVE' | 'SUSPENDED') => void;
@@ -230,7 +286,6 @@ interface AccountingContextType {
   // Treasury, FP&A, Approvals & Tax Engine Operations
   executeSweepTransfer: (fromAccId: string, toAccId: string, amount: number) => { success: boolean; error?: string };
   updateDepartmentBudget: (budgetId: string, newAnnualAmount: number) => void;
-  processApprovalDecision: (approvalId: string, decision: 'APPROVED' | 'REJECTED') => void;
   postTaxSettlementVoucher: (jurisdictionId: string) => { success: boolean; entryId?: string; error?: string };
 
   // Bank & Assets
@@ -240,9 +295,59 @@ interface AccountingContextType {
   createAndReconcileGLLine: (statementId: string, accountCode: string, memo?: string) => { success: boolean; error?: string };
   runDepreciationForTenant: (asOfDate: string) => { success: boolean; totalDepreciation: number; entriesCreated: number };
   
-  // Entity Management
+  // Entity Management & Chart of Accounts
   createTenant: (tenantData: Omit<Tenant, 'id' | 'organizations'>) => void;
   createAccount: (accountData: Omit<Account, 'id' | 'tenantId' | 'balance'>) => { success: boolean; error?: string };
+  updateAccount: (accountId: string, updates: Partial<Account>) => { success: boolean; error?: string };
+  deleteAccount: (accountId: string, force?: boolean) => { success: boolean; error?: string; isArchived?: boolean };
+  applyIndustryPresetCOA: (presetId: string, mode?: 'merge' | 'replace') => { success: boolean; addedCount: number; replacedCount?: number; error?: string };
+  batchImportAccounts: (accountsList: Array<Partial<Account>>, mode?: 'merge' | 'replace') => { success: boolean; count: number; errors: string[] };
+  industryCoaPresets: IndustryCoaPreset[];
+
+  // Recurring Billing & Automated Invoicing
+  recurringSchedules: RecurringInvoiceSchedule[];
+  createRecurringSchedule: (data: Omit<RecurringInvoiceSchedule, 'id' | 'generatedInvoicesCount'>) => { success: boolean; schedule?: RecurringInvoiceSchedule; error?: string };
+  updateRecurringSchedule: (id: string, updates: Partial<RecurringInvoiceSchedule>) => { success: boolean; error?: string };
+  deleteRecurringSchedule: (id: string) => { success: boolean; error?: string };
+  runRecurringScheduleNow: (id: string) => { success: boolean; invoice?: CustomerInvoice; error?: string };
+
+  // Expense Tracking & OCR Receipt Capture
+  expenseReceipts: ExpenseReceipt[];
+  createExpenseReceipt: (data: Omit<ExpenseReceipt, 'id' | 'createdAt' | 'status'>) => { success: boolean; receipt?: ExpenseReceipt; error?: string };
+  postExpenseReceiptToGL: (receiptId: string, paymentAccountId?: string) => { success: boolean; entryId?: string; error?: string };
+  deleteExpenseReceipt: (id: string) => { success: boolean; error?: string };
+
+  // Mileage Tracking for Tax Deductions
+  mileageLogs: MileageLogEntry[];
+  createMileageLog: (data: Omit<MileageLogEntry, 'id' | 'createdAt' | 'status' | 'totalDeductionAmount'>) => { success: boolean; log?: MileageLogEntry; error?: string };
+  postMileageLogToGL: (logId: string, paymentAccountId?: string) => { success: boolean; entryId?: string; error?: string };
+  deleteMileageLog: (id: string) => { success: boolean; error?: string };
+
+  // Inventory Tracking & Stock Movements
+  inventoryItems: InventoryStockItem[];
+  inventoryAdjustments: InventoryAdjustmentRecord[];
+  createInventoryItem: (data: Omit<InventoryStockItem, 'id' | 'status' | 'totalValuation'>) => { success: boolean; item?: InventoryStockItem; error?: string };
+  updateInventoryItem: (id: string, updates: Partial<InventoryStockItem>) => { success: boolean; error?: string };
+  adjustInventoryStock: (params: { itemId: string; type: InventoryAdjustmentRecord['type']; quantityDelta: number; reason: string; unitCost?: number; postToGl?: boolean }) => { success: boolean; adjustment?: InventoryAdjustmentRecord; error?: string };
+  deleteInventoryItem: (id: string) => { success: boolean; error?: string };
+
+  // Payroll Management & Tax Withholdings
+  payrollEmployees: PayrollEmployee[];
+  payrollRuns: PayrollRun[];
+  createPayrollEmployee: (data: Omit<PayrollEmployee, 'id'>) => { success: boolean; employee?: PayrollEmployee; error?: string };
+  updatePayrollEmployee: (id: string, updates: Partial<PayrollEmployee>) => { success: boolean; error?: string };
+  deletePayrollEmployee: (id: string) => { success: boolean; error?: string };
+  calculatePayRunPreview: (payPeriodStart: string, payPeriodEnd: string, payDate: string, employeeIds?: string[]) => { lines: PayrollRunEmployeeLine[]; totalGrossPay: number; totalEmployeeTaxWithholdings: number; totalEmployerTaxes: number; totalNetPay: number };
+  executePayRun: (params: { payPeriodStart: string; payPeriodEnd: string; payDate: string; employeeIds?: string[]; postToGl?: boolean }) => { success: boolean; run?: PayrollRun; entryId?: string; error?: string };
+
+  // Connected Bank Feeds
+  connectedBankFeeds: ConnectedBankFeed[];
+  connectBankFeed: (data: Omit<ConnectedBankFeed, 'id' | 'lastSyncedAt' | 'status'>) => { success: boolean; feed?: ConnectedBankFeed; error?: string };
+  syncBankFeed: (feedId: string) => { success: boolean; newLinesCount: number; error?: string };
+  disconnectBankFeed: (feedId: string) => { success: boolean; error?: string };
+
+  // Online Payment Gateway Simulation
+  processOnlineInvoicePayment: (invoiceId: string, paymentMethod: PaymentMethodType, paymentDetails: { cardLast4?: string; accountLast4?: string; email?: string; notes?: string }) => { success: boolean; receipt?: CustomerPaymentReceipt; error?: string };
 
   // Financial Reports & Intelligence Calculators
   trialBalance: TrialBalanceRow[];
@@ -253,6 +358,41 @@ interface AccountingContextType {
   financialRatios: FinancialRatiosData;
   consolidatedFinancials: ConsolidatedEntityData;
   
+  // Company Data Backup, 1-Click Export & Point-in-Time Restore Engine
+  downloadCompanyBackup: (options?: { tenantId?: string; scope?: 'single_company' | 'full_system' }) => { success: boolean; fileName?: string; backupPayload?: CompanyBackupPayload; error?: string };
+  validateBackupFileContent: (fileContent: string) => BackupValidationResult;
+  restoreCompanyBackup: (payload: CompanyBackupPayload, options?: { mode: 'replace_current' | 'restore_as_new_tenant'; targetTenantCode?: string; targetTenantName?: string }) => { success: boolean; tenantId?: string; tenantName?: string; restoredCounts?: CompanyBackupRecordCounts; error?: string };
+
+  // Webhooks Dispatcher & Outbound Event Engine
+  webhookEndpoints: WebhookEndpoint[];
+  webhookLogs: WebhookDeliveryLog[];
+  createWebhookEndpoint: (data: Omit<WebhookEndpoint, 'id' | 'createdAt' | 'updatedAt' | 'failureCount'>) => WebhookEndpoint;
+  updateWebhookEndpoint: (id: string, updates: Partial<WebhookEndpoint>) => void;
+  deleteWebhookEndpoint: (id: string) => void;
+  testDispatchWebhook: (endpointId: string, event: WebhookEventType, customPayload?: any) => Promise<{ success: boolean; log: WebhookDeliveryLog }>;
+  retryWebhookDelivery: (logId: string) => Promise<{ success: boolean; log?: WebhookDeliveryLog }>;
+  dispatchAccountingEvent: (event: WebhookEventType, payloadData: any, tenantIdOverride?: string) => Promise<void>;
+
+  // Scoped API Keys & Developer Portal
+  scopedApiKeys: ScopedApiKey[];
+  createScopedApiKey: (data: { name: string; role: Role; environment?: 'LIVE' | 'TEST' | 'SANDBOX'; scopes: ApiKeyPermissionScope[]; rateLimitPerMin?: number; expiresInDays?: number; tenantId?: string }) => { success: boolean; apiKey?: ScopedApiKey; fullSecretKey?: string; error?: string };
+  revokeScopedApiKey: (id: string) => void;
+  deleteScopedApiKey: (id: string) => void;
+
+  // Zapier / Make & E-Commerce Integration Connectors
+  integrationConnectors: IntegrationConnector[];
+  connectIntegrationConnector: (platform: ConnectorPlatform, credentials: Record<string, string>, syncSettings?: any) => { success: boolean; connector?: IntegrationConnector };
+  syncIntegrationConnector: (connectorId: string) => Promise<{ success: boolean; syncedCount: number; message: string }>;
+  disconnectIntegrationConnector: (connectorId: string) => void;
+
+  // AI Audit Copilot Entity Configuration & Token Quotas
+  tenantAiConfigs: Record<string, EntityAiConfig>;
+  activeTenantAiConfig: EntityAiConfig;
+  aiUsageLogs: AiTokenUsageLog[];
+  updateTenantAiConfig: (tenantId: string, updates: Partial<EntityAiConfig>) => { success: boolean; error?: string };
+  recordAiTokenUsage: (params: { tenantId: string; model: string; promptTokens: number; responseTokens: number; queryTopic: string }) => void;
+  resetTenantAiQuota: (tenantId: string) => { success: boolean; error?: string };
+
   // Helper to parse CSV/JSON text
   parseCsvOrJsonUpload: (fileContent: string, format: 'csv' | 'json') => ParsedTransactionUpload[];
 }
@@ -279,9 +419,10 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [treasuryAccounts, setTreasuryAccounts] = useState<TreasuryAccount[]>(INITIAL_TREASURY_ACCOUNTS);
   const [departmentBudgets, setDepartmentBudgets] = useState<DepartmentBudget[]>(INITIAL_DEPARTMENT_BUDGETS);
   const [approvalItems, setApprovalItems] = useState<ApprovalItem[]>(INITIAL_APPROVAL_ITEMS);
+  const [approvalRules, setApprovalRules] = useState<ConfigurableApprovalRule[]>(INITIAL_APPROVAL_RULES);
   const [taxJurisdictions, setTaxJurisdictions] = useState<TaxJurisdiction[]>(INITIAL_TAX_JURISDICTIONS);
   const [enterpriseUsers, setEnterpriseUsers] = useState<EnterpriseUser[]>(INITIAL_ENTERPRISE_USERS);
-  const [customRoles] = useState<CustomRoleDefinition[]>(INITIAL_CUSTOM_ROLES);
+  const [customRoles, setCustomRoles] = useState<CustomRoleDefinition[]>(INITIAL_CUSTOM_ROLES);
   const [customers, setCustomers] = useState<CustomerContact[]>(mockCustomerContacts);
   const [vendors, setVendors] = useState<VendorContact[]>(mockVendorContacts);
   const [customAttributeDefinitions, setCustomAttributeDefinitions] = useState<CustomAttributeDefinition[]>(mockCustomAttributeDefinitions);
@@ -291,6 +432,20 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [bulkInvoiceBatches, setBulkInvoiceBatches] = useState<BulkInvoiceBatchRun[]>(INITIAL_BULK_BATCHES);
   const [paymentReceipts, setPaymentReceipts] = useState<CustomerPaymentReceipt[]>(INITIAL_PAYMENT_RECEIPTS);
   const [openingBalances, setOpeningBalances] = useState<CustomerOpeningBalanceRecord[]>(INITIAL_OPENING_BALANCES);
+  const [recurringSchedules, setRecurringSchedules] = useState<RecurringInvoiceSchedule[]>(INITIAL_RECURRING_SCHEDULES);
+  const [expenseReceipts, setExpenseReceipts] = useState<ExpenseReceipt[]>(INITIAL_EXPENSE_RECEIPTS);
+  const [mileageLogs, setMileageLogs] = useState<MileageLogEntry[]>(INITIAL_MILEAGE_LOGS);
+  const [inventoryItems, setInventoryItems] = useState<InventoryStockItem[]>(INITIAL_INVENTORY_ITEMS);
+  const [inventoryAdjustments, setInventoryAdjustments] = useState<InventoryAdjustmentRecord[]>(INITIAL_INVENTORY_ADJUSTMENTS);
+  const [payrollEmployees, setPayrollEmployees] = useState<PayrollEmployee[]>(INITIAL_PAYROLL_EMPLOYEES);
+  const [payrollRuns, setPayrollRuns] = useState<PayrollRun[]>(INITIAL_PAYROLL_RUNS);
+  const [connectedBankFeeds, setConnectedBankFeeds] = useState<ConnectedBankFeed[]>(INITIAL_CONNECTED_BANK_FEEDS);
+  const [webhookEndpoints, setWebhookEndpoints] = useState<WebhookEndpoint[]>(INITIAL_WEBHOOK_ENDPOINTS);
+  const [webhookLogs, setWebhookLogs] = useState<WebhookDeliveryLog[]>(INITIAL_WEBHOOK_LOGS);
+  const [scopedApiKeys, setScopedApiKeys] = useState<ScopedApiKey[]>(INITIAL_SCOPED_API_KEYS);
+  const [integrationConnectors, setIntegrationConnectors] = useState<IntegrationConnector[]>(INITIAL_INTEGRATION_CONNECTORS);
+  const [tenantAiConfigs, setTenantAiConfigs] = useState<Record<string, EntityAiConfig>>(INITIAL_TENANT_AI_CONFIGS);
+  const [aiUsageLogs, setAiUsageLogs] = useState<AiTokenUsageLog[]>(INITIAL_AI_USAGE_LOGS);
 
   // Active Tenant object
   const activeTenant = useMemo(() => {
@@ -957,6 +1112,309 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     return { success: true };
   };
 
+  // Update existing Chart of Account
+  const updateAccount = (accountId: string, updates: Partial<Account>) => {
+    const current = accountsMap[activeTenant.id] || [];
+    const target = current.find((a) => a.id === accountId);
+    if (!target) {
+      return { success: false, error: 'Account not found in current Chart of Accounts.' };
+    }
+
+    if (updates.code && updates.code !== target.code) {
+      if (current.some((a) => a.id !== accountId && a.code === updates.code)) {
+        return { success: false, error: `Account code "${updates.code}" is already assigned to another account in ${activeTenant.name}.` };
+      }
+    }
+
+    const updatedAccount: Account = {
+      ...target,
+      ...updates,
+    };
+
+    setAccountsMap((prev) => ({
+      ...prev,
+      [activeTenant.id]: (prev[activeTenant.id] || []).map((a) => (a.id === accountId ? updatedAccount : a)),
+    }));
+
+    addAuditLog({
+      action: 'CREATE_TENANT',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated Chart of Account [${target.code}] "${target.name}" → [${updatedAccount.code}] "${updatedAccount.name}" (${updatedAccount.type})`,
+      status: 'SUCCESS',
+      payloadSummary: `Updated fields: ${Object.keys(updates).join(', ')} | Status: ${updatedAccount.isActive === false ? 'Inactive' : 'Active'}`,
+    });
+
+    return { success: true };
+  };
+
+  // Delete or Archive Chart of Account
+  const deleteAccount = (accountId: string, force: boolean = false) => {
+    const current = accountsMap[activeTenant.id] || [];
+    const target = current.find((a) => a.id === accountId);
+    if (!target) {
+      return { success: false, error: 'Account not found.' };
+    }
+
+    // Safety checks: Non-zero balance
+    if (Math.abs(target.balance || 0) > 0.001 && !force) {
+      return {
+        success: false,
+        error: `Cannot delete account "${target.code} - ${target.name}" because it has an active balance of ${activeTenant.currency} ${(target.balance || 0).toFixed(2)}. Please transfer the balance first, or mark the account as Inactive.`,
+      };
+    }
+
+    // Safety checks: Active journal postings
+    const hasPostings = journalEntries.some((je) =>
+      je.tenantId === activeTenant.id && je.lines.some((l) => l.accountId === accountId || l.accountCode === target.code)
+    );
+
+    if (hasPostings && !force) {
+      // Archive instead of hard delete to maintain double-entry audit integrity
+      setAccountsMap((prev) => ({
+        ...prev,
+        [activeTenant.id]: (prev[activeTenant.id] || []).map((a) =>
+          a.id === accountId ? { ...a, isActive: false } : a
+        ),
+      }));
+
+      addAuditLog({
+        action: 'CREATE_TENANT',
+        tenantId: activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Archived/Deactivated Chart of Account [${target.code}] "${target.name}" (Account retained for audit trail compliance)`,
+        status: 'SUCCESS',
+        payloadSummary: `Account ID: ${accountId} | Status set to Inactive`,
+      });
+
+      return {
+        success: true,
+        isArchived: true,
+        error: `Account has historical journal postings. It has been deactivated/archived to preserve ledger immutability.`,
+      };
+    }
+
+    // Hard delete if no postings or forced
+    setAccountsMap((prev) => ({
+      ...prev,
+      [activeTenant.id]: (prev[activeTenant.id] || []).filter((a) => a.id !== accountId),
+    }));
+
+    addAuditLog({
+      action: 'CREATE_TENANT',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Permanently deleted Chart of Account [${target.code}] "${target.name}" from ${activeTenant.name}`,
+      status: 'SUCCESS',
+      payloadSummary: `Account ID: ${accountId} | Type: ${target.type}`,
+    });
+
+    return { success: true };
+  };
+
+  // Apply Pre-configured Industry COA Template
+  const applyIndustryPresetCOA = (presetId: string, mode: 'merge' | 'replace' = 'merge') => {
+    const preset = INDUSTRY_COA_PRESETS.find((p) => p.id === presetId);
+    if (!preset) {
+      return { success: false, addedCount: 0, error: 'Industry preset template not found.' };
+    }
+
+    const current = accountsMap[activeTenant.id] || [];
+
+    if (mode === 'replace') {
+      const newAccounts: Account[] = preset.accounts.map((accDef, idx) => ({
+        id: `acc-${activeTenant.id}-${preset.id}-${Date.now()}-${idx}`,
+        tenantId: activeTenant.id,
+        code: accDef.code,
+        name: accDef.name,
+        type: accDef.type,
+        currency: activeTenant.currency,
+        balance: accDef.initialBalance || 0,
+        subCategory: accDef.subCategory,
+        description: accDef.description,
+        normalBalance: accDef.normalBalance,
+        isSystemAccount: accDef.isSystemAccount,
+        isActive: true,
+        industryTag: preset.name,
+      }));
+
+      setAccountsMap((prev) => ({
+        ...prev,
+        [activeTenant.id]: newAccounts,
+      }));
+
+      addAuditLog({
+        action: 'CREATE_TENANT',
+        tenantId: activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Initialized Chart of Accounts from pre-configured Industry Template: "${preset.name}" (${newAccounts.length} accounts configured in mode: REPLACE)`,
+        status: 'SUCCESS',
+        payloadSummary: `Sector: ${preset.sector} | Standard: ${preset.standard} | Tenant: ${activeTenant.name}`,
+      });
+
+      return { success: true, addedCount: newAccounts.length, replacedCount: current.length };
+    } else {
+      // Smart Merge mode
+      const existingCodes = new Set(current.map((a) => a.code));
+      const additions: Account[] = [];
+
+      preset.accounts.forEach((accDef, idx) => {
+        if (!existingCodes.has(accDef.code)) {
+          additions.push({
+            id: `acc-${activeTenant.id}-${preset.id}-${Date.now()}-${idx}`,
+            tenantId: activeTenant.id,
+            code: accDef.code,
+            name: accDef.name,
+            type: accDef.type,
+            currency: activeTenant.currency,
+            balance: accDef.initialBalance || 0,
+            subCategory: accDef.subCategory,
+            description: accDef.description,
+            normalBalance: accDef.normalBalance,
+            isSystemAccount: accDef.isSystemAccount,
+            isActive: true,
+            industryTag: preset.name,
+          });
+        }
+      });
+
+      // Also enrich existing accounts with missing subCategory or description from preset
+      const updatedExisting = current.map((existingAcc) => {
+        const match = preset.accounts.find((p) => p.code === existingAcc.code);
+        if (match) {
+          return {
+            ...existingAcc,
+            subCategory: existingAcc.subCategory || match.subCategory,
+            description: existingAcc.description || match.description,
+            normalBalance: existingAcc.normalBalance || match.normalBalance,
+          };
+        }
+        return existingAcc;
+      });
+
+      const mergedList = [...updatedExisting, ...additions];
+
+      setAccountsMap((prev) => ({
+        ...prev,
+        [activeTenant.id]: mergedList,
+      }));
+
+      addAuditLog({
+        action: 'CREATE_TENANT',
+        tenantId: activeTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Merged Industry COA Preset "${preset.name}" into ${activeTenant.name}. Added ${additions.length} new specialized industry accounts.`,
+        status: 'SUCCESS',
+        payloadSummary: `Sector: ${preset.sector} | Total Accounts: ${mergedList.length} | Added: ${additions.length}`,
+      });
+
+      return { success: true, addedCount: additions.length };
+    }
+  };
+
+  // Batch Import Accounts from CSV / Excel parsed rows
+  const batchImportAccounts = (
+    accountsList: Array<Partial<Account>>,
+    mode: 'merge' | 'replace' = 'merge'
+  ) => {
+    const current = accountsMap[activeTenant.id] || [];
+    const errors: string[] = [];
+    const validAccounts: Account[] = [];
+
+    accountsList.forEach((row, idx) => {
+      const code = String(row.code || '').trim();
+      const name = String(row.name || '').trim();
+      const rawType = String(row.type || '').trim().toUpperCase();
+
+      if (!code) {
+        errors.push(`Row ${idx + 1}: Missing account code.`);
+        return;
+      }
+      if (!name) {
+        errors.push(`Row ${idx + 1}: Missing account name for code "${code}".`);
+        return;
+      }
+
+      let type: AccountType = 'ASSET';
+      if (['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'].includes(rawType)) {
+        type = rawType as AccountType;
+      } else {
+        errors.push(`Row ${idx + 1}: Invalid account type "${rawType}". Must be ASSET, LIABILITY, EQUITY, REVENUE, or EXPENSE.`);
+        return;
+      }
+
+      const defaultNormal = (type === 'ASSET' || type === 'EXPENSE') ? 'DEBIT' : 'CREDIT';
+      const normalBal = (row.normalBalance === 'DEBIT' || row.normalBalance === 'CREDIT') ? row.normalBalance : defaultNormal;
+
+      validAccounts.push({
+        id: row.id || `acc-imp-${Date.now()}-${idx}`,
+        tenantId: activeTenant.id,
+        code,
+        name,
+        type,
+        currency: row.currency || activeTenant.currency,
+        balance: Number(row.balance || 0),
+        subCategory: row.subCategory || (type === 'ASSET' ? 'Current Assets' : type === 'LIABILITY' ? 'Current Liabilities' : type === 'EQUITY' ? 'Contributed Capital' : type === 'REVENUE' ? 'Operating Income' : 'Operating Expenses'),
+        description: row.description || `Imported account maintained in ${row.currency || activeTenant.currency}`,
+        normalBalance: normalBal,
+        isActive: row.isActive !== false,
+        isSystemAccount: row.isSystemAccount || false,
+      });
+    });
+
+    if (validAccounts.length === 0) {
+      return { success: false, count: 0, errors: errors.length > 0 ? errors : ['No valid accounts found in upload.'] };
+    }
+
+    if (mode === 'replace') {
+      setAccountsMap((prev) => ({
+        ...prev,
+        [activeTenant.id]: validAccounts,
+      }));
+    } else {
+      // Merge
+      const importCodeMap = new Map(validAccounts.map((a) => [a.code, a]));
+      const updatedExisting = current.map((existing) => {
+        const imported = importCodeMap.get(existing.code);
+        if (imported) {
+          importCodeMap.delete(existing.code);
+          return {
+            ...existing,
+            name: imported.name || existing.name,
+            type: imported.type || existing.type,
+            subCategory: imported.subCategory || existing.subCategory,
+            description: imported.description || existing.description,
+            normalBalance: imported.normalBalance || existing.normalBalance,
+          };
+        }
+        return existing;
+      });
+
+      const finalMerged = [...updatedExisting, ...Array.from(importCodeMap.values())];
+      setAccountsMap((prev) => ({
+        ...prev,
+        [activeTenant.id]: finalMerged,
+      }));
+    }
+
+    addAuditLog({
+      action: 'CREATE_TENANT',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Batch imported Chart of Accounts (${validAccounts.length} rows processed in mode: ${mode.toUpperCase()})`,
+      status: 'SUCCESS',
+      payloadSummary: `Imported Valid: ${validAccounts.length} | Errors: ${errors.length}`,
+    });
+
+    return { success: true, count: validAccounts.length, errors };
+  };
+
   // Create New Tenant
   const createTenant = (tenantData: Omit<Tenant, 'id' | 'organizations'>) => {
     const tId = `t-${Date.now()}`;
@@ -1053,30 +1511,236 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
   };
 
-  // Governance Approval Decision Processor
-  const processApprovalDecision = (approvalId: string, decision: 'APPROVED' | 'REJECTED') => {
+  // Governance Approval Decision Processor & Maker-Checker Dual Authorization
+  const processApprovalDecision = (approvalId: string, decision: 'APPROVED' | 'REJECTED', comments?: string) => {
+    const targetItem = approvalItems.find((i) => i.id === approvalId);
+    if (!targetItem) return { success: false, error: 'Approval item not found.' };
+
+    // Segregation of Duties (SoD) & Maker-Checker enforcement:
+    // The requester (maker) cannot self-approve their own request
+    if (decision === 'APPROVED' && targetItem.requestedBy.toLowerCase() === userEmail.toLowerCase() && activeRole !== 'super_user') {
+      const sodErr = `SEGREGATION OF DUTIES (SoD) VIOLATION: Requester (${targetItem.requestedBy}) cannot self-approve item ${targetItem.referenceNumber}. Dual signature required from an independent Checker.`;
+      addAuditLog({
+        action: 'POST_JOURNAL',
+        tenantId: targetItem.tenantId || activeTenantId,
+        userRole: activeRole,
+        userEmail,
+        details: `Blocked self-approval attempt by maker on ${targetItem.referenceNumber}`,
+        status: 'FORBIDDEN',
+        payloadSummary: sodErr,
+      });
+      return { success: false, error: sodErr };
+    }
+
+    const now = new Date().toISOString();
     setApprovalItems((prev) =>
-      prev.map((item) => (item.id === approvalId ? { ...item, status: decision } : item))
+      prev.map((item) =>
+        item.id === approvalId
+          ? {
+              ...item,
+              status: decision,
+              approvedBy: userEmail,
+              approvedRole: activeRole,
+              approvalDate: now,
+              approverComments: comments || (decision === 'APPROVED' ? 'Verified & approved via Maker-Checker SOX 404 control workflow.' : 'Rejected by authorized reviewer.'),
+              rejectionReason: decision === 'REJECTED' ? comments : undefined,
+            }
+          : item
+      )
     );
 
-    const targetItem = approvalItems.find((i) => i.id === approvalId);
-    if (targetItem) {
-      setAuditLogs((prev) => [
-        {
-          id: `log-app-${Date.now()}`,
-          timestamp: new Date().toISOString(),
-          actorEmail: userEmail,
-          actorRole: activeRole,
-          actionType: decision === 'APPROVED' ? 'POST_ENTRY' : 'REVERSE_ENTRY',
-          resourceType: targetItem.entityType,
-          resourceId: targetItem.referenceNumber,
-          changesDescription: `Governance Approval decision ${decision} for ${targetItem.description} ($${targetItem.amount.toLocaleString()})`,
-          hash: `hash-app-${Math.random().toString(36).substring(2, 9)}`,
-          tenantId: activeTenantId,
-        },
-        ...prev,
-      ]);
+    addAuditLog({
+      action: 'POST_JOURNAL',
+      tenantId: targetItem.tenantId || activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Maker-Checker Approval Decision: ${decision} for ${targetItem.referenceNumber} (${targetItem.entityType}) - ${targetItem.amount} ${targetItem.currency}`,
+      status: 'SUCCESS',
+      payloadSummary: `Maker: ${targetItem.requestedBy} | Checker: ${userEmail} (${activeRole}) | Notes: ${comments || 'None'}`,
+    });
+
+    return { success: true };
+  };
+
+  const submitApprovalRequest = (item: Omit<ApprovalItem, 'id' | 'requestedDate' | 'status'>) => {
+    const newApproval: ApprovalItem = {
+      ...item,
+      id: `app-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      requestedDate: new Date().toISOString().split('T')[0],
+      requestedRole: activeRole,
+      status: 'PENDING',
+    };
+
+    setApprovalItems((prev) => [newApproval, ...prev]);
+
+    addAuditLog({
+      action: 'POST_JOURNAL',
+      tenantId: item.tenantId || activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Queued dual-signature governance approval request for ${newApproval.referenceNumber} (${newApproval.entityType})`,
+      status: 'SUCCESS',
+      payloadSummary: `Amount: ${newApproval.amount} ${newApproval.currency} | Requested By: ${newApproval.requestedBy}`,
+    });
+
+    return { success: true, item: newApproval };
+  };
+
+  const createApprovalRule = (ruleData: Omit<ConfigurableApprovalRule, 'id'>) => {
+    const newRule: ConfigurableApprovalRule = {
+      ...ruleData,
+      id: `rule-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    };
+
+    setApprovalRules((prev) => [newRule, ...prev]);
+
+    addAuditLog({
+      action: 'SYSTEM_CLOSE',
+      tenantId: ruleData.tenantId || activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Configured new Maker-Checker approval threshold rule: "${newRule.ruleName}" (${newRule.entityType} > ${newRule.thresholdAmount})`,
+      status: 'SUCCESS',
+      payloadSummary: `Required Role: ${newRule.requiredRole} | Maker-Checker Enforced: ${newRule.enforceMakerChecker}`,
+    });
+
+    return { success: true, rule: newRule };
+  };
+
+  const updateApprovalRule = (id: string, updates: Partial<ConfigurableApprovalRule>) => {
+    setApprovalRules((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, ...updates } : r))
+    );
+
+    addAuditLog({
+      action: 'SYSTEM_CLOSE',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated approval threshold rule ID: ${id}`,
+      status: 'SUCCESS',
+    });
+
+    return { success: true };
+  };
+
+  const deleteApprovalRule = (id: string) => {
+    const rule = approvalRules.find((r) => r.id === id);
+    setApprovalRules((prev) => prev.filter((r) => r.id !== id));
+
+    addAuditLog({
+      action: 'SYSTEM_CLOSE',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Deleted approval threshold rule "${rule?.ruleName || id}"`,
+      status: 'SUCCESS',
+    });
+
+    return { success: true };
+  };
+
+  const toggleApprovalRule = (id: string) => {
+    setApprovalRules((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, isEnabled: !r.isEnabled } : r))
+    );
+    return { success: true };
+  };
+
+  // Custom Roles & Permissions Engine Management
+  const createCustomRole = (roleData: Omit<CustomRoleDefinition, 'id' | 'isSystemRole'>) => {
+    const existing = customRoles.find((r) => r.code.toLowerCase() === roleData.code.toLowerCase());
+    if (existing) {
+      return { success: false, error: `A role with code "${roleData.code}" already exists.` };
     }
+
+    const newRole: CustomRoleDefinition = {
+      ...roleData,
+      id: `role-custom-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      isSystemRole: false,
+    };
+
+    setCustomRoles((prev) => [...prev, newRole]);
+
+    addAuditLog({
+      action: 'CREATE_TENANT',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Created Custom RBAC Role: "${newRole.name}" (${newRole.code}) with ${newRole.permissions.length} granular permissions.`,
+      status: 'SUCCESS',
+      payloadSummary: `Permissions: ${newRole.permissions.slice(0, 8).join(', ')}...`,
+    });
+
+    return { success: true, role: newRole };
+  };
+
+  const updateCustomRole = (id: string, updates: Partial<CustomRoleDefinition>) => {
+    const target = customRoles.find((r) => r.id === id);
+    if (!target) return { success: false, error: 'Custom role not found.' };
+
+    setCustomRoles((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, ...updates } : r))
+    );
+
+    addAuditLog({
+      action: 'CREATE_TENANT',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated permissions for Role: "${target.name}" (${target.code})`,
+      status: 'SUCCESS',
+      payloadSummary: updates.permissions ? `Total Scopes: ${updates.permissions.length}` : 'Configuration updated',
+    });
+
+    return { success: true };
+  };
+
+  const deleteCustomRole = (id: string) => {
+    const target = customRoles.find((r) => r.id === id);
+    if (!target) return { success: false, error: 'Role not found.' };
+    if (target.isSystemRole) return { success: false, error: 'System defined standard roles cannot be deleted.' };
+
+    setCustomRoles((prev) => prev.filter((r) => r.id !== id));
+
+    addAuditLog({
+      action: 'CREATE_TENANT',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Deleted Custom Role "${target.name}" (${target.code})`,
+      status: 'SUCCESS',
+    });
+
+    return { success: true };
+  };
+
+  const cloneCustomRole = (sourceRoleId: string, newName: string, newCode: string) => {
+    const source = customRoles.find((r) => r.id === sourceRoleId);
+    if (!source) return { success: false, error: 'Source role not found.' };
+
+    const newRole: CustomRoleDefinition = {
+      id: `role-custom-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      name: newName,
+      code: newCode,
+      description: `Cloned from ${source.name}. ${source.description}`,
+      isSystemRole: false,
+      colorBadge: 'indigo',
+      permissions: [...source.permissions],
+    };
+
+    setCustomRoles((prev) => [...prev, newRole]);
+
+    addAuditLog({
+      action: 'CREATE_TENANT',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Cloned role "${source.name}" into new custom role "${newName}" (${newCode})`,
+      status: 'SUCCESS',
+    });
+
+    return { success: true, role: newRole };
   };
 
   // Post Tax Settlement Voucher
@@ -1329,7 +1993,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       payloadSummary: `Due Date: ${invoiceData.dueDate} | Revenue Acc: ${invoiceData.revenueAccountCode}`,
     });
 
-    return { success: true };
+    return { success: true, invoice: newInv };
   };
 
   const receiveInvoicePayment = (invoiceId: string, paymentAmount: number, bankAccountId: string) => {
@@ -3267,6 +3931,1559 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     };
   };
 
+  // ==========================================
+  // RECURRING INVOICES & SUBSCRIPTIONS ENGINE
+  // ==========================================
+  const createRecurringSchedule = (
+    data: Omit<RecurringInvoiceSchedule, 'id' | 'generatedInvoicesCount'>
+  ) => {
+    const newSchedule: RecurringInvoiceSchedule = {
+      ...data,
+      id: `rec-sch-${Date.now()}`,
+      generatedInvoicesCount: 0,
+    };
+    setRecurringSchedules((prev) => [newSchedule, ...prev]);
+    return { success: true, schedule: newSchedule };
+  };
+
+  const updateRecurringSchedule = (id: string, updates: Partial<RecurringInvoiceSchedule>) => {
+    setRecurringSchedules((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+    );
+    return { success: true };
+  };
+
+  const deleteRecurringSchedule = (id: string) => {
+    setRecurringSchedules((prev) => prev.filter((s) => s.id !== id));
+    return { success: true };
+  };
+
+  const runRecurringScheduleNow = (id: string) => {
+    const schedule = recurringSchedules.find((s) => s.id === id);
+    if (!schedule) return { success: false, error: 'Recurring schedule not found.' };
+
+    const issueDate = new Date().toISOString().split('T')[0];
+    const dueDateObj = new Date();
+    dueDateObj.setDate(dueDateObj.getDate() + 30);
+    const dueDate = dueDateObj.toISOString().split('T')[0];
+
+    const invoiceResult = createInvoice({
+      tenantId: schedule.tenantId,
+      customerId: schedule.customerId,
+      customerName: schedule.customerName,
+      customerEmail: schedule.customerEmail,
+      issueDate,
+      dueDate,
+      currency: activeTenant.currency,
+      items: schedule.items,
+      subtotal: schedule.subtotal,
+      taxTotal: schedule.taxTotal,
+      totalAmount: schedule.totalAmount,
+      revenueAccountCode: schedule.revenueAccountCode || '4010',
+      notes: `Generated from recurring subscription schedule: ${schedule.profileName}`,
+    });
+
+    if (invoiceResult.success) {
+      // Advance next run date
+      const nextDate = new Date();
+      if (schedule.frequency === 'WEEKLY') nextDate.setDate(nextDate.getDate() + 7);
+      else if (schedule.frequency === 'MONTHLY') nextDate.setMonth(nextDate.getMonth() + 1);
+      else if (schedule.frequency === 'QUARTERLY') nextDate.setMonth(nextDate.getMonth() + 3);
+      else if (schedule.frequency === 'SEMI_ANNUAL') nextDate.setMonth(nextDate.getMonth() + 6);
+      else nextDate.setFullYear(nextDate.getFullYear() + 1);
+
+      setRecurringSchedules((prev) =>
+        prev.map((s) =>
+          s.id === id
+            ? {
+                ...s,
+                lastRunDate: issueDate,
+                nextRunDate: nextDate.toISOString().split('T')[0],
+                generatedInvoicesCount: s.generatedInvoicesCount + 1,
+              }
+            : s
+        )
+      );
+      return { success: true };
+    }
+    return { success: false, error: (invoiceResult as any).error || 'Failed to generate recurring invoice' };
+  };
+
+  // ==========================================
+  // EXPENSE TRACKING & OCR RECEIPT CAPTURE
+  // ==========================================
+  const createExpenseReceipt = (
+    data: Omit<ExpenseReceipt, 'id' | 'createdAt' | 'status'>
+  ) => {
+    const newReceipt: ExpenseReceipt = {
+      ...data,
+      id: `exp-rcpt-${Date.now()}`,
+      status: 'DRAFT',
+      createdAt: new Date().toISOString(),
+    };
+    setExpenseReceipts((prev) => [newReceipt, ...prev]);
+    return { success: true, receipt: newReceipt };
+  };
+
+  const postExpenseReceiptToGL = (receiptId: string, paymentAccountId: string = '1010') => {
+    const rcpt = expenseReceipts.find((r) => r.id === receiptId);
+    if (!rcpt) return { success: false, error: 'Receipt not found.' };
+
+    const netAmount = rcpt.amount;
+    const taxAmount = rcpt.taxAmount || 0;
+    const totalAmount = rcpt.totalAmount || netAmount + taxAmount;
+
+    const lines: JournalLine[] = [
+      {
+        id: `line-${Date.now()}-1`,
+        accountId: 'acc-exp',
+        accountCode: rcpt.expenseAccountCode || '5010',
+        accountName: rcpt.category || 'Business Expense',
+        debit: netAmount,
+        credit: 0,
+        memo: `Expense: ${rcpt.vendorName} (${rcpt.receiptNumber})`,
+      },
+    ];
+
+    if (taxAmount > 0) {
+      lines.push({
+        id: `line-${Date.now()}-2`,
+        accountId: 'acc-tax-input',
+        accountCode: '1070',
+        accountName: 'Input Tax Credit / Deductible VAT/GST',
+        debit: taxAmount,
+        credit: 0,
+        memo: `Tax Credit on ${rcpt.vendorName}`,
+      });
+    }
+
+    const payAccCode = paymentAccountId === 'credit_card' ? '2010' : paymentAccountId || '1010';
+    lines.push({
+      id: `line-${Date.now()}-3`,
+      accountId: 'acc-pay-source',
+      accountCode: payAccCode,
+      accountName: payAccCode === '2010' ? 'Accounts Payable / Corporate Card' : 'Operating Cash - Chase',
+      debit: 0,
+      credit: totalAmount,
+      memo: `Disbursement for ${rcpt.vendorName} by ${rcpt.paidBy}`,
+    });
+
+    const entryRes = postJournalEntry({
+      tenantId: rcpt.tenantId,
+      date: rcpt.expenseDate,
+      description: `Expense Receipt Post: ${rcpt.vendorName} - ${rcpt.category}`,
+      reference: rcpt.receiptNumber,
+      pluginId: activeTenant.pluginId,
+      lines,
+    });
+
+    if (entryRes.success) {
+      setExpenseReceipts((prev) =>
+        prev.map((r) =>
+          r.id === receiptId ? { ...r, status: 'POSTED', journalEntryId: entryRes.entryId } : r
+        )
+      );
+      return { success: true, entryId: entryRes.entryId };
+    }
+    return { success: false, error: entryRes.error };
+  };
+
+  const deleteExpenseReceipt = (id: string) => {
+    setExpenseReceipts((prev) => prev.filter((r) => r.id !== id));
+    return { success: true };
+  };
+
+  // ==========================================
+  // MILEAGE TRACKING & TRAVEL DEDUCTIONS
+  // ==========================================
+  const createMileageLog = (
+    data: Omit<MileageLogEntry, 'id' | 'createdAt' | 'status' | 'totalDeductionAmount'>
+  ) => {
+    const rate = data.ratePerMile || 0.67;
+    const totalDeductionAmount = Math.round(data.distanceMiles * rate * 100) / 100;
+    const newLog: MileageLogEntry = {
+      ...data,
+      ratePerMile: rate,
+      totalDeductionAmount,
+      id: `mil-${Date.now()}`,
+      status: 'LOGGED',
+      createdAt: new Date().toISOString(),
+    };
+    setMileageLogs((prev) => [newLog, ...prev]);
+    return { success: true, log: newLog };
+  };
+
+  const postMileageLogToGL = (logId: string, paymentAccountId: string = '1010') => {
+    const log = mileageLogs.find((m) => m.id === logId);
+    if (!log) return { success: false, error: 'Mileage trip record not found.' };
+
+    const entryRes = postJournalEntry({
+      tenantId: log.tenantId,
+      date: log.tripDate,
+      description: `Business Mileage Deduction: ${log.driverName} (${log.distanceMiles} mi @ ${log.ratePerMile}/mi) - ${log.purpose}`,
+      reference: `MIL-${log.tripDate.replace(/-/g, '')}`,
+      pluginId: activeTenant.pluginId,
+      lines: [
+        {
+          id: `line-${Date.now()}-1`,
+          accountId: 'acc-mileage-exp',
+          accountCode: '5010',
+          accountName: 'Travel & Vehicle Mileage Expense',
+          debit: log.totalDeductionAmount,
+          credit: 0,
+          memo: `${log.startLocation} to ${log.endLocation}`,
+        },
+        {
+          id: `line-${Date.now()}-2`,
+          accountId: 'acc-mileage-pay',
+          accountCode: paymentAccountId || '1010',
+          accountName: paymentAccountId === '2010' ? 'Employee Reimbursements Payable' : 'Operating Cash - Chase',
+          debit: 0,
+          credit: log.totalDeductionAmount,
+          memo: `Reimbursement to ${log.driverName}`,
+        },
+      ],
+    });
+
+    if (entryRes.success) {
+      setMileageLogs((prev) =>
+        prev.map((m) =>
+          m.id === logId ? { ...m, status: 'POSTED_TO_GL', journalEntryId: entryRes.entryId } : m
+        )
+      );
+      return { success: true, entryId: entryRes.entryId };
+    }
+    return { success: false, error: entryRes.error };
+  };
+
+  const deleteMileageLog = (id: string) => {
+    setMileageLogs((prev) => prev.filter((m) => m.id !== id));
+    return { success: true };
+  };
+
+  // ==========================================
+  // INVENTORY TRACKING & VALUATION ENGINE
+  // ==========================================
+  const createInventoryItem = (
+    data: Omit<InventoryStockItem, 'id' | 'status' | 'totalValuation'>
+  ) => {
+    const totalValuation = Math.round(data.quantityOnHand * data.unitCost * 100) / 100;
+    const status: InventoryStockItem['status'] =
+      data.quantityOnHand <= 0
+        ? 'OUT_OF_STOCK'
+        : data.quantityOnHand <= data.reorderThreshold
+        ? 'LOW_STOCK'
+        : 'IN_STOCK';
+
+    const newItem: InventoryStockItem = {
+      ...data,
+      id: `inv-item-${Date.now()}`,
+      totalValuation,
+      status,
+    };
+    setInventoryItems((prev) => [newItem, ...prev]);
+    return { success: true, item: newItem };
+  };
+
+  const updateInventoryItem = (id: string, updates: Partial<InventoryStockItem>) => {
+    setInventoryItems((prev) =>
+      prev.map((item) => {
+        if (item.id !== id) return item;
+        const updated = { ...item, ...updates };
+        updated.totalValuation = Math.round(updated.quantityOnHand * updated.unitCost * 100) / 100;
+        updated.status =
+          updated.quantityOnHand <= 0
+            ? 'OUT_OF_STOCK'
+            : updated.quantityOnHand <= updated.reorderThreshold
+            ? 'LOW_STOCK'
+            : 'IN_STOCK';
+        return updated;
+      })
+    );
+    return { success: true };
+  };
+
+  const adjustInventoryStock = (params: {
+    itemId: string;
+    type: InventoryAdjustmentRecord['type'];
+    quantityDelta: number;
+    reason: string;
+    unitCost?: number;
+    postToGl?: boolean;
+  }) => {
+    const item = inventoryItems.find((i) => i.id === params.itemId);
+    if (!item) return { success: false, error: 'Inventory stock item not found.' };
+
+    const previousQuantity = item.quantityOnHand;
+    const newQuantity = Math.max(0, previousQuantity + params.quantityDelta);
+    const cost = params.unitCost || item.unitCost;
+    const totalCostAdjustment = Math.round(Math.abs(params.quantityDelta) * cost * 100) / 100;
+
+    let entryId: string | undefined = undefined;
+    if (params.postToGl && totalCostAdjustment > 0) {
+      const isPositive = params.quantityDelta > 0;
+      const glRes = postJournalEntry({
+        tenantId: item.tenantId,
+        date: new Date().toISOString().split('T')[0],
+        description: `Inventory Adjustment (${params.type}): ${item.sku} - ${item.name}`,
+        reference: `INV-ADJ-${Date.now().toString().slice(-6)}`,
+        pluginId: activeTenant.pluginId,
+        lines: [
+          {
+            id: `line-${Date.now()}-1`,
+            accountId: 'acc-inv-asset',
+            accountCode: '1500',
+            accountName: 'Merchandise Inventory Asset',
+            debit: isPositive ? totalCostAdjustment : 0,
+            credit: isPositive ? 0 : totalCostAdjustment,
+            memo: `${params.reason} (${params.quantityDelta > 0 ? '+' : ''}${params.quantityDelta} units)`,
+          },
+          {
+            id: `line-${Date.now()}-2`,
+            accountId: 'acc-inv-cogs',
+            accountCode: isPositive ? '2010' : '5010',
+            accountName: isPositive ? 'Accounts Payable / Supplier' : 'Cost of Goods Sold / Inventory Shrinkage',
+            debit: isPositive ? 0 : totalCostAdjustment,
+            credit: isPositive ? totalCostAdjustment : 0,
+            memo: `${params.type}: ${item.name}`,
+          },
+        ],
+      });
+      if (glRes.success) entryId = glRes.entryId;
+    }
+
+    const adjustmentRecord: InventoryAdjustmentRecord = {
+      id: `inv-adj-${Date.now()}`,
+      tenantId: item.tenantId,
+      date: new Date().toISOString().split('T')[0],
+      inventoryItemId: item.id,
+      sku: item.sku,
+      name: item.name,
+      type: params.type,
+      quantityDelta: params.quantityDelta,
+      previousQuantity,
+      newQuantity,
+      unitCost: cost,
+      totalCostAdjustment,
+      reason: params.reason,
+      performedBy: userEmail,
+      journalEntryId: entryId,
+      createdAt: new Date().toISOString(),
+    };
+
+    setInventoryAdjustments((prev) => [adjustmentRecord, ...prev]);
+    updateInventoryItem(item.id, {
+      quantityOnHand: newQuantity,
+      lastRestockedDate: params.quantityDelta > 0 ? new Date().toISOString().split('T')[0] : item.lastRestockedDate,
+    });
+
+    return { success: true, adjustment: adjustmentRecord };
+  };
+
+  const deleteInventoryItem = (id: string) => {
+    setInventoryItems((prev) => prev.filter((i) => i.id !== id));
+    return { success: true };
+  };
+
+  // ==========================================
+  // PAYROLL & TAX WITHHOLDING ENGINE
+  // ==========================================
+  const createPayrollEmployee = (data: Omit<PayrollEmployee, 'id'>) => {
+    const newEmp: PayrollEmployee = {
+      ...data,
+      id: `emp-${Date.now()}`,
+    };
+    setPayrollEmployees((prev) => [...prev, newEmp]);
+    return { success: true, employee: newEmp };
+  };
+
+  const updatePayrollEmployee = (id: string, updates: Partial<PayrollEmployee>) => {
+    setPayrollEmployees((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updates } : e))
+    );
+    return { success: true };
+  };
+
+  const deletePayrollEmployee = (id: string) => {
+    setPayrollEmployees((prev) => prev.filter((e) => e.id !== id));
+    return { success: true };
+  };
+
+  const calculatePayRunPreview = (
+    payPeriodStart: string,
+    payPeriodEnd: string,
+    payDate: string,
+    employeeIds?: string[]
+  ) => {
+    const targetEmps = payrollEmployees.filter(
+      (e) =>
+        e.tenantId === activeTenant.id &&
+        e.status === 'ACTIVE' &&
+        (!employeeIds || employeeIds.includes(e.id))
+    );
+
+    const lines: PayrollRunEmployeeLine[] = targetEmps.map((emp) => {
+      // Calculate gross pay based on pay frequency and hourly vs salary
+      let periodsPerYear = 24; // default SEMI_MONTHLY
+      if (emp.payFrequency === 'WEEKLY') periodsPerYear = 52;
+      else if (emp.payFrequency === 'BI_WEEKLY') periodsPerYear = 26;
+      else if (emp.payFrequency === 'MONTHLY') periodsPerYear = 12;
+
+      let grossPay = 0;
+      if (emp.payType === 'HOURLY' && emp.hourlyRate) {
+        const weeklyHours = emp.standardHoursPerWeek || 40;
+        const totalAnnualHours = weeklyHours * 52;
+        grossPay = Math.round(((emp.hourlyRate * totalAnnualHours) / periodsPerYear) * 100) / 100;
+      } else {
+        const annual = emp.baseSalaryAnnual || 100000;
+        grossPay = Math.round((annual / periodsPerYear) * 100) / 100;
+      }
+
+      // Standard tax withholding rates & custom withholdings
+      const federalRate = emp.filingStatus === 'MARRIED_FILING_JOINTLY' ? 0.13 : 0.15;
+      const federalTax = Math.round((grossPay * federalRate + (emp.additionalWithholdingPerPeriod || 0)) * 100) / 100;
+      const stateTax = Math.round(grossPay * 0.05 * 100) / 100;
+      const socialSecurityTax = Math.round(grossPay * 0.062 * 100) / 100;
+      const medicareTax = Math.round(grossPay * 0.0145 * 100) / 100;
+      
+      const healthDeduction = emp.healthBenefitDeduction !== undefined ? emp.healthBenefitDeduction : 125.0;
+      const dentalVision = emp.dentalVisionDeduction || 0;
+      const fourZeroOneK = emp.fourZeroOneKContributionRate ? Math.round(grossPay * (emp.fourZeroOneKContributionRate / 100) * 100) / 100 : 0;
+      const benefitsDeduction = Math.round((healthDeduction + dentalVision + fourZeroOneK) * 100) / 100;
+
+      const totalDeductions = federalTax + stateTax + socialSecurityTax + medicareTax + benefitsDeduction;
+      const netPay = Math.round((grossPay - totalDeductions) * 100) / 100;
+
+      // Employer match taxes & 401k match
+      const employerFicaMatch = Math.round(grossPay * (0.062 + 0.0145) * 100) / 100;
+      const employerFuta = Math.round(grossPay * 0.006 * 100) / 100;
+      const totalEmployerCost = Math.round((grossPay + employerFicaMatch + employerFuta) * 100) / 100;
+
+      return {
+        employeeId: emp.id,
+        employeeName: emp.name,
+        department: emp.department,
+        grossPay,
+        federalTax,
+        stateTax,
+        socialSecurityTax,
+        medicareTax,
+        benefitsDeduction,
+        netPay,
+        employerFicaMatch,
+        employerFuta,
+        totalEmployerCost,
+      };
+    });
+
+    const totalGrossPay = Math.round(lines.reduce((s, l) => s + l.grossPay, 0) * 100) / 100;
+    const totalEmployeeTaxWithholdings = Math.round(
+      lines.reduce((s, l) => s + l.federalTax + l.stateTax + l.socialSecurityTax + l.medicareTax + l.benefitsDeduction, 0) * 100
+    ) / 100;
+    const totalEmployerTaxes = Math.round(
+      lines.reduce((s, l) => s + l.employerFicaMatch + l.employerFuta, 0) * 100
+    ) / 100;
+    const totalNetPay = Math.round(lines.reduce((s, l) => s + l.netPay, 0) * 100) / 100;
+
+    return {
+      lines,
+      totalGrossPay,
+      totalEmployeeTaxWithholdings,
+      totalEmployerTaxes,
+      totalNetPay,
+    };
+  };
+
+  const executePayRun = (params: {
+    payPeriodStart: string;
+    payPeriodEnd: string;
+    payDate: string;
+    employeeIds?: string[];
+    postToGl?: boolean;
+  }) => {
+    const preview = calculatePayRunPreview(
+      params.payPeriodStart,
+      params.payPeriodEnd,
+      params.payDate,
+      params.employeeIds
+    );
+
+    if (preview.lines.length === 0) {
+      return { success: false, error: 'No active employees found for this pay run.' };
+    }
+
+    let entryId: string | undefined = undefined;
+    if (params.postToGl !== false) {
+      const glRes = postJournalEntry({
+        tenantId: activeTenant.id,
+        date: params.payDate,
+        description: `Payroll Disbursement & Withholdings: Period ${params.payPeriodStart} to ${params.payPeriodEnd}`,
+        reference: `PAY-${params.payDate.replace(/-/g, '')}`,
+        pluginId: activeTenant.pluginId,
+        lines: [
+          {
+            id: `line-${Date.now()}-1`,
+            accountId: 'acc-sal-exp',
+            accountCode: '5020',
+            accountName: 'Engineering & Staff Salaries Expense',
+            debit: preview.totalGrossPay,
+            credit: 0,
+            memo: `Gross Wages (${preview.lines.length} staff)`,
+          },
+          {
+            id: `line-${Date.now()}-2`,
+            accountId: 'acc-emp-tax-exp',
+            accountCode: '5020',
+            accountName: 'Employer FICA & Payroll Taxes Expense',
+            debit: preview.totalEmployerTaxes,
+            credit: 0,
+            memo: 'Employer FICA & FUTA Match',
+          },
+          {
+            id: `line-${Date.now()}-3`,
+            accountId: 'acc-tax-payable',
+            accountCode: '2200',
+            accountName: 'Payroll Taxes & Withholdings Payable',
+            debit: 0,
+            credit: Math.round((preview.totalEmployeeTaxWithholdings + preview.totalEmployerTaxes) * 100) / 100,
+            memo: 'Federal, State, FICA & Benefits Withholdings',
+          },
+          {
+            id: `line-${Date.now()}-4`,
+            accountId: 'acc-net-cash',
+            accountCode: '1010',
+            accountName: 'Operating Cash - Chase (Direct Deposit)',
+            debit: 0,
+            credit: preview.totalNetPay,
+            memo: 'Direct Deposit Net Disbursements',
+          },
+        ],
+      });
+      if (glRes.success) entryId = glRes.entryId;
+    }
+
+    const newRun: PayrollRun = {
+      id: `prun-${Date.now()}`,
+      tenantId: activeTenant.id,
+      runNumber: `PAY-${params.payDate.slice(0, 7)}-${payrollRuns.length + 1}`,
+      payPeriodStart: params.payPeriodStart,
+      payPeriodEnd: params.payPeriodEnd,
+      payDate: params.payDate,
+      status: 'POSTED_TO_GL',
+      totalGrossPay: preview.totalGrossPay,
+      totalEmployeeTaxWithholdings: preview.totalEmployeeTaxWithholdings,
+      totalEmployerTaxes: preview.totalEmployerTaxes,
+      totalNetPay: preview.totalNetPay,
+      employeeCount: preview.lines.length,
+      journalEntryId: entryId,
+      executedBy: userEmail,
+      createdAt: new Date().toISOString(),
+      lines: preview.lines,
+    };
+
+    setPayrollRuns((prev) => [newRun, ...prev]);
+    return { success: true, run: newRun, entryId };
+  };
+
+  // ==========================================
+  // CONNECTED BANK FEEDS ENGINE
+  // ==========================================
+  const connectBankFeed = (
+    data: Omit<ConnectedBankFeed, 'id' | 'lastSyncedAt' | 'status'>
+  ) => {
+    const newFeed: ConnectedBankFeed = {
+      ...data,
+      id: `feed-${Date.now()}`,
+      lastSyncedAt: new Date().toISOString(),
+      status: 'CONNECTED',
+    };
+    setConnectedBankFeeds((prev) => [newFeed, ...prev]);
+    return { success: true, feed: newFeed };
+  };
+
+  const syncBankFeed = (feedId: string) => {
+    const feed = connectedBankFeeds.find((f) => f.id === feedId);
+    if (!feed) return { success: false, newLinesCount: 0, error: 'Bank feed not found.' };
+
+    const simulatedLines: Omit<BankStatementLine, 'id' | 'tenantId' | 'reconciled'>[] = [
+      {
+        date: new Date().toISOString().split('T')[0],
+        description: `Direct Deposit Settlement - ${feed.institutionName}`,
+        amount: Math.round((12000 + Math.random() * 8000) * 100) / 100,
+        reference: `WIRE-${Date.now().toString().slice(-6)}`,
+      },
+      {
+        date: new Date().toISOString().split('T')[0],
+        description: `Merchant Interchange Fee - Automated Sweep`,
+        amount: -Math.round((85 + Math.random() * 120) * 100) / 100,
+        reference: `FEE-${Date.now().toString().slice(-4)}`,
+      },
+    ];
+
+    const importRes = importBankStatements(simulatedLines);
+    if (importRes.success) {
+      setConnectedBankFeeds((prev) =>
+        prev.map((f) => (f.id === feedId ? { ...f, lastSyncedAt: new Date().toISOString() } : f))
+      );
+      return { success: true, newLinesCount: importRes.count };
+    }
+    return { success: false, newLinesCount: 0, error: importRes.error };
+  };
+
+  const disconnectBankFeed = (feedId: string) => {
+    setConnectedBankFeeds((prev) => prev.filter((f) => f.id !== feedId));
+    return { success: true };
+  };
+
+  // ==========================================
+  // ONLINE PAYMENT GATEWAY & PORTAL SIMULATOR
+  // ==========================================
+  const processOnlineInvoicePayment = (
+    invoiceId: string,
+    paymentMethod: PaymentMethodType,
+    paymentDetails: { cardLast4?: string; accountLast4?: string; email?: string; notes?: string }
+  ) => {
+    const inv = invoices.find((i) => i.id === invoiceId);
+    if (!inv) return { success: false, error: 'Invoice not found.' };
+
+    const outstanding = inv.totalAmount - inv.amountPaid;
+    if (outstanding <= 0) return { success: false, error: 'Invoice is already fully settled.' };
+
+    const receiptRes = recordCustomerPaymentReceipt({
+      customerId: inv.customerId || 'cust-101',
+      paymentDate: new Date().toISOString().split('T')[0],
+      paymentMethod,
+      bankAccountId: 'acc-1001',
+      referenceNumber: `GATEWAY-TX-${Date.now().toString().slice(-7)}`,
+      totalAmountReceived: outstanding,
+      allocations: [
+        {
+          invoiceId: inv.id,
+          invoiceNumber: inv.invoiceNumber,
+          allocatedAmount: outstanding,
+        },
+      ],
+      notes: `Online Gateway Checkout (${paymentMethod}) - ${paymentDetails.notes || 'Instant Settlement'}`,
+    });
+
+    return receiptRes;
+  };
+
+  // ==========================================
+  // COMPANY DATA BACKUP, 1-CLICK EXPORT & RESTORE ENGINE
+  // ==========================================
+  const downloadCompanyBackup = (options?: { tenantId?: string; scope?: 'single_company' | 'full_system' }) => {
+    const targetTenantId = options?.tenantId || activeTenant.id;
+    const isFullSystem = options?.scope === 'full_system';
+    const targetTenant = tenants.find((t) => t.id === targetTenantId) || activeTenant;
+    
+    // Collect accounts for tenant or all
+    const tenantAccounts = accountsMap[targetTenantId] || [];
+    const allAccountsFlat = Object.values(accountsMap).flat();
+    
+    // Filter company-specific data
+    const filteredJournals = isFullSystem ? journalEntries : journalEntries.filter((j) => j.tenantId === targetTenantId);
+    const filteredInvoices = isFullSystem ? invoices : invoices.filter((i) => i.tenantId === targetTenantId);
+    const filteredBills = isFullSystem ? vendorBills : vendorBills.filter((b) => b.tenantId === targetTenantId);
+    const filteredReceipts = isFullSystem ? paymentReceipts : paymentReceipts.filter((p) => p.tenantId === targetTenantId);
+    const filteredOpeningBalances = isFullSystem ? openingBalances : openingBalances.filter((o) => o.tenantId === targetTenantId);
+    const filteredCustomers = isFullSystem ? customers : customers.filter((c) => c.tenantId === targetTenantId);
+    const filteredVendors = isFullSystem ? vendors : vendors.filter((v) => v.tenantId === targetTenantId);
+    const filteredProducts = isFullSystem ? productsServices : productsServices.filter((p) => p.tenantId === targetTenantId);
+    const filteredPriceHistory = isFullSystem ? priceChangeHistory : priceChangeHistory.filter((h) => h.tenantId === targetTenantId);
+    const filteredTemplates = isFullSystem ? invoiceTemplates : invoiceTemplates.filter((t) => t.tenantId === targetTenantId);
+    const filteredBatches = isFullSystem ? bulkInvoiceBatches : bulkInvoiceBatches.filter((b) => b.tenantId === targetTenantId);
+    const filteredRecurring = isFullSystem ? recurringSchedules : recurringSchedules.filter((r) => r.tenantId === targetTenantId);
+    const filteredExpenses = isFullSystem ? expenseReceipts : expenseReceipts.filter((e) => e.tenantId === targetTenantId);
+    const filteredMileage = isFullSystem ? mileageLogs : mileageLogs.filter((m) => m.tenantId === targetTenantId);
+    const filteredInventory = isFullSystem ? inventoryItems : inventoryItems.filter((i) => i.tenantId === targetTenantId);
+    const filteredAdjustments = isFullSystem ? inventoryAdjustments : inventoryAdjustments.filter((a) => a.tenantId === targetTenantId);
+    const filteredEmployees = isFullSystem ? payrollEmployees : payrollEmployees.filter((e) => e.tenantId === targetTenantId);
+    const filteredPayrollRuns = isFullSystem ? payrollRuns : payrollRuns.filter((r) => r.tenantId === targetTenantId);
+    const filteredBankFeeds = isFullSystem ? connectedBankFeeds : connectedBankFeeds.filter((f) => f.tenantId === targetTenantId);
+    const filteredBankStatements = isFullSystem ? bankStatements : bankStatements.filter((s) => s.tenantId === targetTenantId);
+    const filteredFixedAssets = isFullSystem ? fixedAssets : fixedAssets.filter((a) => a.tenantId === targetTenantId);
+    const filteredPeriods = isFullSystem ? fiscalPeriods : fiscalPeriods.filter((p) => p.tenantId === targetTenantId);
+    const filteredTreasury = isFullSystem ? treasuryAccounts : treasuryAccounts.filter((t) => t.tenantId === targetTenantId);
+    const filteredBudgets = isFullSystem ? departmentBudgets : departmentBudgets.filter((b) => b.tenantId === targetTenantId);
+    const filteredApprovals = isFullSystem ? approvalItems : approvalItems.filter((a) => a.tenantId === targetTenantId);
+    const filteredTaxJurisdictions = isFullSystem ? taxJurisdictions : taxJurisdictions.filter((t) => t.tenantId === targetTenantId);
+    const filteredCustomAttributes = isFullSystem ? customAttributeDefinitions : customAttributeDefinitions.filter((c) => c.tenantId === targetTenantId);
+    const filteredAuditLogs = isFullSystem ? auditLogs : auditLogs.filter((a) => a.tenantId === targetTenantId);
+
+    // Calculate debits and credits totals
+    let totalDebits = 0;
+    let totalCredits = 0;
+    filteredJournals.forEach((j) => {
+      totalDebits += j.totalDebit || 0;
+      totalCredits += j.totalCredit || 0;
+    });
+
+    const recordCounts: CompanyBackupRecordCounts = {
+      accounts: (isFullSystem ? allAccountsFlat : tenantAccounts).length,
+      journalEntries: filteredJournals.length,
+      invoices: filteredInvoices.length,
+      vendorBills: filteredBills.length,
+      paymentReceipts: filteredReceipts.length,
+      openingBalances: filteredOpeningBalances.length,
+      customers: filteredCustomers.length,
+      vendors: filteredVendors.length,
+      productsServices: filteredProducts.length,
+      priceChangeHistory: filteredPriceHistory.length,
+      invoiceTemplates: filteredTemplates.length,
+      bulkInvoiceBatches: filteredBatches.length,
+      recurringSchedules: filteredRecurring.length,
+      expenseReceipts: filteredExpenses.length,
+      mileageLogs: filteredMileage.length,
+      inventoryItems: filteredInventory.length,
+      inventoryAdjustments: filteredAdjustments.length,
+      payrollEmployees: filteredEmployees.length,
+      payrollRuns: filteredPayrollRuns.length,
+      connectedBankFeeds: filteredBankFeeds.length,
+      bankStatements: filteredBankStatements.length,
+      fixedAssets: filteredFixedAssets.length,
+      fiscalPeriods: filteredPeriods.length,
+      treasuryAccounts: filteredTreasury.length,
+      departmentBudgets: filteredBudgets.length,
+      approvalItems: filteredApprovals.length,
+      taxJurisdictions: filteredTaxJurisdictions.length,
+      customAttributeDefinitions: filteredCustomAttributes.length,
+      auditLogs: filteredAuditLogs.length,
+    };
+
+    const backupId = `bkp-${targetTenant.code.toLowerCase()}-${Date.now()}`;
+    const exportedAt = new Date().toISOString();
+
+    const payload: CompanyBackupPayload = {
+      schema: 'enterprise_accounting_backup_v1',
+      metadata: {
+        schemaVersion: '1.0',
+        backupId,
+        exportedAt,
+        exportedBy: userEmail,
+        scope: isFullSystem ? 'full_system' : 'single_company',
+        tenantId: targetTenant.id,
+        tenantName: targetTenant.name,
+        tenantCode: targetTenant.code,
+        currency: targetTenant.currency,
+        country: targetTenant.country,
+        pluginId: targetTenant.pluginId,
+        totalDebits: Math.round(totalDebits * 100) / 100,
+        totalCredits: Math.round(totalCredits * 100) / 100,
+        isBalanced: Math.abs(totalDebits - totalCredits) < 0.01,
+        recordCounts,
+        systemNote: `One-Click Company Snapshot exported for ${targetTenant.name} (${targetTenant.code}) on ${new Date().toLocaleDateString()}`,
+      },
+      data: {
+        tenant: targetTenant,
+        accounts: isFullSystem ? allAccountsFlat : tenantAccounts,
+        journalEntries: filteredJournals,
+        invoices: filteredInvoices,
+        vendorBills: filteredBills,
+        paymentReceipts: filteredReceipts,
+        openingBalances: filteredOpeningBalances,
+        customers: filteredCustomers,
+        vendors: filteredVendors,
+        productsServices: filteredProducts,
+        priceChangeHistory: filteredPriceHistory,
+        invoiceTemplates: filteredTemplates,
+        bulkInvoiceBatches: filteredBatches,
+        recurringSchedules: filteredRecurring,
+        expenseReceipts: filteredExpenses,
+        mileageLogs: filteredMileage,
+        inventoryItems: filteredInventory,
+        inventoryAdjustments: filteredAdjustments,
+        payrollEmployees: filteredEmployees,
+        payrollRuns: filteredPayrollRuns,
+        connectedBankFeeds: filteredBankFeeds,
+        bankStatements: filteredBankStatements,
+        fixedAssets: filteredFixedAssets,
+        fiscalPeriods: filteredPeriods,
+        treasuryAccounts: filteredTreasury,
+        departmentBudgets: filteredBudgets,
+        approvalItems: filteredApprovals,
+        taxJurisdictions: filteredTaxJurisdictions,
+        customAttributeDefinitions: filteredCustomAttributes,
+        auditLogs: filteredAuditLogs,
+        ...(isFullSystem ? { allTenants: tenants } : {}),
+      },
+    };
+
+    // Generate JSON and trigger automatic download
+    try {
+      const jsonString = JSON.stringify(payload, null, 2);
+      const dateStr = new Date().toISOString().split('T')[0];
+      const fileName = `${targetTenant.code.toLowerCase()}_backup_${dateStr}_${Date.now().toString().slice(-4)}.json`;
+      
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      addAuditLog({
+        action: 'EXPORT_REPORT',
+        tenantId: targetTenant.id,
+        userRole: activeRole,
+        userEmail,
+        details: `Downloaded 1-Click Company Snapshot for ${targetTenant.name} (${targetTenant.code})`,
+        status: 'SUCCESS',
+        payloadSummary: `File: ${fileName} | Records: ${Object.values(recordCounts).reduce((a, b) => a + b, 0)} total records | Balanced: ${payload.metadata.isBalanced ? 'YES' : 'NO'}`,
+      });
+
+      return { success: true, fileName, backupPayload: payload };
+    } catch (err: any) {
+      return { success: false, error: err?.message || 'Failed to generate download file.' };
+    }
+  };
+
+  const validateBackupFileContent = (fileContent: string): BackupValidationResult => {
+    try {
+      const parsed = JSON.parse(fileContent) as CompanyBackupPayload;
+      const errors: string[] = [];
+      const warnings: string[] = [];
+
+      if (!parsed || typeof parsed !== 'object') {
+        return { isValid: false, errors: ['File does not contain a valid JSON object.'], warnings: [] };
+      }
+
+      if (parsed.schema !== 'enterprise_accounting_backup_v1') {
+        errors.push(`Unrecognized or missing backup schema: '${(parsed as any).schema || 'undefined'}'. Expected 'enterprise_accounting_backup_v1'.`);
+      }
+
+      if (!parsed.metadata) {
+        errors.push('Missing backup metadata section.');
+      } else {
+        if (!parsed.metadata.tenantId || !parsed.metadata.tenantCode) {
+          errors.push('Invalid tenant information in metadata.');
+        }
+        if (parsed.metadata.isBalanced === false) {
+          warnings.push('Warning: Backup metadata indicates a trial balance imbalance at export time.');
+        }
+      }
+
+      if (!parsed.data || typeof parsed.data !== 'object') {
+        errors.push('Missing backup data payload.');
+      } else {
+        if (!Array.isArray(parsed.data.accounts)) {
+          errors.push('Missing or invalid accounts array in data payload.');
+        }
+        if (!Array.isArray(parsed.data.journalEntries)) {
+          errors.push('Missing or invalid journalEntries array in data payload.');
+        }
+      }
+
+      return {
+        isValid: errors.length === 0,
+        errors,
+        warnings,
+        metadata: parsed.metadata,
+        parsedPayload: parsed,
+      };
+    } catch (err: any) {
+      return {
+        isValid: false,
+        errors: [`JSON parse error: ${err?.message || 'Invalid format'}`],
+        warnings: [],
+      };
+    }
+  };
+
+  const restoreCompanyBackup = (
+    payload: CompanyBackupPayload,
+    options?: { mode: 'replace_current' | 'restore_as_new_tenant'; targetTenantCode?: string; targetTenantName?: string }
+  ) => {
+    if (!payload || !payload.data || !payload.metadata) {
+      return { success: false, error: 'Invalid backup structure. Missing payload or metadata.' };
+    }
+
+    const mode = options?.mode || 'replace_current';
+    const originalTenant = payload.data.tenant || {
+      id: payload.metadata.tenantId,
+      name: payload.metadata.tenantName,
+      code: payload.metadata.tenantCode,
+      currency: payload.metadata.currency || 'USD',
+      country: payload.metadata.country || 'US',
+      pluginId: payload.metadata.pluginId || 'us_gaap',
+      organizations: [],
+    };
+
+    let targetTenantId = originalTenant.id;
+    let targetTenantObj = { ...originalTenant };
+
+    if (mode === 'restore_as_new_tenant') {
+      const suffix = Math.random().toString(36).substring(2, 6).toUpperCase();
+      targetTenantId = `t-${(options?.targetTenantCode || originalTenant.code).toLowerCase()}-${suffix.toLowerCase()}`;
+      targetTenantObj = {
+        ...originalTenant,
+        id: targetTenantId,
+        name: options?.targetTenantName || `${originalTenant.name} (Restored ${new Date().toLocaleDateString()})`,
+        code: (options?.targetTenantCode || `${originalTenant.code}_REST_${suffix}`).toUpperCase(),
+        organizations: originalTenant.organizations?.map((org) => ({
+          ...org,
+          id: `org-${targetTenantId}-${Math.random().toString(36).substring(2, 5)}`,
+          tenantId: targetTenantId,
+          branches: org.branches?.map((br) => ({
+            ...br,
+            id: `br-${targetTenantId}-${Math.random().toString(36).substring(2, 5)}`,
+            tenantId: targetTenantId,
+          })) || [],
+        })) || [],
+      };
+    }
+
+    // Remap data tenantId if restoring as a new tenant
+    const mapTenantId = <T extends { tenantId?: string }>(item: T): T => {
+      if (mode === 'restore_as_new_tenant') {
+        return { ...item, tenantId: targetTenantId };
+      }
+      return item;
+    };
+
+    const restoredAccounts = (payload.data.accounts || []).map(mapTenantId);
+    const restoredJournals = (payload.data.journalEntries || []).map(mapTenantId);
+    const restoredInvoices = (payload.data.invoices || []).map(mapTenantId);
+    const restoredBills = (payload.data.vendorBills || []).map(mapTenantId);
+    const restoredReceipts = (payload.data.paymentReceipts || []).map(mapTenantId);
+    const restoredOpeningBalances = (payload.data.openingBalances || []).map(mapTenantId);
+    const restoredCustomers = (payload.data.customers || []).map(mapTenantId);
+    const restoredVendors = (payload.data.vendors || []).map(mapTenantId);
+    const restoredProducts = (payload.data.productsServices || []).map(mapTenantId);
+    const restoredPriceHistory = (payload.data.priceChangeHistory || []).map(mapTenantId);
+    const restoredTemplates = (payload.data.invoiceTemplates || []).map(mapTenantId);
+    const restoredBatches = (payload.data.bulkInvoiceBatches || []).map(mapTenantId);
+    const restoredRecurring = (payload.data.recurringSchedules || []).map(mapTenantId);
+    const restoredExpenses = (payload.data.expenseReceipts || []).map(mapTenantId);
+    const restoredMileage = (payload.data.mileageLogs || []).map(mapTenantId);
+    const restoredInventory = (payload.data.inventoryItems || []).map(mapTenantId);
+    const restoredAdjustments = (payload.data.inventoryAdjustments || []).map(mapTenantId);
+    const restoredEmployees = (payload.data.payrollEmployees || []).map(mapTenantId);
+    const restoredPayrollRuns = (payload.data.payrollRuns || []).map(mapTenantId);
+    const restoredBankFeeds = (payload.data.connectedBankFeeds || []).map(mapTenantId);
+    const restoredBankStatements = (payload.data.bankStatements || []).map(mapTenantId);
+    const restoredFixedAssets = (payload.data.fixedAssets || []).map(mapTenantId);
+    const restoredFiscalPeriods = (payload.data.fiscalPeriods || []).map(mapTenantId);
+    const restoredTreasury = (payload.data.treasuryAccounts || []).map(mapTenantId);
+    const restoredBudgets = (payload.data.departmentBudgets || []).map(mapTenantId);
+    const restoredApprovals = (payload.data.approvalItems || []).map(mapTenantId);
+    const restoredTaxJurisdictions = (payload.data.taxJurisdictions || []).map(mapTenantId);
+    const restoredCustomAttributes = (payload.data.customAttributeDefinitions || []).map(mapTenantId);
+    const restoredAuditLogs = (payload.data.auditLogs || []).map(mapTenantId);
+
+    // 1. Update tenants
+    setTenants((prev) => {
+      const exists = prev.some((t) => t.id === targetTenantId);
+      if (exists) {
+        return prev.map((t) => (t.id === targetTenantId ? targetTenantObj : t));
+      }
+      return [...prev, targetTenantObj];
+    });
+
+    // 2. Update accounts map
+    setAccountsMap((prev) => ({
+      ...prev,
+      [targetTenantId]: restoredAccounts,
+    }));
+
+    // 3. Update sub-ledgers (replace existing records for this tenant)
+    setJournalEntries((prev) => [...prev.filter((j) => j.tenantId !== targetTenantId), ...restoredJournals]);
+    setInvoices((prev) => [...prev.filter((i) => i.tenantId !== targetTenantId), ...restoredInvoices]);
+    setVendorBills((prev) => [...prev.filter((b) => b.tenantId !== targetTenantId), ...restoredBills]);
+    setPaymentReceipts((prev) => [...prev.filter((p) => p.tenantId !== targetTenantId), ...restoredReceipts]);
+    setOpeningBalances((prev) => [...prev.filter((o) => o.tenantId !== targetTenantId), ...restoredOpeningBalances]);
+    setCustomers((prev) => [...prev.filter((c) => c.tenantId !== targetTenantId), ...restoredCustomers]);
+    setVendors((prev) => [...prev.filter((v) => v.tenantId !== targetTenantId), ...restoredVendors]);
+    setProductsServices((prev) => [...prev.filter((p) => p.tenantId !== targetTenantId), ...restoredProducts]);
+    setPriceChangeHistory((prev) => [...prev.filter((h) => h.tenantId !== targetTenantId), ...restoredPriceHistory]);
+    setInvoiceTemplates((prev) => [...prev.filter((t) => t.tenantId !== targetTenantId), ...restoredTemplates]);
+    setBulkInvoiceBatches((prev) => [...prev.filter((b) => b.tenantId !== targetTenantId), ...restoredBatches]);
+    setRecurringSchedules((prev) => [...prev.filter((r) => r.tenantId !== targetTenantId), ...restoredRecurring]);
+    setExpenseReceipts((prev) => [...prev.filter((e) => e.tenantId !== targetTenantId), ...restoredExpenses]);
+    setMileageLogs((prev) => [...prev.filter((m) => m.tenantId !== targetTenantId), ...restoredMileage]);
+    setInventoryItems((prev) => [...prev.filter((i) => i.tenantId !== targetTenantId), ...restoredInventory]);
+    setInventoryAdjustments((prev) => [...prev.filter((a) => a.tenantId !== targetTenantId), ...restoredAdjustments]);
+    setPayrollEmployees((prev) => [...prev.filter((p) => p.tenantId !== targetTenantId), ...restoredEmployees]);
+    setPayrollRuns((prev) => [...prev.filter((r) => r.tenantId !== targetTenantId), ...restoredPayrollRuns]);
+    setConnectedBankFeeds((prev) => [...prev.filter((f) => f.tenantId !== targetTenantId), ...restoredBankFeeds]);
+    setBankStatements((prev) => [...prev.filter((s) => s.tenantId !== targetTenantId), ...restoredBankStatements]);
+    setFixedAssets((prev) => [...prev.filter((a) => a.tenantId !== targetTenantId), ...restoredFixedAssets]);
+    if (restoredFiscalPeriods.length > 0) {
+      setFiscalPeriods((prev) => [...prev.filter((p) => p.tenantId !== targetTenantId), ...restoredFiscalPeriods]);
+    }
+    if (restoredTreasury.length > 0) {
+      setTreasuryAccounts((prev) => [...prev.filter((t) => t.tenantId !== targetTenantId), ...restoredTreasury]);
+    }
+    if (restoredBudgets.length > 0) {
+      setDepartmentBudgets((prev) => [...prev.filter((b) => b.tenantId !== targetTenantId), ...restoredBudgets]);
+    }
+    if (restoredApprovals.length > 0) {
+      setApprovalItems((prev) => [...prev.filter((a) => a.tenantId !== targetTenantId), ...restoredApprovals]);
+    }
+    if (restoredTaxJurisdictions.length > 0) {
+      setTaxJurisdictions((prev) => [...prev.filter((t) => t.tenantId !== targetTenantId), ...restoredTaxJurisdictions]);
+    }
+    if (restoredCustomAttributes.length > 0) {
+      setCustomAttributeDefinitions((prev) => [...prev.filter((c) => c.tenantId !== targetTenantId), ...restoredCustomAttributes]);
+    }
+    setAuditLogs((prev) => [...prev.filter((a) => a.tenantId !== targetTenantId), ...restoredAuditLogs]);
+
+    // 4. Switch context to the restored tenant
+    setActiveTenantId(targetTenantId);
+
+    addAuditLog({
+      action: 'SYSTEM_CLOSE',
+      tenantId: targetTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Restored company data snapshot for ${targetTenantObj.name} (${targetTenantObj.code}) [Mode: ${mode}]`,
+      status: 'SUCCESS',
+      payloadSummary: `Source Backup ID: ${payload.metadata.backupId} | Restored: ${restoredAccounts.length} accounts, ${restoredJournals.length} journals, ${restoredInvoices.length} invoices, ${restoredCustomers.length} customers`,
+    });
+
+    return {
+      success: true,
+      tenantId: targetTenantId,
+      tenantName: targetTenantObj.name,
+      restoredCounts: payload.metadata.recordCounts,
+    };
+  };
+
+  // Webhooks Dispatcher & Outbound Event Engine Handlers
+  const createWebhookEndpoint = (
+    data: Omit<WebhookEndpoint, 'id' | 'createdAt' | 'updatedAt' | 'failureCount'>
+  ): WebhookEndpoint => {
+    const newEp: WebhookEndpoint = {
+      ...data,
+      id: `wh_${Math.random().toString(36).substring(2, 9)}`,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      failureCount: 0,
+    };
+    setWebhookEndpoints((prev) => [newEp, ...prev]);
+    addAuditLog({
+      action: 'WEBHOOK_CREATE',
+      tenantId: data.tenantId || activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Created outbound webhook endpoint "${newEp.name}" (${newEp.url}) for events: ${newEp.events.join(', ')}`,
+    });
+    return newEp;
+  };
+
+  const updateWebhookEndpoint = (id: string, updates: Partial<WebhookEndpoint>) => {
+    setWebhookEndpoints((prev) =>
+      prev.map((ep) => (ep.id === id ? { ...ep, ...updates, updatedAt: new Date().toISOString() } : ep))
+    );
+    addAuditLog({
+      action: 'WEBHOOK_UPDATE',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Updated webhook endpoint configuration ID: ${id}`,
+    });
+  };
+
+  const deleteWebhookEndpoint = (id: string) => {
+    const ep = webhookEndpoints.find((e) => e.id === id);
+    setWebhookEndpoints((prev) => prev.filter((e) => e.id !== id));
+    addAuditLog({
+      action: 'WEBHOOK_DELETE',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Deleted webhook endpoint "${ep?.name || id}"`,
+    });
+  };
+
+  const testDispatchWebhook = async (
+    endpointId: string,
+    event: WebhookEventType,
+    customPayload?: any
+  ): Promise<{ success: boolean; log: WebhookDeliveryLog }> => {
+    const ep = webhookEndpoints.find((e) => e.id === endpointId);
+    const targetName = ep ? ep.name : 'Simulated Endpoint';
+    const targetTenant = ep?.tenantId || activeTenantId;
+
+    const payload =
+      customPayload || {
+        event,
+        timestamp: new Date().toISOString(),
+        tenantId: targetTenant,
+        data: {
+          test: true,
+          triggeredBy: userEmail,
+          message: 'Interactive Webhook Event Simulation Payload',
+        },
+      };
+
+    const latency = Math.floor(Math.random() * 120) + 35; // 35 - 155ms realistic latency
+    const isSuccess = !ep || ep.isActive;
+
+    const newLog: WebhookDeliveryLog = {
+      id: `whlog_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      tenantId: targetTenant,
+      endpointId,
+      endpointName: targetName,
+      event,
+      payload,
+      responseStatus: isSuccess ? 200 : 503,
+      responseBody: isSuccess
+        ? JSON.stringify({ status: 'ok', received: true, event, processedAt: new Date().toISOString() }, null, 2)
+        : JSON.stringify({ error: 'Endpoint inactive or unreachable in current simulated network topology' }, null, 2),
+      status: isSuccess ? 'SUCCESS' : 'FAILED',
+      latencyMs: latency,
+      attemptNumber: 1,
+      timestamp: new Date().toISOString(),
+      requestHeaders: {
+        'Content-Type': 'application/json',
+        'User-Agent': 'Enterprise-Accounting-Webhook-Dispatcher/2.0',
+        'X-Hub-Signature-256': `sha256=${Math.random().toString(36).substring(2)}${Math.random().toString(36).substring(2)}`,
+        'X-Delivery-Id': `del_${Math.random().toString(36).substring(2, 10)}`,
+        'X-Accounting-Event': event,
+      },
+    };
+
+    setWebhookLogs((prev) => [newLog, ...prev]);
+
+    // Update endpoint last triggered date
+    if (ep) {
+      setWebhookEndpoints((prev) =>
+        prev.map((e) => (e.id === endpointId ? { ...e, lastTriggeredAt: new Date().toISOString() } : e))
+      );
+    }
+
+    addAuditLog({
+      action: 'WEBHOOK_DISPATCH',
+      tenantId: targetTenant,
+      userRole: activeRole,
+      userEmail,
+      status: isSuccess ? 'SUCCESS' : 'FAILED',
+      details: `Dispatched webhook event "${event}" to ${targetName} (HTTP ${newLog.responseStatus} in ${latency}ms)`,
+    });
+
+    return { success: isSuccess, log: newLog };
+  };
+
+  const retryWebhookDelivery = async (logId: string): Promise<{ success: boolean; log?: WebhookDeliveryLog }> => {
+    const existingLog = webhookLogs.find((l) => l.id === logId);
+    if (!existingLog) return { success: false };
+
+    const latency = Math.floor(Math.random() * 95) + 28;
+    const updatedLog: WebhookDeliveryLog = {
+      ...existingLog,
+      id: `whlog_${Date.now()}_retry`,
+      responseStatus: 200,
+      responseBody: JSON.stringify({ status: 'ok', replayed: true, previousLogId: logId, processedAt: new Date().toISOString() }, null, 2),
+      status: 'SUCCESS',
+      attemptNumber: existingLog.attemptNumber + 1,
+      latencyMs: latency,
+      timestamp: new Date().toISOString(),
+    };
+
+    setWebhookLogs((prev) => [updatedLog, ...prev]);
+    addAuditLog({
+      action: 'WEBHOOK_DISPATCH',
+      tenantId: existingLog.tenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Re-dispatched webhook event "${existingLog.event}" to ${existingLog.endpointName} (Attempt #${updatedLog.attemptNumber})`,
+    });
+
+    return { success: true, log: updatedLog };
+  };
+
+  const dispatchAccountingEvent = async (event: WebhookEventType, payloadData: any, tenantIdOverride?: string) => {
+    const targetTenant = tenantIdOverride || activeTenantId;
+    const matchingEndpoints = webhookEndpoints.filter(
+      (ep) => ep.tenantId === targetTenant && ep.isActive && ep.events.includes(event)
+    );
+
+    for (const ep of matchingEndpoints) {
+      await testDispatchWebhook(ep.id, event, {
+        event,
+        timestamp: new Date().toISOString(),
+        tenantId: targetTenant,
+        data: payloadData,
+      });
+    }
+  };
+
+  // Scoped API Key Engine Handlers
+  const createScopedApiKey = (data: {
+    name: string;
+    role: Role;
+    environment?: 'LIVE' | 'TEST' | 'SANDBOX';
+    scopes: ApiKeyPermissionScope[];
+    rateLimitPerMin?: number;
+    expiresInDays?: number;
+    tenantId?: string;
+  }): { success: boolean; apiKey?: ScopedApiKey; fullSecretKey?: string; error?: string } => {
+    const env = data.environment || 'LIVE';
+    const prefix = env === 'LIVE' ? 'sec_live_' : env === 'TEST' ? 'sec_test_' : 'sec_sbx_';
+    const randomBody = `${Math.random().toString(36).substring(2, 12)}${Math.random().toString(36).substring(2, 12)}`;
+    const fullSecretKey = `${prefix}${randomBody}`;
+    const maskedKey = `${prefix}${randomBody.substring(0, 4)}••••••••${randomBody.substring(randomBody.length - 4)}`;
+    const expiresAt = new Date(Date.now() + (data.expiresInDays || 365) * 24 * 60 * 60 * 1000).toISOString();
+
+    const newKey: ScopedApiKey = {
+      id: `key_${Math.random().toString(36).substring(2, 9)}`,
+      tenantId: data.tenantId || activeTenantId,
+      name: data.name,
+      keyPrefix: `${prefix}${randomBody.substring(0, 4)}`,
+      maskedKey,
+      fullKey: fullSecretKey,
+      role: data.role,
+      environment: env,
+      scopes: data.scopes,
+      rateLimitPerMin: data.rateLimitPerMin || 600,
+      createdAt: new Date().toISOString(),
+      expiresAt,
+      status: 'ACTIVE',
+      createdBy: userEmail,
+    };
+
+    setScopedApiKeys((prev) => [newKey, ...prev]);
+    addAuditLog({
+      action: 'API_KEY_CREATE',
+      tenantId: data.tenantId || activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Generated new ${env} API Key "${newKey.name}" with scopes: [${newKey.scopes.join(', ')}]`,
+    });
+
+    return { success: true, apiKey: newKey, fullSecretKey };
+  };
+
+  const revokeScopedApiKey = (id: string) => {
+    const key = scopedApiKeys.find((k) => k.id === id);
+    setScopedApiKeys((prev) =>
+      prev.map((k) => (k.id === id ? { ...k, status: 'REVOKED' } : k))
+    );
+    addAuditLog({
+      action: 'API_KEY_REVOKE',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Revoked API Key "${key?.name || id}" (${key?.keyPrefix})`,
+    });
+  };
+
+  const deleteScopedApiKey = (id: string) => {
+    setScopedApiKeys((prev) => prev.filter((k) => k.id !== id));
+    addAuditLog({
+      action: 'API_KEY_REVOKE',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Deleted API Key record ID: ${id}`,
+    });
+  };
+
+  // Integration Connectors Hub Handlers
+  const connectIntegrationConnector = (
+    platform: ConnectorPlatform,
+    credentials: Record<string, string>,
+    syncSettings?: any
+  ): { success: boolean; connector?: IntegrationConnector } => {
+    const existing = integrationConnectors.find(
+      (c) => c.tenantId === activeTenantId && c.platform === platform
+    );
+
+    const defaultSettings = {
+      autoSyncInvoices: true,
+      autoSyncCustomers: true,
+      autoPostJournals: true,
+      syncIntervalMinutes: 15,
+      taxHandling: 'AUTO_CALCULATE' as const,
+      ...syncSettings,
+    };
+
+    if (existing) {
+      const updated: IntegrationConnector = {
+        ...existing,
+        status: 'CONNECTED',
+        credentials: { ...existing.credentials, ...credentials },
+        syncSettings: defaultSettings,
+      };
+      setIntegrationConnectors((prev) =>
+        prev.map((c) => (c.id === existing.id ? updated : c))
+      );
+      addAuditLog({
+        action: 'CONNECTOR_CONNECT',
+        tenantId: activeTenantId,
+        userRole: activeRole,
+        userEmail,
+        status: 'SUCCESS',
+        details: `Configured and connected ${existing.name} integration connector`,
+      });
+      return { success: true, connector: updated };
+    } else {
+      const newConn: IntegrationConnector = {
+        id: `conn_${platform.toLowerCase()}_${Math.random().toString(36).substring(2, 6)}`,
+        tenantId: activeTenantId,
+        platform,
+        name: platform.charAt(0) + platform.slice(1).toLowerCase(),
+        description: `Connected ${platform} integration hub connector`,
+        category:
+          platform === 'ZAPIER' || platform === 'MAKE'
+            ? 'AUTOMATION'
+            : platform === 'STRIPE'
+            ? 'PAYMENTS'
+            : platform === 'SHOPIFY'
+            ? 'ECOMMERCE'
+            : platform === 'GUSTO'
+            ? 'PAYROLL'
+            : 'CRM',
+        status: 'CONNECTED',
+        authType: 'API_KEY',
+        credentials,
+        syncSettings: defaultSettings,
+        stats: {
+          totalSyncedRecords: 0,
+        },
+      };
+      setIntegrationConnectors((prev) => [newConn, ...prev]);
+      addAuditLog({
+        action: 'CONNECTOR_CONNECT',
+        tenantId: activeTenantId,
+        userRole: activeRole,
+        userEmail,
+        status: 'SUCCESS',
+        details: `Connected new ${newConn.name} integration connector`,
+      });
+      return { success: true, connector: newConn };
+    }
+  };
+
+  const syncIntegrationConnector = async (
+    connectorId: string
+  ): Promise<{ success: boolean; syncedCount: number; message: string }> => {
+    const conn = integrationConnectors.find((c) => c.id === connectorId);
+    if (!conn) return { success: false, syncedCount: 0, message: 'Connector not found' };
+
+    // Simulate batch sync
+    const simulatedBatchCount = Math.floor(Math.random() * 8) + 2;
+    const updated: IntegrationConnector = {
+      ...conn,
+      stats: {
+        lastSyncTimestamp: new Date().toISOString(),
+        lastSyncStatus: 'OK',
+        lastSyncMessage: `Successfully ingested ${simulatedBatchCount} new transactions & synchronized general ledger accounts.`,
+        totalSyncedRecords: conn.stats.totalSyncedRecords + simulatedBatchCount,
+      },
+    };
+
+    setIntegrationConnectors((prev) =>
+      prev.map((c) => (c.id === connectorId ? updated : c))
+    );
+
+    addAuditLog({
+      action: 'CONNECTOR_SYNC',
+      tenantId: conn.tenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Executed scheduled synchronization for ${conn.name} (+${simulatedBatchCount} records posted)`,
+    });
+
+    return {
+      success: true,
+      syncedCount: simulatedBatchCount,
+      message: `Successfully synchronized ${simulatedBatchCount} records from ${conn.name}`,
+    };
+  };
+
+  const disconnectIntegrationConnector = (connectorId: string) => {
+    const conn = integrationConnectors.find((c) => c.id === connectorId);
+    setIntegrationConnectors((prev) =>
+      prev.map((c) => (c.id === connectorId ? { ...c, status: 'DISCONNECTED' } : c))
+    );
+    addAuditLog({
+      action: 'CONNECTOR_DISCONNECT',
+      tenantId: activeTenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Disconnected ${conn?.name || connectorId} integration connector`,
+    });
+  };
+
+  // AI Audit Copilot Entity Configuration & Token Quotas
+  const activeTenantAiConfig = useMemo<EntityAiConfig>(() => {
+    if (tenantAiConfigs[activeTenantId]) {
+      return tenantAiConfigs[activeTenantId];
+    }
+    return {
+      tenantId: activeTenantId,
+      apiKey: '',
+      isKeyConfigured: false,
+      model: 'gemini-2.5-flash',
+      monthlyTokenQuota: 500000,
+      tokensUsedThisPeriod: 0,
+      quotaResetCycle: 'MONTHLY',
+      lastResetDate: new Date().toISOString().split('T')[0],
+      requestsCountThisPeriod: 0,
+      totalTokensAllTime: 0,
+      alertThresholdPercent: 80,
+      enforceStrictQuota: true,
+      customAuditInstructions: '',
+    };
+  }, [tenantAiConfigs, activeTenantId]);
+
+  const updateTenantAiConfig = (tenantId: string, updates: Partial<EntityAiConfig>): { success: boolean; error?: string } => {
+    // Check permission: super_user, entity_admin (for their tenant), admin
+    const currentScope = enterpriseUsers.find((u) => u.email === userEmail)?.tenantScopes.find((s) => s.tenantId === tenantId);
+    const isEntityAdminForTenant = activeRole === 'entity_admin' && (currentScope?.role === 'entity_admin' || activeTenantId === tenantId);
+    const isSuperUserOrAdmin = activeRole === 'super_user' || activeRole === 'admin';
+
+    if (!isSuperUserOrAdmin && !isEntityAdminForTenant) {
+      return {
+        success: false,
+        error: 'Forbidden: Only an Entity Administrator or Super User can configure AI API Keys and Token Quota limits for this entity.'
+      };
+    }
+
+    setTenantAiConfigs((prev) => {
+      const existing = prev[tenantId] || {
+        tenantId,
+        apiKey: '',
+        isKeyConfigured: false,
+        model: 'gemini-2.5-flash',
+        monthlyTokenQuota: 500000,
+        tokensUsedThisPeriod: 0,
+        quotaResetCycle: 'MONTHLY',
+        lastResetDate: new Date().toISOString().split('T')[0],
+        requestsCountThisPeriod: 0,
+        totalTokensAllTime: 0,
+        alertThresholdPercent: 80,
+        enforceStrictQuota: true,
+      };
+
+      const newApiKey = updates.apiKey !== undefined ? updates.apiKey.trim() : existing.apiKey;
+      const isConfigured = Boolean(newApiKey && newApiKey.length > 0);
+
+      const updated: EntityAiConfig = {
+        ...existing,
+        ...updates,
+        apiKey: newApiKey,
+        isKeyConfigured: isConfigured,
+        configuredByEmail: userEmail,
+        configuredAt: new Date().toISOString(),
+      };
+
+      return {
+        ...prev,
+        [tenantId]: updated
+      };
+    });
+
+    addAuditLog({
+      action: 'AI_ENTITY_KEY_CONFIGURED',
+      tenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `Entity AI API Key and Token Quota updated. Model: ${updates.model || 'gemini-2.5-flash'}, Quota: ${updates.monthlyTokenQuota ? updates.monthlyTokenQuota.toLocaleString() + ' tokens' : 'Unlimited'}, Enforce Strict: ${updates.enforceStrictQuota !== false ? 'YES' : 'NO'}.`,
+    });
+
+    return { success: true };
+  };
+
+  const recordAiTokenUsage = (params: { tenantId: string; model: string; promptTokens: number; responseTokens: number; queryTopic: string }) => {
+    const total = params.promptTokens + params.responseTokens;
+    const now = new Date().toISOString();
+
+    setTenantAiConfigs((prev) => {
+      const existing = prev[params.tenantId] || {
+        tenantId: params.tenantId,
+        apiKey: '',
+        isKeyConfigured: false,
+        model: params.model || 'gemini-2.5-flash',
+        monthlyTokenQuota: 500000,
+        tokensUsedThisPeriod: 0,
+        quotaResetCycle: 'MONTHLY',
+        lastResetDate: new Date().toISOString().split('T')[0],
+        requestsCountThisPeriod: 0,
+        totalTokensAllTime: 0,
+        alertThresholdPercent: 80,
+        enforceStrictQuota: true,
+      };
+
+      return {
+        ...prev,
+        [params.tenantId]: {
+          ...existing,
+          tokensUsedThisPeriod: existing.tokensUsedThisPeriod + total,
+          totalTokensAllTime: existing.totalTokensAllTime + total,
+          requestsCountThisPeriod: existing.requestsCountThisPeriod + 1,
+          lastUsedAt: now,
+        }
+      };
+    });
+
+    const newLog: AiTokenUsageLog = {
+      id: `ai-log-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      timestamp: now.replace('T', ' ').slice(0, 19),
+      tenantId: params.tenantId,
+      userEmail,
+      model: params.model,
+      promptTokens: params.promptTokens,
+      responseTokens: params.responseTokens,
+      totalTokens: total,
+      queryTopic: params.queryTopic,
+    };
+
+    setAiUsageLogs((prev) => [newLog, ...prev]);
+  };
+
+  const resetTenantAiQuota = (tenantId: string): { success: boolean; error?: string } => {
+    const isEntityAdminForTenant = activeRole === 'entity_admin' && activeTenantId === tenantId;
+    const isSuperUserOrAdmin = activeRole === 'super_user' || activeRole === 'admin';
+
+    if (!isSuperUserOrAdmin && !isEntityAdminForTenant) {
+      return {
+        success: false,
+        error: 'Forbidden: Only an Entity Administrator or Super User can reset the AI token consumption counter.'
+      };
+    }
+
+    setTenantAiConfigs((prev) => {
+      const existing = prev[tenantId];
+      if (!existing) return prev;
+      return {
+        ...prev,
+        [tenantId]: {
+          ...existing,
+          tokensUsedThisPeriod: 0,
+          requestsCountThisPeriod: 0,
+          lastResetDate: new Date().toISOString().split('T')[0],
+        }
+      };
+    });
+
+    addAuditLog({
+      action: 'AI_TOKEN_QUOTA_RESET',
+      tenantId,
+      userRole: activeRole,
+      userEmail,
+      status: 'SUCCESS',
+      details: `AI Token usage counter manually reset to 0 for entity ${tenantId}.`,
+    });
+
+    return { success: true };
+  };
+
   return (
     <AccountingContext.Provider
       value={{
@@ -3293,6 +5510,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         treasuryAccounts,
         departmentBudgets,
         approvalItems,
+        approvalRules,
         taxJurisdictions,
         enterpriseUsers,
         customRoles,
@@ -3305,6 +5523,26 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         bulkInvoiceBatches,
         paymentReceipts,
         openingBalances,
+        recurringSchedules,
+        expenseReceipts,
+        mileageLogs,
+        inventoryItems,
+        inventoryAdjustments,
+        payrollEmployees,
+        payrollRuns,
+        connectedBankFeeds,
+
+        createApprovalRule,
+        updateApprovalRule,
+        deleteApprovalRule,
+        toggleApprovalRule,
+        submitApprovalRequest,
+        processApprovalDecision,
+
+        createCustomRole,
+        updateCustomRole,
+        deleteCustomRole,
+        cloneCustomRole,
 
         createCustomer,
         updateCustomer,
@@ -3356,16 +5594,84 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         executeYearEndClose,
         executeSweepTransfer,
         updateDepartmentBudget,
-        processApprovalDecision,
         postTaxSettlementVoucher,
         reconcileBankLine,
         importBankStatements,
         autoMatchAndReconcile,
         createAndReconcileGLLine,
 
+        createRecurringSchedule,
+        updateRecurringSchedule,
+        deleteRecurringSchedule,
+        runRecurringScheduleNow,
+
+        createExpenseReceipt,
+        postExpenseReceiptToGL,
+        deleteExpenseReceipt,
+
+        createMileageLog,
+        postMileageLogToGL,
+        deleteMileageLog,
+
+        createInventoryItem,
+        updateInventoryItem,
+        adjustInventoryStock,
+        deleteInventoryItem,
+
+        createPayrollEmployee,
+        updatePayrollEmployee,
+        deletePayrollEmployee,
+        calculatePayRunPreview,
+        executePayRun,
+
+        connectBankFeed,
+        syncBankFeed,
+        disconnectBankFeed,
+
+        downloadCompanyBackup,
+        validateBackupFileContent,
+        restoreCompanyBackup,
+
+        // Webhooks Dispatcher & Outbound Event Engine
+        webhookEndpoints,
+        webhookLogs,
+        createWebhookEndpoint,
+        updateWebhookEndpoint,
+        deleteWebhookEndpoint,
+        testDispatchWebhook,
+        retryWebhookDelivery,
+        dispatchAccountingEvent,
+
+        // Scoped API Keys & Developer Portal
+        scopedApiKeys,
+        createScopedApiKey,
+        revokeScopedApiKey,
+        deleteScopedApiKey,
+
+        // Zapier / Make & E-Commerce Integration Connectors
+        integrationConnectors,
+        connectIntegrationConnector,
+        syncIntegrationConnector,
+        disconnectIntegrationConnector,
+
+        // AI Audit Copilot Entity Configuration & Token Quotas
+        tenantAiConfigs,
+        activeTenantAiConfig,
+        aiUsageLogs,
+        updateTenantAiConfig,
+        recordAiTokenUsage,
+        resetTenantAiQuota,
+
+        processOnlineInvoicePayment,
+
         runDepreciationForTenant,
         createTenant,
         createAccount,
+        updateAccount,
+        deleteAccount,
+        applyIndustryPresetCOA,
+        batchImportAccounts,
+        industryCoaPresets: INDUSTRY_COA_PRESETS,
         trialBalance,
         balanceSheet,
         incomeStatement,

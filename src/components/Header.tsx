@@ -1,14 +1,19 @@
 import React from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { Building2, ShieldCheck, UserCheck, Scale, Globe2, ChevronDown, Plus, BookOpen, HelpCircle } from 'lucide-react';
+import { Building2, ShieldCheck, UserCheck, Scale, Globe2, ChevronDown, Plus, BookOpen, HelpCircle, HardDriveDownload } from 'lucide-react';
 import { Role } from '../types';
 
 interface HeaderProps {
   onOpenCreateTenantModal: () => void;
   onOpenHelpCenter?: () => void;
+  onOpenBackupModal?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onOpenCreateTenantModal, onOpenHelpCenter }) => {
+export const Header: React.FC<HeaderProps> = ({
+  onOpenCreateTenantModal,
+  onOpenHelpCenter,
+  onOpenBackupModal,
+}) => {
   const {
     tenants,
     activeTenant,
@@ -23,6 +28,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCreateTenantModal, onOpenH
     setActiveRole,
     setUserEmail,
     balanceSheet,
+    downloadCompanyBackup,
   } = useAccounting();
 
   const handleRoleChange = (role: Role) => {
@@ -175,6 +181,19 @@ export const Header: React.FC<HeaderProps> = ({ onOpenCreateTenantModal, onOpenH
           <div className="hidden xl:flex items-center gap-2 bg-slate-950/80 px-3 py-1 rounded-md border border-slate-800 font-mono text-[10px] text-slate-400">
             <span className="text-indigo-400">x-tenant-id:</span> {activeTenant.id}
           </div>
+
+          {/* Backup & Restore Data Button */}
+          {onOpenBackupModal && (
+            <button
+              onClick={onOpenBackupModal}
+              title="1-Click Company Data Backup & Point-in-Time Restore"
+              className="flex items-center gap-1.5 px-3 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
+            >
+              <HardDriveDownload className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Backup & Restore</span>
+              <span className="sm:hidden">Backup</span>
+            </button>
+          )}
 
           {/* Help Center Quick Access Button */}
           {onOpenHelpCenter && (

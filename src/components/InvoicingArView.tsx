@@ -29,6 +29,10 @@ import {
   FileDown,
   Search,
   Filter,
+  CreditCard,
+  Smartphone,
+  ShieldCheck,
+  Zap,
 } from 'lucide-react';
 import { CustomerContact, ProductServiceItem, InvoiceTemplate } from '../types';
 import { InvoiceTemplatesView } from './InvoiceTemplatesView';
@@ -84,7 +88,17 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
     paymentReceipts,
     openingBalances,
     getCustomerStatementData,
+    processOnlineInvoicePayment,
   } = useAccounting();
+
+  // Online Payment Modal state
+  const [onlinePayInvoice, setOnlinePayInvoice] = useState<any | null>(null);
+  const [onlinePayMethod, setOnlinePayMethod] = useState<'CREDIT_CARD' | 'ACH' | 'APPLE_PAY'>('CREDIT_CARD');
+  const [cardNumber, setCardNumber] = useState('4242 •••• •••• 4242');
+  const [cardExpiry, setCardExpiry] = useState('12/28');
+  const [cardCvc, setCardCvc] = useState('888');
+  const [isProcessingOnlinePay, setIsProcessingOnlinePay] = useState(false);
+  const [onlinePaySuccessMessage, setOnlinePaySuccessMessage] = useState<string | null>(null);
 
   // Tab View: Invoices Register vs Bulk Generation vs Customer Statements vs Invoice Templates Master
   const [activeTab, setActiveTab] = useState<'INVOICES' | 'BULK_GENERATION' | 'STATEMENTS' | 'TEMPLATES'>(() => {
@@ -1014,16 +1028,28 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                         <td className="p-3 text-right font-sans">
                           <div className="flex items-center justify-end gap-1.5">
                             {isUnpaid ? (
-                              <button
-                                onClick={() => {
-                                  setGlobalPaymentTargetInvoiceId(inv.id);
-                                  setGlobalPaymentTargetCustomerId(inv.customerId);
-                                  setShowGlobalPaymentModal(true);
-                                }}
-                                className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] font-semibold shadow transition cursor-pointer"
-                              >
-                                Receive Payment
-                              </button>
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setOnlinePayInvoice(inv);
+                                    setOnlinePaySuccessMessage(null);
+                                  }}
+                                  className="px-2.5 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded text-[11px] font-semibold shadow transition cursor-pointer flex items-center gap-1"
+                                  title="Open Online Customer Checkout & Payment Portal"
+                                >
+                                  <CreditCard className="w-3 h-3" /> Pay Online
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setGlobalPaymentTargetInvoiceId(inv.id);
+                                    setGlobalPaymentTargetCustomerId(inv.customerId);
+                                    setShowGlobalPaymentModal(true);
+                                  }}
+                                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] font-semibold shadow transition cursor-pointer"
+                                >
+                                  Receive Payment
+                                </button>
+                              </>
                             ) : (
                               <span className="text-slate-500 text-[11px] px-2 py-0.5">Settled</span>
                             )}
@@ -1682,6 +1708,192 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
         isOpen={showGlobalOpeningModal}
         onClose={() => setShowGlobalOpeningModal(false)}
       />
+
+      {/* ONLINE PAYMENT GATEWAY CHECKOUT MODAL */}
+      {onlinePayInvoice && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-5 shadow-2xl relative">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-lg">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-white">Online Payment Gateway</h3>
+                  <p className="text-[11px] text-slate-400">Secure Merchant Checkout for Invoice #{onlinePayInvoice.invoiceNumber}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setOnlinePayInvoice(null)}
+                className="text-slate-400 hover:text-white cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            {onlinePaySuccessMessage ? (
+              <div className="py-8 text-center space-y-3">
+                <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/40">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+                <h4 className="text-base font-bold text-white">Payment Authorized & Settled!</h4>
+                <p className="text-xs text-slate-300 max-w-sm mx-auto">{onlinePaySuccessMessage}</p>
+                <button
+                  onClick={() => setOnlinePayInvoice(null)}
+                  className="mt-4 px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl"
+                >
+                  Close Checkout
+                </button>
+              </div>
+            ) : (
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  setIsProcessingOnlinePay(true);
+                  setTimeout(() => {
+                    const fee = onlinePayMethod === 'CREDIT_CARD' ? Math.round(onlinePayInvoice.totalAmount * 0.029 + 0.3) : 0;
+                    const res = processOnlineInvoicePayment(onlinePayInvoice.id, onlinePayMethod, fee);
+                    setIsProcessingOnlinePay(false);
+                    if (res.success) {
+                      setOnlinePaySuccessMessage(`Captured ${onlinePayInvoice.currency} ${onlinePayInvoice.totalAmount.toLocaleString()} via ${onlinePayMethod}. Auto-reconciled against Accounts Receivable with instant GL double-entry voucher posted.`);
+                    }
+                  }, 800);
+                }}
+                className="space-y-4 text-xs"
+              >
+                {/* INVOICE SUMMARY CARD */}
+                <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 font-mono">
+                  <div className="flex justify-between text-slate-400">
+                    <span>Customer Payee:</span>
+                    <span className="text-white font-sans font-bold">{onlinePayInvoice.customerName}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-400">
+                    <span>Due Date:</span>
+                    <span className="text-slate-300">{onlinePayInvoice.dueDate}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-300 pt-1 border-t border-slate-800 text-sm">
+                    <span className="font-bold">Total Amount Due:</span>
+                    <span className="font-black text-emerald-400">
+                      {onlinePayInvoice.currency} {(onlinePayInvoice.totalAmount - onlinePayInvoice.amountPaid).toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                </div>
+
+                {/* PAYMENT METHOD SELECTOR */}
+                <div className="space-y-1.5">
+                  <label className="text-slate-300 font-bold">Select Payment Gateway Method</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setOnlinePayMethod('CREDIT_CARD')}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition cursor-pointer ${
+                        onlinePayMethod === 'CREDIT_CARD'
+                          ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300 font-bold'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <CreditCard className="w-4 h-4" />
+                      <span className="text-[10px]">Credit Card</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setOnlinePayMethod('ACH')}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition cursor-pointer ${
+                        onlinePayMethod === 'ACH'
+                          ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300 font-bold'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Building2 className="w-4 h-4" />
+                      <span className="text-[10px]">ACH Bank Wire</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setOnlinePayMethod('APPLE_PAY')}
+                      className={`p-2.5 rounded-xl border flex flex-col items-center gap-1 transition cursor-pointer ${
+                        onlinePayMethod === 'APPLE_PAY'
+                          ? 'bg-indigo-600/20 border-indigo-500 text-indigo-300 font-bold'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      <Smartphone className="w-4 h-4" />
+                      <span className="text-[10px]">Apple / Google Pay</span>
+                    </button>
+                  </div>
+                </div>
+
+                {onlinePayMethod === 'CREDIT_CARD' && (
+                  <div className="space-y-2.5 bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
+                    <div>
+                      <label className="text-slate-400 text-[11px] block mb-1">Card Number</label>
+                      <input
+                        type="text"
+                        value={cardNumber}
+                        onChange={(e) => setCardNumber(e.target.value)}
+                        className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 font-mono text-white text-xs"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-slate-400 text-[11px] block mb-1">Expiration</label>
+                        <input
+                          type="text"
+                          value={cardExpiry}
+                          onChange={(e) => setCardExpiry(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 font-mono text-white text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-slate-400 text-[11px] block mb-1">CVC / CVV</label>
+                        <input
+                          type="text"
+                          value={cardCvc}
+                          onChange={(e) => setCardCvc(e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 font-mono text-white text-xs"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800">
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                    <span>Encrypted with Stripe & Level 1 PCI DSS</span>
+                  </div>
+                  <span className="font-bold text-slate-200">Instant GL Settlement</span>
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setOnlinePayInvoice(null)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isProcessingOnlinePay}
+                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                  >
+                    {isProcessingOnlinePay ? (
+                      <span>Authorizing Payment...</span>
+                    ) : (
+                      <>
+                        <Zap className="w-4 h-4 text-amber-300" />
+                        <span>Pay {onlinePayInvoice.currency} {(onlinePayInvoice.totalAmount - onlinePayInvoice.amountPaid).toLocaleString()} Now</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

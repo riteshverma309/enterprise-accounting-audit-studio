@@ -39,6 +39,12 @@ export interface Account {
   balance: number;
   parentAccountId?: string;
   isHeader?: boolean;
+  subCategory?: string;
+  description?: string;
+  normalBalance?: 'DEBIT' | 'CREDIT';
+  isActive?: boolean;
+  isSystemAccount?: boolean;
+  industryTag?: string;
 }
 
 export interface JournalLine {
@@ -137,7 +143,20 @@ export interface AuditLogEvent {
     | 'ATTRIBUTE_CREATE'
     | 'ATTRIBUTE_DELETE'
     | 'INVOICE_BATCH_GENERATE'
-    | 'INVOICE_BATCH_ROLLBACK';
+    | 'INVOICE_BATCH_ROLLBACK'
+    | 'EXPORT_REPORT'
+    | 'SYSTEM_CLOSE'
+    | 'BACKUP_EXPORT'
+    | 'BACKUP_RESTORE'
+    | 'WEBHOOK_CREATE'
+    | 'WEBHOOK_UPDATE'
+    | 'WEBHOOK_DELETE'
+    | 'WEBHOOK_DISPATCH'
+    | 'API_KEY_CREATE'
+    | 'API_KEY_REVOKE'
+    | 'CONNECTOR_CONNECT'
+    | 'CONNECTOR_SYNC'
+    | 'CONNECTOR_DISCONNECT';
   tenantId: string;
   organizationId?: string;
   branchId?: string;
@@ -436,14 +455,21 @@ export interface ApprovalPolicy {
 export interface ApprovalItem {
   id: string;
   tenantId: string;
-  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE';
+  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PAYROLL_RUN' | 'EXPENSE_CLAIM' | 'PERIOD_REOPEN' | 'BACKUP_RESTORE';
   referenceNumber: string;
   amount: number;
   currency: string;
   description: string;
-  requestedBy: string;
+  requestedBy: string; // Maker email
+  requestedRole?: Role;
   requestedDate: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  approvedBy?: string; // Checker email
+  approvedRole?: Role;
+  approvalDate?: string;
+  approverComments?: string;
+  rejectionReason?: string;
+  ruleIdMatched?: string;
 }
 
 export interface TaxJurisdiction {
@@ -458,21 +484,106 @@ export interface TaxJurisdiction {
 }
 
 export type PermissionKey =
+  // General Ledger
   | 'journals:create'
   | 'journals:post'
   | 'journals:reverse'
+  | 'coa:manage'
+  // Accounts Receivable (AR)
+  | 'ar:view'
   | 'ar:manage'
+  | 'ar:create_invoice'
+  | 'ar:approve_invoice'
+  | 'ar:collect_payment'
+  | 'ar:write_off'
+  // Accounts Payable (AP)
+  | 'ap:view'
   | 'ap:manage'
+  | 'ap:create_bill'
+  | 'ap:approve_bill'
+  | 'ap:disburse_funds'
+  // Expenses & Mileage
+  | 'expenses:submit'
+  | 'expenses:approve'
+  | 'expenses:post_gl'
+  // Inventory & Stock
+  | 'inventory:view'
+  | 'inventory:adjust'
+  | 'inventory:manage'
+  // Employees & Payroll
+  | 'employees:view'
+  | 'employees:manage'
+  | 'payroll:view'
+  | 'payroll:draft_run'
+  | 'payroll:approve_and_post'
+  // Treasury & Banking
+  | 'treasury:view'
   | 'treasury:sweep'
+  | 'bank:connect_feed'
+  | 'bank:reconcile'
+  // FP&A & Budgets
+  | 'fpa:view'
   | 'fpa:budget_edit'
-  | 'governance:approve'
+  // Tax & Statutory
+  | 'tax:view'
   | 'tax:settle'
+  | 'tax:configure'
+  // Fiscal Close & Period Controls
+  | 'fiscal:view'
   | 'fiscal:lock_period'
   | 'fiscal:year_end_close'
+  | 'fiscal:reopen_period'
+  // Multi-Signature Governance & Approvals
+  | 'governance:approve'
+  | 'governance:configure_rules'
+  // Backup & Data Restore
+  | 'backup:export'
+  | 'backup:restore'
+  // Developer & Integrations
+  | 'webhooks:manage'
+  | 'apikeys:manage'
+  | 'connectors:manage'
+  // Identity & User Administration
   | 'users:manage_provisioning'
   | 'users:manage_global'
   | 'users:manage_entity'
+  | 'roles:manage_custom'
+  | 'ai:use_copilot'
+  | 'ai:configure_entity_key'
+  // Reports & Audits
+  | 'reports:view'
   | 'reports:export';
+
+export interface EntityAiConfig {
+  tenantId: string;
+  apiKey: string;
+  isKeyConfigured: boolean;
+  model: string;
+  monthlyTokenQuota: number; // 0 = unlimited, otherwise e.g. 500,000
+  tokensUsedThisPeriod: number;
+  quotaResetCycle: 'MONTHLY' | 'DAILY' | 'TOTAL';
+  lastResetDate: string;
+  requestsCountThisPeriod: number;
+  totalTokensAllTime: number;
+  alertThresholdPercent: number; // e.g. 80
+  enforceStrictQuota: boolean;
+  customAuditInstructions?: string;
+  configuredByEmail?: string;
+  configuredAt?: string;
+  lastUsedAt?: string;
+}
+
+export interface AiTokenUsageLog {
+  id: string;
+  timestamp: string;
+  tenantId: string;
+  userEmail: string;
+  model: string;
+  promptTokens: number;
+  responseTokens: number;
+  totalTokens: number;
+  queryTopic: string;
+}
 
 export interface TenantAccessScope {
   tenantId: string;
@@ -501,7 +612,21 @@ export interface CustomRoleDefinition {
   code: Role | string;
   description: string;
   isSystemRole: boolean;
+  colorBadge?: string;
   permissions: PermissionKey[];
+}
+
+export interface ConfigurableApprovalRule {
+  id: string;
+  tenantId: string;
+  ruleName: string;
+  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PAYROLL_RUN' | 'EXPENSE_CLAIM' | 'PERIOD_REOPEN' | 'BACKUP_RESTORE';
+  thresholdAmount: number; // 0 means all requests require approval
+  requiredRole: Role;
+  requiredPermission: PermissionKey;
+  enforceMakerChecker: boolean; // Requester cannot self-approve
+  isEnabled: boolean;
+  description: string;
 }
 
 export type CustomAttributeDataType = 'text' | 'number' | 'decimal' | 'date' | 'boolean' | 'select';
@@ -728,6 +853,450 @@ export interface CustomerStatementData {
   };
 }
 
+export type RecurrenceFrequency = 'WEEKLY' | 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL';
 
+export interface RecurringInvoiceSchedule {
+  id: string;
+  tenantId: string;
+  customerId: string;
+  customerName: string;
+  customerEmail: string;
+  profileName: string;
+  frequency: RecurrenceFrequency;
+  startDate: string;
+  endDate?: string;
+  nextRunDate: string;
+  lastRunDate?: string;
+  items: InvoiceLineItem[];
+  subtotal: number;
+  taxTotal: number;
+  totalAmount: number;
+  revenueAccountCode: string;
+  autoSendEmail: boolean;
+  autoChargePayment: boolean;
+  paymentMethodType?: PaymentMethodType;
+  status: 'ACTIVE' | 'PAUSED' | 'CANCELLED';
+  generatedInvoicesCount: number;
+  notes?: string;
+}
 
+export interface ExpenseReceipt {
+  id: string;
+  tenantId: string;
+  receiptNumber: string;
+  expenseDate: string;
+  vendorName: string;
+  category: string;
+  expenseAccountCode: string;
+  amount: number;
+  taxAmount: number;
+  totalAmount: number;
+  paymentMethod: 'COMPANY_CARD' | 'CASH' | 'PETTY_CASH' | 'BANK_TRANSFER' | 'PERSONAL_EXPENSE';
+  paidBy: string;
+  receiptImageUrl?: string;
+  receiptFileName?: string;
+  ocrExtractedData?: {
+    rawText?: string;
+    confidenceScore?: number;
+    detectedTaxRate?: number;
+    detectedVendor?: string;
+    detectedDate?: string;
+  };
+  status: 'DRAFT' | 'POSTED' | 'REIMBURSED';
+  journalEntryId?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface MileageLogEntry {
+  id: string;
+  tenantId: string;
+  tripDate: string;
+  driverName: string;
+  driverEmail: string;
+  vehicleName: string;
+  vehicleType: 'CAR' | 'SUV' | 'TRUCK' | 'ELECTRIC' | 'MOTORCYCLE';
+  startLocation: string;
+  endLocation: string;
+  purpose: string;
+  distanceMiles: number;
+  ratePerMile: number;
+  totalDeductionAmount: number;
+  isReimbursable: boolean;
+  status: 'LOGGED' | 'APPROVED' | 'POSTED_TO_GL';
+  journalEntryId?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export interface InventoryStockItem {
+  id: string;
+  tenantId: string;
+  productId?: string;
+  sku: string;
+  name: string;
+  category: string;
+  location: string;
+  quantityOnHand: number;
+  reorderThreshold: number;
+  reorderQuantity: number;
+  unitCost: number;
+  totalValuation: number;
+  valuationMethod: 'FIFO' | 'WEIGHTED_AVG' | 'SPECIFIC_ID';
+  unitOfMeasure: string;
+  status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  lastRestockedDate?: string;
+  notes?: string;
+}
+
+export interface InventoryAdjustmentRecord {
+  id: string;
+  tenantId: string;
+  date: string;
+  inventoryItemId: string;
+  sku: string;
+  name: string;
+  type: 'RECEIPT_PURCHASE' | 'CYCLE_COUNT_GAIN' | 'DAMAGE_SPOILAGE_LOSS' | 'THEFT_SHRINKAGE' | 'RETURN_RESTOCK';
+  quantityDelta: number;
+  previousQuantity: number;
+  newQuantity: number;
+  unitCost: number;
+  totalCostAdjustment: number;
+  reason: string;
+  performedBy: string;
+  journalEntryId?: string;
+  createdAt: string;
+}
+
+export type EmployeeEmploymentType = 'FULL_TIME' | 'PART_TIME' | 'CONTRACTOR' | 'INTERN';
+export type EmployeeStatus = 'ACTIVE' | 'ON_LEAVE' | 'TERMINATED';
+export type EmployeePayType = 'SALARY' | 'HOURLY';
+export type EmployeePayFrequency = 'WEEKLY' | 'BI_WEEKLY' | 'SEMI_MONTHLY' | 'MONTHLY';
+export type EmployeeFilingStatus = 'SINGLE' | 'MARRIED_FILING_JOINTLY' | 'MARRIED_FILING_SEPARATELY' | 'HEAD_OF_HOUSEHOLD';
+export type EmployeePaymentMethod = 'DIRECT_DEPOSIT' | 'CHECK' | 'WIRE' | 'CASH';
+
+export interface PayrollEmployee {
+  id: string;
+  tenantId: string;
+  employeeNumber: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string; // Job Title
+  department: string;
+  employmentType: EmployeeEmploymentType;
+  status: EmployeeStatus;
+  hireDate: string; // YYYY-MM-DD
+  terminationDate?: string;
+  address?: string;
+  taxId?: string; // SSN / TIN masked e.g. "•••-••-8821"
+
+  // Compensation & Pay Type
+  payType: EmployeePayType;
+  baseSalaryAnnual?: number;
+  hourlyRate?: number;
+  standardHoursPerWeek?: number;
+  payFrequency: EmployeePayFrequency;
+
+  // Tax Withholding & Benefits
+  filingStatus: EmployeeFilingStatus;
+  stateFilingStatus?: string;
+  allowances: number;
+  additionalWithholdingPerPeriod?: number;
+  fourZeroOneKContributionRate?: number; // % e.g. 5
+  fourZeroOneKEmployerMatchRate?: number; // % e.g. 4
+  healthBenefitDeduction?: number; // $ amount per period
+  dentalVisionDeduction?: number; // $ amount per period
+
+  // Direct Deposit / Payment Details
+  paymentMethod: EmployeePaymentMethod;
+  bankName?: string;
+  bankAccountNumber?: string;
+  bankRoutingNumber?: string;
+  accountType?: 'CHECKING' | 'SAVINGS';
+
+  // Notes & Emergency Contact
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
+export interface PayrollRunEmployeeLine {
+  employeeId: string;
+  employeeName: string;
+  department: string;
+  grossPay: number;
+  federalTax: number;
+  stateTax: number;
+  socialSecurityTax: number;
+  medicareTax: number;
+  benefitsDeduction: number;
+  netPay: number;
+  employerFicaMatch: number;
+  employerFuta: number;
+  totalEmployerCost: number;
+}
+
+export interface PayrollRun {
+  id: string;
+  tenantId: string;
+  runNumber: string;
+  payPeriodStart: string;
+  payPeriodEnd: string;
+  payDate: string;
+  status: 'DRAFT' | 'APPROVED' | 'POSTED_TO_GL';
+  totalGrossPay: number;
+  totalEmployeeTaxWithholdings: number;
+  totalEmployerTaxes: number;
+  totalNetPay: number;
+  employeeCount: number;
+  journalEntryId?: string;
+  executedBy: string;
+  createdAt: string;
+  lines: PayrollRunEmployeeLine[];
+}
+
+export interface ConnectedBankFeed {
+  id: string;
+  tenantId: string;
+  institutionName: string;
+  accountName: string;
+  accountNumberMasked: string;
+  accountType: 'CHECKING' | 'SAVINGS' | 'CREDIT_CARD' | 'MERCHANT';
+  balance: number;
+  currency: string;
+  lastSyncedAt: string;
+  status: 'CONNECTED' | 'SYNCING' | 'NEEDS_REAUTH' | 'DISCONNECTED';
+  autoSyncIntervalHours: number;
+  matchedGlAccountId: string;
+  logoUrl?: string;
+}
+
+export interface CompanyBackupRecordCounts {
+  accounts: number;
+  journalEntries: number;
+  invoices: number;
+  vendorBills: number;
+  paymentReceipts: number;
+  openingBalances: number;
+  customers: number;
+  vendors: number;
+  productsServices: number;
+  priceChangeHistory: number;
+  invoiceTemplates: number;
+  bulkInvoiceBatches: number;
+  recurringSchedules: number;
+  expenseReceipts: number;
+  mileageLogs: number;
+  inventoryItems: number;
+  inventoryAdjustments: number;
+  payrollEmployees: number;
+  payrollRuns: number;
+  connectedBankFeeds: number;
+  bankStatements: number;
+  fixedAssets: number;
+  fiscalPeriods: number;
+  treasuryAccounts: number;
+  departmentBudgets: number;
+  approvalItems: number;
+  taxJurisdictions: number;
+  customAttributeDefinitions: number;
+  auditLogs: number;
+}
+
+export interface CompanyBackupMetadata {
+  schemaVersion: '1.0';
+  backupId: string;
+  exportedAt: string;
+  exportedBy: string;
+  scope: 'single_company' | 'full_system';
+  tenantId: string;
+  tenantName: string;
+  tenantCode: string;
+  currency: string;
+  country: string;
+  pluginId: PluginId;
+  totalDebits: number;
+  totalCredits: number;
+  isBalanced: boolean;
+  recordCounts: CompanyBackupRecordCounts;
+  systemNote?: string;
+}
+
+export interface CompanyBackupPayload {
+  schema: 'enterprise_accounting_backup_v1';
+  metadata: CompanyBackupMetadata;
+  data: {
+    tenant: Tenant;
+    accounts: Account[];
+    journalEntries: JournalEntry[];
+    invoices: CustomerInvoice[];
+    vendorBills: VendorBill[];
+    paymentReceipts: CustomerPaymentReceipt[];
+    openingBalances: CustomerOpeningBalanceRecord[];
+    customers: CustomerContact[];
+    vendors: VendorContact[];
+    productsServices: ProductServiceItem[];
+    priceChangeHistory: PriceChangeHistoryEntry[];
+    invoiceTemplates: InvoiceTemplate[];
+    bulkInvoiceBatches: BulkInvoiceBatchRun[];
+    recurringSchedules: RecurringInvoiceSchedule[];
+    expenseReceipts: ExpenseReceipt[];
+    mileageLogs: MileageLogEntry[];
+    inventoryItems: InventoryStockItem[];
+    inventoryAdjustments: InventoryAdjustmentRecord[];
+    payrollEmployees: PayrollEmployee[];
+    payrollRuns: PayrollRun[];
+    connectedBankFeeds: ConnectedBankFeed[];
+    bankStatements: BankStatementLine[];
+    fixedAssets: FixedAsset[];
+    fiscalPeriods: FiscalPeriod[];
+    treasuryAccounts: TreasuryAccount[];
+    departmentBudgets: DepartmentBudget[];
+    approvalItems: ApprovalItem[];
+    taxJurisdictions: TaxJurisdiction[];
+    customAttributeDefinitions: CustomAttributeDefinition[];
+    auditLogs: AuditLogEvent[];
+    allTenants?: Tenant[];
+  };
+}
+
+export interface BackupValidationResult {
+  isValid: boolean;
+  errors: string[];
+  warnings: string[];
+  metadata?: CompanyBackupMetadata;
+  parsedPayload?: CompanyBackupPayload;
+}
+
+// ----------------------------------------------------
+// INTEGRATIONS & INTERFACE SUITE (WEBHOOKS, API KEYS, CONNECTORS)
+// ----------------------------------------------------
+
+export type WebhookEventType =
+  | 'invoice.created'
+  | 'invoice.paid'
+  | 'invoice.overdue'
+  | 'bill.created'
+  | 'bill.paid'
+  | 'journal.posted'
+  | 'customer.created'
+  | 'vendor.created'
+  | 'payment.received'
+  | 'period.closed'
+  | 'inventory.low_stock'
+  | 'payroll.executed';
+
+export interface WebhookEndpoint {
+  id: string;
+  tenantId: string;
+  name: string;
+  url: string;
+  secret: string; // HMAC signing secret
+  events: WebhookEventType[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  description?: string;
+  headers?: { key: string; value: string }[];
+  failureCount: number;
+  lastTriggeredAt?: string;
+  lastStatusCode?: number;
+}
+
+export interface WebhookDeliveryLog {
+  id: string;
+  endpointId: string;
+  endpointName: string;
+  tenantId: string;
+  event: WebhookEventType;
+  payload: any;
+  requestHeaders: Record<string, string>;
+  responseStatus: number;
+  responseBody: string;
+  latencyMs: number;
+  timestamp: string;
+  status: 'SUCCESS' | 'FAILED' | 'RETRYING';
+  attemptNumber: number;
+  error?: string;
+}
+
+export type ApiKeyPermissionScope =
+  | 'read:all'
+  | 'write:all'
+  | 'read:invoices'
+  | 'write:invoices'
+  | 'read:bills'
+  | 'write:bills'
+  | 'read:journals'
+  | 'write:journals'
+  | 'read:customers'
+  | 'write:customers'
+  | 'read:reports'
+  | 'execute:sync';
+
+export interface ScopedApiKey {
+  id: string;
+  tenantId: string;
+  name: string;
+  keyPrefix: string;
+  maskedKey: string;
+  fullKey?: string; // Only shown on generation
+  scopes: ApiKeyPermissionScope[];
+  role: Role;
+  environment: 'LIVE' | 'TEST' | 'SANDBOX';
+  createdAt: string;
+  lastUsedAt?: string;
+  expiresAt?: string;
+  rateLimitPerMin: number;
+  status: 'ACTIVE' | 'REVOKED' | 'EXPIRED';
+  createdBy: string;
+}
+
+export type ConnectorPlatform =
+  | 'ZAPIER'
+  | 'MAKE'
+  | 'STRIPE'
+  | 'SHOPIFY'
+  | 'WOOCOMMERCE'
+  | 'SALESFORCE'
+  | 'HUBSPOT'
+  | 'GUSTO'
+  | 'PAYPAL';
+
+export interface IntegrationConnector {
+  id: string;
+  tenantId: string;
+  platform: ConnectorPlatform;
+  name: string;
+  category: 'AUTOMATION' | 'ECOMMERCE' | 'PAYMENTS' | 'CRM' | 'PAYROLL';
+  status: 'CONNECTED' | 'DISCONNECTED' | 'SYNCING' | 'ERROR';
+  description: string;
+  authType: 'API_KEY' | 'OAUTH2' | 'WEBHOOK_PAIR';
+  credentials: {
+    apiKey?: string;
+    storeDomain?: string;
+    webhookUrl?: string;
+    clientId?: string;
+    accountEmail?: string;
+  };
+  syncSettings: {
+    autoSyncInvoices: boolean;
+    autoSyncCustomers: boolean;
+    autoPostJournals: boolean;
+    syncIntervalMinutes: number;
+    defaultIncomeAccountId?: string;
+    defaultExpenseAccountId?: string;
+    defaultBankAccountId?: string;
+    taxHandling: 'AUTO_CALCULATE' | 'PASSTHROUGH';
+  };
+  stats: {
+    totalSyncedRecords: number;
+    lastSyncTimestamp?: string;
+    lastSyncStatus?: 'OK' | 'ERROR' | 'PARTIAL';
+    lastSyncMessage?: string;
+  };
+  presetTriggerSample?: any;
+}
 

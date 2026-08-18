@@ -9,6 +9,11 @@ import { ProductServicesView } from './components/ProductServicesView';
 import { LedgerView } from './components/LedgerView';
 import { InvoicingArView } from './components/InvoicingArView';
 import { PayablesApView } from './components/PayablesApView';
+import { ExpenseTrackingView } from './components/ExpenseTrackingView';
+import { RecurringBillingView } from './components/RecurringBillingView';
+import { InventoryManagementView } from './components/InventoryManagementView';
+import { PayrollView } from './components/PayrollView';
+import { EmployeeDirectoryView } from './components/EmployeeDirectoryView';
 import { TreasuryView } from './components/TreasuryView';
 import { FpaBudgetView } from './components/FpaBudgetView';
 import { ApprovalsView } from './components/ApprovalsView';
@@ -25,6 +30,11 @@ import { AuditTrailView } from './components/AuditTrailView';
 import { AiAuditCopilot } from './components/AiAuditCopilot';
 import { HelpCenterView } from './components/HelpCenterView';
 import { ApiManualView } from './components/ApiManualView';
+import { BackupRestoreView } from './components/BackupRestoreView';
+import { WebhooksDispatcherDashboard } from './components/WebhooksDispatcherDashboard';
+import { ApiKeysDeveloperPortal } from './components/ApiKeysDeveloperPortal';
+import { IntegrationsConnectorsHub } from './components/IntegrationsConnectorsHub';
+import { CompanyBackupModal } from './components/CompanyBackupModal';
 import { NewJournalModal } from './components/NewJournalModal';
 import { CreateTenantModal } from './components/CreateTenantModal';
 
@@ -32,6 +42,7 @@ function MainLayout() {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
   const [isJournalModalOpen, setIsJournalModalOpen] = useState(false);
   const [isTenantModalOpen, setIsTenantModalOpen] = useState(false);
+  const [isBackupModalOpen, setIsBackupModalOpen] = useState(false);
   const [selectedCustomerForInvoice, setSelectedCustomerForInvoice] = useState<any>(null);
   const [selectedCustomerForStatement, setSelectedCustomerForStatement] = useState<any>(null);
   const [selectedProductForInvoice, setSelectedProductForInvoice] = useState<any>(null);
@@ -44,6 +55,7 @@ function MainLayout() {
       <Header
         onOpenCreateTenantModal={() => setIsTenantModalOpen(true)}
         onOpenHelpCenter={() => setActiveTab('help_center')}
+        onOpenBackupModal={() => setIsBackupModalOpen(true)}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -59,6 +71,8 @@ function MainLayout() {
               onOpenNewJournalModal={() => setIsJournalModalOpen(true)}
             />
           )}
+
+          {activeTab === 'backup_restore' && <BackupRestoreView />}
 
           {activeTab === 'batch_upload' && <BatchUploadView />}
 
@@ -101,8 +115,25 @@ function MainLayout() {
             />
           )}
 
+          {activeTab === 'recurring_billing' && <RecurringBillingView />}
+
           {activeTab === 'payables_ap' && (
             <PayablesApView preSelectedVendor={selectedVendorForBill} />
+          )}
+
+          {activeTab === 'expenses' && <ExpenseTrackingView />}
+
+          {activeTab === 'inventory' && <InventoryManagementView />}
+
+          {activeTab === 'employees' && (
+            <EmployeeDirectoryView
+              onNavigateToPayroll={() => setActiveTab('payroll')}
+              onNavigateToExpenses={() => setActiveTab('expenses')}
+            />
+          )}
+
+          {activeTab === 'payroll' && (
+            <PayrollView onNavigateToEmployees={() => setActiveTab('employees')} />
           )}
 
           {activeTab === 'treasury' && <TreasuryView />}
@@ -128,6 +159,21 @@ function MainLayout() {
 
           {activeTab === 'consolidation' && <ConsolidationView />}
 
+          {activeTab === 'integrations_hub' && (
+            <IntegrationsConnectorsHub
+              onNavigateToWebhooks={() => setActiveTab('webhooks')}
+              onNavigateToApiKeys={() => setActiveTab('api_keys')}
+            />
+          )}
+
+          {activeTab === 'webhooks' && (
+            <WebhooksDispatcherDashboard onNavigateToApiKeys={() => setActiveTab('api_keys')} />
+          )}
+
+          {activeTab === 'api_keys' && (
+            <ApiKeysDeveloperPortal onNavigateToWebhooks={() => setActiveTab('webhooks')} />
+          )}
+
           {activeTab === 'audit_trail' && <AuditTrailView />}
 
           {activeTab === 'ai_copilot' && <AiAuditCopilot />}
@@ -148,6 +194,11 @@ function MainLayout() {
         isOpen={isTenantModalOpen}
         onClose={() => setIsTenantModalOpen(false)}
         onNavigateToImporter={() => setActiveTab('batch_upload')}
+      />
+
+      <CompanyBackupModal
+        isOpen={isBackupModalOpen}
+        onClose={() => setIsBackupModalOpen(false)}
       />
     </div>
   );
