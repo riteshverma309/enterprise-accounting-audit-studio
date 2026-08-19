@@ -70,7 +70,15 @@ import {
   ConnectorPlatform,
   EntityAiConfig,
   AiTokenUsageLog,
+  TabType,
+  RoleMenuPermissionsMap,
+  TenantRoleMenuConfig,
 } from '../types';
+import {
+  DEFAULT_ROLE_MENU_PERMISSIONS,
+  ALL_MENU_OPTIONS,
+  ROLE_MENU_PRESET_TEMPLATES,
+} from '../data/menuOptionsData';
 import {
   INITIAL_TENANTS,
   INITIAL_ACCOUNTS,
@@ -123,6 +131,7 @@ interface AccountingContextType {
   activeBranch: Branch | null;
   activeRole: Role;
   userEmail: string;
+  userName: string;
   activePlugin: PluginId;
 
   // Actions for Switching Context
@@ -131,6 +140,7 @@ interface AccountingContextType {
   setActiveBranchId: (branchId: string | null) => void;
   setActiveRole: (role: Role) => void;
   setUserEmail: (email: string) => void;
+  setUserName: (name: string) => void;
 
   // Ledger & Sub-Ledger Data
   accounts: Account[];
@@ -220,7 +230,7 @@ interface AccountingContextType {
   // User Access & Provisioning Engine
   createEnterpriseUser: (userData: Omit<EnterpriseUser, 'id' | 'createdAt' | 'lastLogin' | 'apiTokenCount'>) => { success: boolean; error?: string };
   updateUserStatus: (userId: string, status: 'ACTIVE' | 'SUSPENDED') => void;
-  updateUserRoleAndScopes: (userId: string, defaultRole: Role, tenantScopes: TenantAccessScope[]) => void;
+  updateUserRoleAndScopes: (userId: string, defaultRole: Role, tenantScopes: TenantAccessScope[]) => { success: boolean; error?: string };
   toggleUserMfa: (userId: string) => void;
   deleteEnterpriseUser: (userId: string) => void;
   hasPermission: (permission: PermissionKey, tenantId?: string) => boolean;
@@ -393,6 +403,15 @@ interface AccountingContextType {
   recordAiTokenUsage: (params: { tenantId: string; model: string; promptTokens: number; responseTokens: number; queryTopic: string }) => void;
   resetTenantAiQuota: (tenantId: string) => { success: boolean; error?: string };
 
+  // Role-to-Menu Access Permissions Engine
+  roleMenuPermissions: Record<string, RoleMenuPermissionsMap>;
+  getRoleAllowedMenus: (role: Role | string, tenantId?: string) => TabType[];
+  updateRoleMenuPermissions: (role: Role | string, allowedTabs: TabType[], tenantId?: string) => { success: boolean; error?: string };
+  resetRoleMenuPermissionsToDefaults: (role?: Role | string, tenantId?: string) => { success: boolean; error?: string };
+  applyRoleMenuPreset: (presetId: string, role: Role | string, tenantId?: string) => { success: boolean; error?: string };
+  copyRoleMenuPermissions: (fromRole: string, toRole: string, tenantId?: string) => { success: boolean; error?: string };
+  batchUpdateRoleMenuPermissions: (permissionsMap: RoleMenuPermissionsMap, tenantId?: string) => { success: boolean; error?: string };
+
   // Helper to parse CSV/JSON text
   parseCsvOrJsonUpload: (fileContent: string, format: 'csv' | 'json') => ParsedTransactionUpload[];
 }
@@ -407,6 +426,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   
   const [activeRole, setActiveRole] = useState<Role>('accountant');
   const [userEmail, setUserEmail] = useState<string>('sarah.accountant@acme.com');
+  const [userName, setUserName] = useState<string>('Sarah Jenkins');
 
   const [accountsMap, setAccountsMap] = useState<Record<string, Account[]>>(INITIAL_ACCOUNTS);
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>(INITIAL_JOURNAL_ENTRIES);
@@ -446,6 +466,138 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [integrationConnectors, setIntegrationConnectors] = useState<IntegrationConnector[]>(INITIAL_INTEGRATION_CONNECTORS);
   const [tenantAiConfigs, setTenantAiConfigs] = useState<Record<string, EntityAiConfig>>(INITIAL_TENANT_AI_CONFIGS);
   const [aiUsageLogs, setAiUsageLogs] = useState<AiTokenUsageLog[]>(INITIAL_AI_USAGE_LOGS);
+
+  // Role-to-Menu Access Permissions State (per-tenant map)
+  const [roleMenuPermissions, setRoleMenuPermissions] = useState<Record<string, RoleMenuPermissionsMap>>(() => {
+    const initialMap: Record<string, RoleMenuPermissionsMap> = {};
+    INITIAL_TENANTS.forEach((t) => {
+      initialMap[t.id] = JSON.parse(JSON.stringify(DEFAULT_ROLE_MENU_PERMISSIONS));
+    });
+    return initialMap;
+  });
+
+  const getRoleAllowedMenus = (role: Role | string, targetTenantId?: string): TabType[] => {
+    const effectiveTenantId = targetTenantId || activeTenantId;
+    const tenantPerms = roleMenuPermissions[effectiveTenantId] || roleMenuPermissions['t-acme-us'] || DEFAULT_ROLE_MENU_PERMISSIONS;
+    if (tenantPerms[role]) {
+      return tenantPerms[role];
+    }
+    if (DEFAULT_ROLE_MENU_PERMISSIONS[role as Role]) {
+      return DEFAULT_ROLE_MENU_PERMISSIONS[role as Role];
+    }
+    return DEFAULT_ROLE_MENU_PERMISSIONS.accountant;
+  };
+
+  const updateRoleMenuPermissions = (role: Role | string, allowedTabs: TabType[], targetTenantId?: string) => {
+    // SOX 404 ITGC Control: Only Super Admin can modify Super Admin access
+    if (role === 'super_user' && activeRole !== 'super_user') {
+      return {
+        success: false,
+        error: 'SOX Security Violation: Entity Administrators cannot modify Super Admin access.',
+      };
+    }
+
+    const effectiveTenantId = targetTenantId || activeTenantId;
+    setRoleMenuPermissions((prev) => {
+      const currentTenantPerms = prev[effectiveTenantId] || JSON.parse(JSON.stringify(DEFAULT_ROLE_MENU_PERMISSIONS));
+      return {
+        ...prev,
+        [effectiveTenantId]: {
+          ...currentTenantPerms,
+          [role]: allowedTabs,
+        },
+      };
+    });
+
+    const auditEvent: AuditLogEvent = {
+      id: `log-menu-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      action: 'UPDATE_ROLE_MENU_ACCESS',
+      tenantId: effectiveTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated accessible menu modules for role [${role}] (${allowedTabs.length} modules granted)`,
+      status: 'SUCCESS',
+      ipAddress: '127.0.0.1',
+      payloadSummary: `Role: ${role} | Granted modules: ${allowedTabs.join(', ')}`,
+    };
+    setAuditLogs((prev) => [auditEvent, ...prev]);
+
+    return { success: true };
+  };
+
+  const resetRoleMenuPermissionsToDefaults = (role?: Role | string, targetTenantId?: string) => {
+    // SOX 404 ITGC Control: Only Super Admin can modify Super Admin access
+    if (role === 'super_user' && activeRole !== 'super_user') {
+      return {
+        success: false,
+        error: 'SOX Security Violation: Entity Administrators cannot modify Super Admin access.',
+      };
+    }
+
+    const effectiveTenantId = targetTenantId || activeTenantId;
+    setRoleMenuPermissions((prev) => {
+      const currentTenantPerms = prev[effectiveTenantId] || {};
+      if (role) {
+        return {
+          ...prev,
+          [effectiveTenantId]: {
+            ...currentTenantPerms,
+            [role]: DEFAULT_ROLE_MENU_PERMISSIONS[role as Role] || DEFAULT_ROLE_MENU_PERMISSIONS.accountant,
+          },
+        };
+      } else {
+        const freshDefaults = JSON.parse(JSON.stringify(DEFAULT_ROLE_MENU_PERMISSIONS));
+        // If not super_user, preserve existing super_user permissions
+        if (activeRole !== 'super_user' && currentTenantPerms.super_user) {
+          freshDefaults.super_user = currentTenantPerms.super_user;
+        }
+        return {
+          ...prev,
+          [effectiveTenantId]: freshDefaults,
+        };
+      }
+    });
+
+    const auditEvent: AuditLogEvent = {
+      id: `log-menu-${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      action: 'RESET_ROLE_MENU_DEFAULTS',
+      tenantId: effectiveTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: role ? `Reset menu permissions for role [${role}] to system default baseline` : `Reset all role-to-menu permissions to factory defaults for entity`,
+      status: 'SUCCESS',
+      ipAddress: '127.0.0.1',
+    };
+    setAuditLogs((prev) => [auditEvent, ...prev]);
+
+    return { success: true };
+  };
+
+  const applyRoleMenuPreset = (presetId: string, role: Role | string, targetTenantId?: string) => {
+    const preset = ROLE_MENU_PRESET_TEMPLATES.find((p) => p.id === presetId);
+    if (!preset) return { success: false, error: 'Preset template not found' };
+    return updateRoleMenuPermissions(role, preset.permissions, targetTenantId);
+  };
+
+  const copyRoleMenuPermissions = (fromRole: string, toRole: string, targetTenantId?: string) => {
+    const effectiveTenantId = targetTenantId || activeTenantId;
+    const sourcePermissions = getRoleAllowedMenus(fromRole, effectiveTenantId);
+    return updateRoleMenuPermissions(toRole, sourcePermissions, effectiveTenantId);
+  };
+
+  const batchUpdateRoleMenuPermissions = (permissionsMap: RoleMenuPermissionsMap, targetTenantId?: string) => {
+    const effectiveTenantId = targetTenantId || activeTenantId;
+    setRoleMenuPermissions((prev) => ({
+      ...prev,
+      [effectiveTenantId]: {
+        ...(prev[effectiveTenantId] || {}),
+        ...permissionsMap,
+      },
+    }));
+    return { success: true };
+  };
 
   // Active Tenant object
   const activeTenant = useMemo(() => {
@@ -2364,10 +2516,11 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     userData: Omit<EnterpriseUser, 'id' | 'createdAt' | 'lastLogin' | 'apiTokenCount'>
   ) => {
     const isSuperUser = activeRole === 'super_user';
-    const isEntityAdmin = activeRole === 'entity_admin' || activeRole === 'admin';
+    const isEntityAdmin = activeRole === 'entity_admin';
+    const isAdmin = activeRole === 'admin';
 
-    if (!isSuperUser && !isEntityAdmin) {
-      const msg = 'HTTP 403 FORBIDDEN: User provisioning requires Super User or Entity Admin privileges.';
+    if (!isSuperUser && !isEntityAdmin && !isAdmin) {
+      const msg = 'HTTP 403 FORBIDDEN: User provisioning requires Super User, Financial Admin, or Entity Admin privileges.';
       addAuditLog({
         action: 'CREATE_TENANT',
         tenantId: activeTenant.id,
@@ -2380,9 +2533,58 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return { success: false, error: msg };
     }
 
-    if (!isSuperUser && userData.defaultRole === 'super_user') {
-      const msg = 'HTTP 403 FORBIDDEN: Only Global Super Users can grant Super User access.';
-      return { success: false, error: msg };
+    // Rule 1: Only Super Admin can grant Super Admin access to any other user
+    if (!isSuperUser) {
+      if (userData.defaultRole === 'super_user' || userData.tenantScopes.some((s) => s.role === 'super_user')) {
+        const msg = 'SOX Access Control Violation: Only a Super Admin can grant Super Admin access to another user.';
+        addAuditLog({
+          action: 'CREATE_TENANT',
+          tenantId: activeTenant.id,
+          userRole: activeRole,
+          userEmail,
+          details: 'Denied attempt to grant Super User role by non-Super Admin.',
+          status: 'FORBIDDEN',
+          payloadSummary: msg,
+        });
+        return { success: false, error: msg };
+      }
+    }
+
+    // Rule 2: Entity Admin for given entity should be able to provision access for only that Entity where he or she is Entity Admin
+    if (isEntityAdmin) {
+      const currentUser = enterpriseUsers.find((u) => u.email.toLowerCase() === userEmail.toLowerCase());
+      const adminTenantIds = new Set<string>();
+      if (currentUser) {
+        currentUser.tenantScopes.forEach((s) => {
+          if (s.role === 'entity_admin' || s.role === 'super_user') {
+            adminTenantIds.add(s.tenantId);
+          }
+        });
+      }
+      if (adminTenantIds.size === 0) {
+        adminTenantIds.add(activeTenant.id);
+      }
+
+      const unauthorizedScopes = userData.tenantScopes.filter((s) => !adminTenantIds.has(s.tenantId));
+      if (unauthorizedScopes.length > 0) {
+        const unauthorizedNames = unauthorizedScopes
+          .map((s) => {
+            const t = tenants.find((item) => item.id === s.tenantId);
+            return t ? t.name : s.tenantId;
+          })
+          .join(', ');
+        const msg = `Scope Restriction: As an Entity Admin, you can only provision user access for entities where you have administrative authority. Access to "${unauthorizedNames}" denied.`;
+        addAuditLog({
+          action: 'CREATE_TENANT',
+          tenantId: activeTenant.id,
+          userRole: activeRole,
+          userEmail,
+          details: `Entity Admin attempted cross-entity provisioning for: ${unauthorizedNames}`,
+          status: 'FORBIDDEN',
+          payloadSummary: msg,
+        });
+        return { success: false, error: msg };
+      }
     }
 
     const newId = `usr-${Date.now()}`;
@@ -2401,9 +2603,9 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       tenantId: activeTenant.id,
       userRole: activeRole,
       userEmail,
-      details: `Provisioned user "${newUser.name}" (${newUser.email}) as ${newUser.defaultRole} by ${activeRole}.`,
+      details: `Provisioned user "${newUser.name}" (${newUser.email}) as ${newUser.defaultRole} across ${newUser.tenantScopes.length} entities by ${activeRole}.`,
       status: 'SUCCESS',
-      payloadSummary: `User ID: ${newId}`,
+      payloadSummary: `User ID: ${newId} | Scopes: ${newUser.tenantScopes.map((s) => `${s.tenantId}:${s.role}`).join(', ')}`,
     });
 
     return { success: true };
@@ -2430,7 +2632,11 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     tenantScopes: TenantAccessScope[]
   ) => {
     const isSuperUser = activeRole === 'super_user';
-    if (!isSuperUser && defaultRole === 'super_user') {
+    const isEntityAdmin = activeRole === 'entity_admin';
+
+    // Rule 1: Only Super Admin can elevate or grant Super Admin access
+    if (!isSuperUser && (defaultRole === 'super_user' || tenantScopes.some((s) => s.role === 'super_user'))) {
+      const msg = 'SOX Security Violation: Only a Super Admin can grant Super Admin privileges.';
       addAuditLog({
         action: 'CREATE_TENANT',
         tenantId: activeTenant.id,
@@ -2438,8 +2644,37 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         userEmail,
         details: 'Denied elevation to Super User by non-Super User role.',
         status: 'FORBIDDEN',
+        payloadSummary: msg,
       });
-      return;
+      return { success: false, error: msg };
+    }
+
+    // Rule 2: Entity Admin can only modify/assign scopes for their authorized entities
+    if (isEntityAdmin) {
+      const currentUser = enterpriseUsers.find((u) => u.email.toLowerCase() === userEmail.toLowerCase());
+      const adminTenantIds = new Set<string>();
+      if (currentUser) {
+        currentUser.tenantScopes.forEach((s) => {
+          if (s.role === 'entity_admin' || s.role === 'super_user') {
+            adminTenantIds.add(s.tenantId);
+          }
+        });
+      }
+      if (adminTenantIds.size === 0) {
+        adminTenantIds.add(activeTenant.id);
+      }
+
+      const unauthorizedScopes = tenantScopes.filter((s) => !adminTenantIds.has(s.tenantId));
+      if (unauthorizedScopes.length > 0) {
+        const unauthorizedNames = unauthorizedScopes
+          .map((s) => {
+            const t = tenants.find((item) => item.id === s.tenantId);
+            return t ? t.name : s.tenantId;
+          })
+          .join(', ');
+        const msg = `Scope Restriction: Entity Admins can only assign access for their authorized entities. Modification to "${unauthorizedNames}" denied.`;
+        return { success: false, error: msg };
+      }
     }
 
     setEnterpriseUsers((prev) =>
@@ -2451,9 +2686,11 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       tenantId: activeTenant.id,
       userRole: activeRole,
       userEmail,
-      details: `Updated role (${defaultRole}) and tenant access scopes for user ${userId}.`,
+      details: `Updated role (${defaultRole}) and tenant access scopes (${tenantScopes.length} entities) for user ${userId}.`,
       status: 'SUCCESS',
     });
+
+    return { success: true };
   };
 
   const toggleUserMfa = (userId: string) => {
@@ -5493,12 +5730,14 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         activeBranch,
         activeRole,
         userEmail,
+        userName,
         activePlugin,
         setActiveTenantId,
         setActiveOrganizationId: setActiveOrgId,
         setActiveBranchId,
         setActiveRole,
         setUserEmail,
+        setUserName,
         accounts,
         journalEntries,
         bankStatements,
@@ -5661,6 +5900,15 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         updateTenantAiConfig,
         recordAiTokenUsage,
         resetTenantAiQuota,
+
+        // Role-to-Menu Access Permissions Engine
+        roleMenuPermissions,
+        getRoleAllowedMenus,
+        updateRoleMenuPermissions,
+        resetRoleMenuPermissionsToDefaults,
+        applyRoleMenuPreset,
+        copyRoleMenuPermissions,
+        batchUpdateRoleMenuPermissions,
 
         processOnlineInvoicePayment,
 

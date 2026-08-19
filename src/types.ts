@@ -1,4 +1,4 @@
-export type Role = 'super_user' | 'entity_admin' | 'admin' | 'controller' | 'accountant' | 'junior_accountant' | 'auditor' | 'viewer';
+export type Role = 'super_user' | 'entity_admin' | 'admin' | 'controller' | 'accountant' | 'junior_accountant' | 'auditor' | 'viewer' | 'vendor' | 'customer';
 export type PluginId = 'us_gaap' | 'eu_ifrs' | 'in_gst';
 
 export interface Tenant {
@@ -156,7 +156,12 @@ export interface AuditLogEvent {
     | 'API_KEY_REVOKE'
     | 'CONNECTOR_CONNECT'
     | 'CONNECTOR_SYNC'
-    | 'CONNECTOR_DISCONNECT';
+    | 'CONNECTOR_DISCONNECT'
+    | 'AI_ENTITY_KEY_CONFIGURED'
+    | 'AI_TOKEN_QUOTA_RESET'
+    | 'AI_COPILOT_QUERY'
+    | 'UPDATE_ROLE_MENU_ACCESS'
+    | 'RESET_ROLE_MENU_DEFAULTS';
   tenantId: string;
   organizationId?: string;
   branchId?: string;
@@ -254,7 +259,7 @@ export interface CustomerOpeningBalanceRecord {
   balanceType?: 'DR' | 'CR'; // DR = Receivable (Customer owes us), CR = Credit / Overpayment (We owe customer / advance)
   offsetAccountCode: string; // e.g. "3010" Opening Balance Equity / "3200" Retained Earnings
   notes?: string;
-  invoiceId: string;
+  invoiceId?: string;
   createdAt: string;
 }
 
@@ -436,7 +441,7 @@ export interface CashFlowForecastItem {
 export interface DepartmentBudget {
   id: string;
   tenantId: string;
-  department: 'Engineering & R&D' | 'Sales & Marketing' | 'General & Administrative' | 'Customer Operations';
+  department: string;
   annualBudget: number;
   ytdActual: number;
   variance: number;
@@ -552,7 +557,11 @@ export type PermissionKey =
   | 'ai:configure_entity_key'
   // Reports & Audits
   | 'reports:view'
-  | 'reports:export';
+  | 'reports:export'
+  // External Partner Financial Position Portal
+  | 'partner:view_portal'
+  // Automated Test Suite & Regression Engine
+  | 'test:run';
 
 export interface EntityAiConfig {
   tenantId: string;
@@ -614,6 +623,71 @@ export interface CustomRoleDefinition {
   isSystemRole: boolean;
   colorBadge?: string;
   permissions: PermissionKey[];
+}
+
+export type TabType =
+  | 'dashboard'
+  | 'backup_restore'
+  | 'batch_upload'
+  | 'entity_master'
+  | 'products_services'
+  | 'ledger'
+  | 'invoicing_ar'
+  | 'recurring_billing'
+  | 'payables_ap'
+  | 'expenses'
+  | 'inventory'
+  | 'employees'
+  | 'payroll'
+  | 'treasury'
+  | 'fpa_budget'
+  | 'approvals'
+  | 'tax_engine'
+  | 'users_access'
+  | 'audit_reports'
+  | 'regulatory'
+  | 'reconciliation'
+  | 'assets_fx'
+  | 'fiscal_close'
+  | 'consolidation'
+  | 'integrations_hub'
+  | 'webhooks'
+  | 'api_keys'
+  | 'audit_trail'
+  | 'ai_copilot'
+  | 'help_center'
+  | 'api_manual'
+  | 'partner_portal'
+  | 'test_suite';
+
+export type MenuCategory =
+  | 'CORE_FINANCIALS'
+  | 'RECEIVABLES_SALES'
+  | 'PAYABLES_SPEND'
+  | 'OPERATIONS_PRODUCTS'
+  | 'PEOPLE_PAYROLL'
+  | 'BANKING_TREASURY_FPA'
+  | 'GOVERNANCE_TAX_AUDIT'
+  | 'IT_ADMIN_DEV';
+
+export interface MenuOptionMetadata {
+  id: TabType;
+  label: string;
+  category: MenuCategory;
+  categoryLabel: string;
+  description: string;
+  badge?: string;
+  iconName: string;
+  sodRiskLevel?: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+}
+
+export type RoleMenuPermissionsMap = Record<string, TabType[]>;
+
+export interface TenantRoleMenuConfig {
+  tenantId: string;
+  permissionsByRole: RoleMenuPermissionsMap;
+  lastModifiedAt?: string;
+  lastModifiedBy?: string;
 }
 
 export interface ConfigurableApprovalRule {
