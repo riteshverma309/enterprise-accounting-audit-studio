@@ -13,16 +13,16 @@ export const TreasuryView: React.FC = () => {
   const currencySymbol = activeTenant.currency === 'EUR' ? '€' : activeTenant.currency === 'INR' ? '₹' : '$';
 
   // Calculate liquidity metrics
-  const totalLiquidAssets = treasuryAccounts.reduce((sum, acc) => sum + acc.balance, 0);
+  const totalLiquidAssets = (treasuryAccounts || []).reduce((sum, acc) => sum + acc.balance, 0);
 
   // Projected 30-Day Open AR Inflows
-  const openArInflow = invoices
-    .filter((inv) => inv.tenantId === activeTenant.id && inv.status !== 'PAID')
+  const openArInflow = (invoices || [])
+    .filter((inv) => inv.tenantId === activeTenant?.id && inv.status !== 'PAID')
     .reduce((sum, inv) => sum + (inv.totalAmount - inv.amountPaid), 0);
 
   // Projected 30-Day Open AP Outflows
-  const openApOutflow = vendorBills
-    .filter((b) => b.tenantId === activeTenant.id && b.status !== 'PAID')
+  const openApOutflow = (vendorBills || [])
+    .filter((b) => b.tenantId === activeTenant?.id && b.status !== 'PAID')
     .reduce((sum, b) => sum + (b.totalAmount - b.amountPaid), 0);
 
   const projected30DayNet = totalLiquidAssets + openArInflow - openApOutflow;

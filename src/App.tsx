@@ -213,6 +213,8 @@ function MainLayout() {
               {activeTab === 'help_center' && <HelpCenterView setActiveTab={setActiveTab} />}
 
               {activeTab === 'api_manual' && <ApiManualView />}
+
+              {activeTab === 'test_suite' && <TestSuiteView />}
             </>
           )}
         </main>

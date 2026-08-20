@@ -60,7 +60,7 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
     (p) => p.id === selectedPresetId
   );
 
-  const filteredPresets = industryCoaPresets.filter((p) => {
+  const filteredPresets = (industryCoaPresets || []).filter((p) => {
     const q = searchQuery.toLowerCase();
     return (
       p.name.toLowerCase().includes(q) ||
@@ -70,12 +70,12 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
     );
   });
 
-  const previewAccounts = selectedPreset
+  const previewAccounts = selectedPreset && selectedPreset.accounts
     ? selectedPreset.accounts.filter((a) => previewTab === 'ALL' || a.type === previewTab)
     : [];
 
-  const existingAccountCodes = new Set(accounts.map((a) => a.code));
-  const newAccountsCount = selectedPreset
+  const existingAccountCodes = new Set((accounts || []).map((a) => a.code));
+  const newAccountsCount = selectedPreset && selectedPreset.accounts
     ? selectedPreset.accounts.filter((a) => !existingAccountCodes.has(a.code)).length
     : 0;
 

@@ -382,6 +382,16 @@ export const ALL_MENU_OPTIONS: MenuOptionMetadata[] = [
     iconName: 'Terminal',
     sodRiskLevel: 'LOW',
   },
+  {
+    id: 'test_suite',
+    label: 'Test Suite & Regressions',
+    category: 'IT_ADMIN_DEV',
+    categoryLabel: 'System Administration & Developer Tools',
+    description: 'Exhaustive automated test runner verifying 65+ assertions across GL double-entry, SOX 404 RBAC, multi-tenant boundaries, and financial position portals.',
+    badge: '65+ Tests',
+    iconName: 'CheckCircle2',
+    sodRiskLevel: 'LOW',
+  },
 ];
 
 /**
@@ -399,6 +409,7 @@ export const DEFAULT_ROLE_MENU_PERMISSIONS: RoleMenuPermissionsMap = {
     'audit_trail',
     'help_center',
     'api_manual',
+    'test_suite',
   ],
 
   // 2. Entity Admin: Full access across business operations and administrative tools within assigned entity
@@ -435,6 +446,7 @@ export const DEFAULT_ROLE_MENU_PERMISSIONS: RoleMenuPermissionsMap = {
     'ai_copilot',
     'help_center',
     'api_manual',
+    'test_suite',
   ],
 
   // 3. Global Financial Administrator: Full access across all functional areas
@@ -471,6 +483,7 @@ export const DEFAULT_ROLE_MENU_PERMISSIONS: RoleMenuPermissionsMap = {
     'ai_copilot',
     'help_center',
     'api_manual',
+    'test_suite',
   ],
 
   // 4. Financial Controller: Authority over financial statement generation, period closing, approvals, treasury, and statutory reporting
@@ -501,6 +514,7 @@ export const DEFAULT_ROLE_MENU_PERMISSIONS: RoleMenuPermissionsMap = {
     'audit_trail',
     'ai_copilot',
     'help_center',
+    'test_suite',
   ],
 
   // 5. Senior GL Accountant: Full day-to-day operational GL, AR, AP, Reconciliation, Fixed Assets, and Tax operations
@@ -569,6 +583,7 @@ export const DEFAULT_ROLE_MENU_PERMISSIONS: RoleMenuPermissionsMap = {
     'audit_trail',
     'ai_copilot',
     'help_center',
+    'test_suite',
   ],
 
   // 8. Executive Read-Only Viewer: Strategic dashboards and high-level reports

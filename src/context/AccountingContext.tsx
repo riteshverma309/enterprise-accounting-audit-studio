@@ -478,14 +478,14 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
   const getRoleAllowedMenus = (role: Role | string, targetTenantId?: string): TabType[] => {
     const effectiveTenantId = targetTenantId || activeTenantId;
-    const tenantPerms = roleMenuPermissions[effectiveTenantId] || roleMenuPermissions['t-acme-us'] || DEFAULT_ROLE_MENU_PERMISSIONS;
-    if (tenantPerms[role]) {
-      return tenantPerms[role];
+    const tenantPerms = (roleMenuPermissions && roleMenuPermissions[effectiveTenantId]) || (roleMenuPermissions && roleMenuPermissions['t-acme-us']) || DEFAULT_ROLE_MENU_PERMISSIONS;
+    if (tenantPerms && tenantPerms[role]) {
+      return tenantPerms[role] || [];
     }
-    if (DEFAULT_ROLE_MENU_PERMISSIONS[role as Role]) {
-      return DEFAULT_ROLE_MENU_PERMISSIONS[role as Role];
+    if (DEFAULT_ROLE_MENU_PERMISSIONS && DEFAULT_ROLE_MENU_PERMISSIONS[role as Role]) {
+      return DEFAULT_ROLE_MENU_PERMISSIONS[role as Role] || [];
     }
-    return DEFAULT_ROLE_MENU_PERMISSIONS.accountant;
+    return (DEFAULT_ROLE_MENU_PERMISSIONS && DEFAULT_ROLE_MENU_PERMISSIONS.accountant) || [];
   };
 
   const updateRoleMenuPermissions = (role: Role | string, allowedTabs: TabType[], targetTenantId?: string) => {
@@ -2565,7 +2565,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         adminTenantIds.add(activeTenant.id);
       }
 
-      const unauthorizedScopes = userData.tenantScopes.filter((s) => !adminTenantIds.has(s.tenantId));
+      const unauthorizedScopes = (userData.tenantScopes || []).filter((s) => !adminTenantIds.has(s.tenantId));
       if (unauthorizedScopes.length > 0) {
         const unauthorizedNames = unauthorizedScopes
           .map((s) => {

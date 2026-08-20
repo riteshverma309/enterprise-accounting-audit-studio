@@ -59,17 +59,17 @@ export const PartnerFinancialPositionView: React.FC = () => {
 
   // Active user object to determine auto-selected partner
   const currentUser = useMemo(() => {
-    return enterpriseUsers.find((u) => u.email.toLowerCase() === (userEmail || '').toLowerCase());
+    return (enterpriseUsers || []).find((u) => u.email.toLowerCase() === (userEmail || '').toLowerCase());
   }, [enterpriseUsers, userEmail]);
 
   // List of customers & vendors in the current active entity
   const entityCustomers = useMemo(() => {
-    return customerContacts.filter((c) => c.tenantId === activeTenant.id);
-  }, [customerContacts, activeTenant.id]);
+    return (customerContacts || []).filter((c) => c.tenantId === activeTenant?.id);
+  }, [customerContacts, activeTenant?.id]);
 
   const entityVendors = useMemo(() => {
-    return vendorContacts.filter((v) => v.tenantId === activeTenant.id);
-  }, [vendorContacts, activeTenant.id]);
+    return (vendorContacts || []).filter((v) => v.tenantId === activeTenant?.id);
+  }, [vendorContacts, activeTenant?.id]);
 
   // Automatically match customer or vendor by email or ID if logged in as a partner
   const matchedCustomer = useMemo(() => {
@@ -134,10 +134,10 @@ export const PartnerFinancialPositionView: React.FC = () => {
   // ----------------------------------------------------
   const customerInvoices = useMemo(() => {
     if (!currentCustomer) return [];
-    return invoices.filter(
-      (inv) => inv.tenantId === activeTenant.id && (inv.customerId === currentCustomer.id || inv.customerName === currentCustomer.name)
+    return (invoices || []).filter(
+      (inv) => inv.tenantId === activeTenant?.id && (inv.customerId === currentCustomer.id || inv.customerName === currentCustomer.name)
     );
-  }, [invoices, activeTenant.id, currentCustomer]);
+  }, [invoices, activeTenant?.id, currentCustomer]);
 
   const customerReceipts = useMemo(() => {
     if (!currentCustomer) return [];

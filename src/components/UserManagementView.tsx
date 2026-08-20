@@ -138,11 +138,11 @@ export const UserManagementView: React.FC = () => {
   }, [isSuperUser, isEntityAdmin, activeRole, tenants, enterpriseUsers, userEmail, activeTenant.id]);
 
   const authorizedTenants = React.useMemo(() => {
-    return tenants.filter((t) => authorizedTenantIds.includes(t.id));
+    return (tenants || []).filter((t) => authorizedTenantIds.includes(t.id));
   }, [tenants, authorizedTenantIds]);
 
   // Available roles for assignment by the current active actor (Super Admin can grant super_user; others cannot)
-  const availableRolesForAssignment = customRoles.filter((r) => {
+  const availableRolesForAssignment = (customRoles || []).filter((r) => {
     if (r.code === 'super_user' && !isSuperUser) {
       return false;
     }
@@ -153,15 +153,15 @@ export const UserManagementView: React.FC = () => {
   // Entity Admins only see users who have access to their authorized entities
   const visibleEnterpriseUsers = React.useMemo(() => {
     if (isSuperUser || activeRole === 'admin') {
-      return enterpriseUsers;
+      return enterpriseUsers || [];
     }
-    return enterpriseUsers.filter((u) =>
+    return (enterpriseUsers || []).filter((u) =>
       (u.tenantScopes || []).some((s) => authorizedTenantIds.includes(s.tenantId))
     );
   }, [isSuperUser, activeRole, enterpriseUsers, authorizedTenantIds]);
 
   const filteredUsers = React.useMemo(() => {
-    return visibleEnterpriseUsers.filter((u) => {
+    return (visibleEnterpriseUsers || []).filter((u) => {
       const matchesSearch =
         u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -174,9 +174,9 @@ export const UserManagementView: React.FC = () => {
     });
   }, [visibleEnterpriseUsers, searchTerm, statusFilter, roleFilter]);
 
-  const totalUsersCount = visibleEnterpriseUsers.length;
-  const activeCount = visibleEnterpriseUsers.filter((u) => u.status === 'ACTIVE').length;
-  const mfaEnforcedCount = visibleEnterpriseUsers.filter((u) => u.mfaEnabled).length;
+  const totalUsersCount = (visibleEnterpriseUsers || []).length;
+  const activeCount = (visibleEnterpriseUsers || []).filter((u) => u.status === 'ACTIVE').length;
+  const mfaEnforcedCount = (visibleEnterpriseUsers || []).filter((u) => u.mfaEnabled).length;
   const mfaPercent = Math.round((mfaEnforcedCount / (totalUsersCount || 1)) * 100);
 
   const permissionsList: { key: PermissionKey; label: string; category: string; description: string }[] = [
@@ -822,17 +822,17 @@ export const UserManagementView: React.FC = () => {
                       <div className="flex flex-wrap items-center gap-1.5 max-w-xs">
                         {(() => {
                           const visibleScopes = (isSuperUser || activeRole === 'admin')
-                            ? user.tenantScopes
-                            : user.tenantScopes.filter((scope) => authorizedTenantIds.includes(scope.tenantId));
+                            ? (user.tenantScopes || [])
+                            : (user.tenantScopes || []).filter((scope) => authorizedTenantIds.includes(scope.tenantId));
 
-                          if (visibleScopes.length === 0) {
+                          if (!visibleScopes || visibleScopes.length === 0) {
                             return (
                               <span className="text-[10px] text-slate-500 italic">No assigned scopes in your entity</span>
                             );
                           }
 
                           return visibleScopes.map((scope) => {
-                            const t = tenants.find((item) => item.id === scope.tenantId);
+                            const t = (tenants || []).find((item) => item.id === scope.tenantId);
                             return (
                               <span
                                 key={scope.tenantId}
@@ -846,7 +846,7 @@ export const UserManagementView: React.FC = () => {
                           });
                         })()}
 
-                        {!isSuperUser && (user.defaultRole === 'super_user' || user.tenantScopes.some((s) => s.role === 'super_user')) ? (
+                        {!isSuperUser && (user.defaultRole === 'super_user' || (user.tenantScopes || []).some((s) => s.role === 'super_user')) ? (
                           <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded text-[9px] font-semibold flex items-center gap-0.5">
                             <Lock className="w-2.5 h-2.5" /> Super Admin
                           </span>

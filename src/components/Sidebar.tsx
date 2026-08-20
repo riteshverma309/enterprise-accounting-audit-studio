@@ -97,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   const isAdminOrSuperAdmin = activeRole === 'super_user' || activeRole === 'admin' || activeRole === 'entity_admin';
 
   // Dynamic allowed menus for active role in the current tenant scope
-  const allowedMenus = getRoleAllowedMenus(activeRole, activeTenant.id);
+  const allowedMenus = getRoleAllowedMenus ? (getRoleAllowedMenus(activeRole, activeTenant?.id) || []) : [];
 
   const menuItems: { id: TabType; label: string; icon: React.ReactNode; badge?: string }[] = [
     { id: 'dashboard', label: 'Executive Dashboard', icon: <LayoutDashboard className="w-4 h-4" /> },
@@ -135,7 +135,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'test_suite', label: 'Test Suite & Regressions', icon: <CheckCircle2 className="w-4 h-4" />, badge: '65+ Tests' },
   ];
 
-  const visibleMenuItems = menuItems.filter((item) => {
+  const visibleMenuItems = (menuItems || []).filter((item) => {
     // Partner Portal users (Vendor / Customer) strictly see ONLY the Financial Position Portal page
     if (isPartnerRole) {
       return item.id === 'partner_portal';
@@ -148,7 +148,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
       return isAdminOrSuperAdmin;
     }
     // Dynamic Role-Menu permissions check
-    return allowedMenus.includes(item.id);
+    return (allowedMenus || []).includes(item.id);
   });
 
   return (

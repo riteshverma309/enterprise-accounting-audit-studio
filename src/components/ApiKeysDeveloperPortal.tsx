@@ -133,11 +133,12 @@ export const ApiKeysDeveloperPortal: React.FC = () => {
   };
 
   const toggleScopeSelection = (scope: ApiKeyPermissionScope) => {
-    if (newKeyForm.scopes.includes(scope)) {
-      if (newKeyForm.scopes.length === 1) return;
-      setNewKeyForm({ ...newKeyForm, scopes: newKeyForm.scopes.filter((s) => s !== scope) });
+    const currentScopes = newKeyForm.scopes || [];
+    if (currentScopes.includes(scope)) {
+      if (currentScopes.length === 1) return;
+      setNewKeyForm({ ...newKeyForm, scopes: currentScopes.filter((s) => s !== scope) });
     } else {
-      setNewKeyForm({ ...newKeyForm, scopes: [...newKeyForm.scopes, scope] });
+      setNewKeyForm({ ...newKeyForm, scopes: [...currentScopes, scope] });
     }
   };
 

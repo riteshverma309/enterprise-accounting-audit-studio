@@ -7,7 +7,7 @@ export const FiscalCloseView: React.FC = () => {
   const [closingYear, setClosingYear] = useState('2026');
   const [closeResult, setCloseResult] = useState<{ success: boolean; msg: string } | null>(null);
 
-  const tenantPeriods = fiscalPeriods.filter((p) => p.tenantId === activeTenant.id);
+  const tenantPeriods = (fiscalPeriods || []).filter((p) => p.tenantId === activeTenant?.id);
 
   const handleRunYearEndClose = () => {
     const res = executeYearEndClose(closingYear);

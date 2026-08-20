@@ -98,7 +98,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
   }, [isSuperUser, activeRole, currentUser, tenants, activeTenant.id]);
 
   const authorizedTenants = useMemo(() => {
-    return tenants.filter((t) => authorizedTenantIds.includes(t.id));
+    return (tenants || []).filter((t) => authorizedTenantIds.includes(t.id));
   }, [tenants, authorizedTenantIds]);
 
   // Selected Target Tenant for Menu Configuration
@@ -107,7 +107,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
   );
 
   const currentConfigTenant = useMemo(() => {
-    return tenants.find((t) => t.id === selectedTenantId) || activeTenant;
+    return (tenants || []).find((t) => t.id === selectedTenantId) || activeTenant;
   }, [tenants, selectedTenantId, activeTenant]);
 
   // View Mode: Role Detail vs Full Matrix Grid
@@ -144,7 +144,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
     ];
 
     const standardRoles = systemRolesOrder.map((code) => {
-      const customMatch = customRoles.find((r) => r.code === code);
+      const customMatch = (customRoles || []).find((r) => r.code === code);
       return {
         code,
         name: customMatch?.name || code.replace('_', ' ').toUpperCase(),
@@ -154,7 +154,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
       };
     });
 
-    const additionalCustom = customRoles
+    const additionalCustom = (customRoles || [])
       .filter((r) => !systemRolesOrder.includes(r.code as Role))
       .map((r) => ({
         code: r.code,
@@ -169,12 +169,12 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
 
   // Currently allowed menus for selected role in selected tenant
   const currentAllowedMenus = useMemo(() => {
-    return getRoleAllowedMenus(selectedRole, selectedTenantId);
+    return (getRoleAllowedMenus && getRoleAllowedMenus(selectedRole, selectedTenantId)) || [];
   }, [getRoleAllowedMenus, selectedRole, selectedTenantId]);
 
   // Filtered menu options based on search and category
   const filteredMenuOptions = useMemo(() => {
-    return ALL_MENU_OPTIONS.filter((item) => {
+    return (ALL_MENU_OPTIONS || []).filter((item) => {
       const matchesSearch =
         item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -90,8 +90,8 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
     { event: 'payroll.executed', label: 'payroll.executed', description: 'Triggered when a bi-weekly or monthly pay run is processed to GL', category: 'Payroll' },
   ];
 
-  const filteredEndpoints = webhookEndpoints.filter((ep) => {
-    if (ep.tenantId !== activeTenant.id) return false;
+  const filteredEndpoints = (webhookEndpoints || []).filter((ep) => {
+    if (ep.tenantId !== activeTenant?.id) return false;
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchName = ep.name.toLowerCase().includes(q);
@@ -99,15 +99,15 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
       const matchDesc = (ep.description || '').toLowerCase().includes(q);
       if (!matchName && !matchUrl && !matchDesc) return false;
     }
-    if (selectedEventFilter !== 'ALL' && !ep.events.includes(selectedEventFilter as WebhookEventType)) {
+    if (selectedEventFilter !== 'ALL' && !(ep.events || []).includes(selectedEventFilter as WebhookEventType)) {
       return false;
     }
     return true;
   });
 
-  const tenantLogs = webhookLogs.filter((log) => log.tenantId === activeTenant.id);
+  const tenantLogs = (webhookLogs || []).filter((log) => log.tenantId === activeTenant?.id);
 
-  const filteredLogs = tenantLogs.filter((log) => {
+  const filteredLogs = (tenantLogs || []).filter((log) => {
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       const matchName = log.endpointName.toLowerCase().includes(q);

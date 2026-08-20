@@ -208,8 +208,8 @@ export const TestSuiteView: React.FC = () => {
   };
 
   const executedCount = Object.keys(testResults).length;
-  const passedCount = Object.values(testResults).filter((r) => r.status === 'PASSED').length;
-  const failedCount = Object.values(testResults).filter((r) => r.status === 'FAILED').length;
+  const passedCount = Object.values(testResults).filter((r: TestResult) => r.status === 'PASSED').length;
+  const failedCount = Object.values(testResults).filter((r: TestResult) => r.status === 'FAILED').length;
   const passRate = executedCount > 0 ? ((passedCount / executedCount) * 100).toFixed(1) : '100.0';
 
   return (

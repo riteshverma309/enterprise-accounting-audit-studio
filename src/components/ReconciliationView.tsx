@@ -73,8 +73,8 @@ export const ReconciliationView: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter bank statements for active tenant
-  const tenantStatements = bankStatements.filter((b) => b.tenantId === activeTenant.id);
-  const tenantBankFeeds = connectedBankFeeds.filter((f) => f.tenantId === activeTenant.id);
+  const tenantStatements = (bankStatements || []).filter((b) => b.tenantId === activeTenant?.id);
+  const tenantBankFeeds = (connectedBankFeeds || []).filter((f) => f.tenantId === activeTenant?.id);
 
   // Calculations for summary stats
   const reconciledCount = tenantStatements.filter((b) => b.reconciled).length;
@@ -85,7 +85,7 @@ export const ReconciliationView: React.FC = () => {
   const pendingBankSum = tenantStatements.filter((b) => !b.reconciled).reduce((sum, b) => sum + b.amount, 0);
 
   // Current Cash Account GL balance
-  const cashAcc = accounts.find((a) => a.code === selectedAccountId) || accounts[0];
+  const cashAcc = (accounts || []).find((a) => a.code === selectedAccountId) || (accounts || [])[0];
   const glCashBalance = cashAcc ? cashAcc.balance : 0;
   const discrepancy = glCashBalance - totalBankFeedSum;
 

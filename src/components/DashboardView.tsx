@@ -48,21 +48,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
   // Monthly Revenue vs Expense dummy aggregation from accounts
   const chartData = [
-    { name: 'May 2026', revenue: incomeStatement.totalRevenue * 0.7, expense: incomeStatement.totalExpense * 0.65 },
-    { name: 'Jun 2026', revenue: incomeStatement.totalRevenue * 0.85, expense: incomeStatement.totalExpense * 0.8 },
-    { name: 'Jul 2026', revenue: incomeStatement.totalRevenue * 0.95, expense: incomeStatement.totalExpense * 0.9 },
-    { name: 'Aug 2026', revenue: incomeStatement.totalRevenue, expense: incomeStatement.totalExpense },
+    { name: 'May 2026', revenue: (incomeStatement?.totalRevenue || 0) * 0.7, expense: (incomeStatement?.totalExpense || 0) * 0.65 },
+    { name: 'Jun 2026', revenue: (incomeStatement?.totalRevenue || 0) * 0.85, expense: (incomeStatement?.totalExpense || 0) * 0.8 },
+    { name: 'Jul 2026', revenue: (incomeStatement?.totalRevenue || 0) * 0.95, expense: (incomeStatement?.totalExpense || 0) * 0.9 },
+    { name: 'Aug 2026', revenue: incomeStatement?.totalRevenue || 0, expense: incomeStatement?.totalExpense || 0 },
   ];
 
   // Asset allocation pie chart
-  const assetAccounts = accounts.filter((a) => a.type === 'ASSET' && a.balance > 0);
+  const assetAccounts = (accounts || []).filter((a) => a.type === 'ASSET' && a.balance > 0);
   const pieColors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'];
   const pieData = assetAccounts.slice(0, 5).map((a) => ({
     name: a.name,
     value: a.balance,
   }));
 
-  const currencySymbol = activeTenant.currency === 'INR' ? '₹' : activeTenant.currency === 'EUR' ? '€' : '$';
+  const currencySymbol = activeTenant?.currency === 'INR' ? '₹' : activeTenant?.currency === 'EUR' ? '€' : '$';
 
   return (
     <div className="p-6 space-y-6 max-w-7xl mx-auto">
@@ -339,3 +339,4 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     </div>
   );
 };
+
