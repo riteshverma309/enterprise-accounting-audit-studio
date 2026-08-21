@@ -16,6 +16,7 @@ import {
   FileSpreadsheet,
 } from 'lucide-react';
 import { VendorContact } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface BillLineItemRow {
   id: string;
@@ -27,6 +28,7 @@ interface BillLineItemRow {
 export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null }> = ({
   preSelectedVendor,
 }) => {
+  const { t, tr } = useLanguage();
   const {
     activeTenant,
     vendorBills,
@@ -174,10 +176,10 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
         <div>
           <h1 className="text-xl font-bold text-slate-100 flex items-center gap-2">
             <CreditCard className="w-6 h-6 text-purple-400" />
-            Accounts Payable (AP) & Vendor Bills
+            {tr('Accounts Payable (AP) & Vendor Bills')}
           </h1>
           <p className="text-xs text-slate-400">
-            Track vendor liability bills linked to Vendor Master profiles, capture contract SLA terms, and execute disbursements with double-entry GL ledger updates.
+            {tr('Track vendor liability bills linked to Vendor Master profiles, capture contract SLA terms, and execute disbursements with double-entry GL ledger updates.')}
           </p>
         </div>
         <button
@@ -190,7 +192,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
           className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-lg text-xs shadow-md shadow-purple-600/20 transition cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          Enter Vendor Bill
+          {tr('Enter Vendor Bill')}
         </button>
       </div>
 
@@ -198,57 +200,57 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-semibold">Total Accounts Payable</span>
+            <span className="text-xs font-semibold">{tr('Total Accounts Payable')}</span>
             <DollarSign className="w-4 h-4 text-purple-400" />
           </div>
           <div className="text-2xl font-bold text-slate-100 font-mono">
             {activeTenant.currency} {totalAp.toLocaleString()}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Pending vendor liabilities</p>
+          <p className="text-[11px] text-slate-500 mt-1">{tr('Pending vendor liabilities')}</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-semibold">Disbursed Cash Payments</span>
+            <span className="text-xs font-semibold">{tr('Disbursed Cash Payments')}</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-emerald-400 font-mono">
             {activeTenant.currency} {paidAp.toLocaleString()}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Settled vendor payments</p>
+          <p className="text-[11px] text-slate-500 mt-1">{tr('Settled vendor payments')}</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-semibold">Overdue Payables Alert</span>
+            <span className="text-xs font-semibold">{tr('Overdue Payables Alert')}</span>
             <AlertCircle className="w-4 h-4 text-rose-400" />
           </div>
           <div className="text-2xl font-bold text-rose-400 font-mono">
             {activeTenant.currency} {overdueAp.toLocaleString()}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Vendor bills past due date</p>
+          <p className="text-[11px] text-slate-500 mt-1">{tr('Vendor bills past due date')}</p>
         </div>
       </div>
 
       {/* Vendor Bills Table */}
       <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-slate-200">Vendor Bill Register</h2>
-          <span className="text-xs text-slate-400 font-mono">{tenantBills.length} Registered Bills</span>
+          <h2 className="text-sm font-semibold text-slate-200">{tr('Vendor Bill Register')}</h2>
+          <span className="text-xs text-slate-400 font-mono">{tenantBills.length} {tr('Registered Bills')}</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] tracking-wider">
               <tr>
-                <th className="p-3">Bill #</th>
-                <th className="p-3">Vendor / Service Provider</th>
-                <th className="p-3">Bill Date</th>
-                <th className="p-3">Due Date</th>
-                <th className="p-3 text-right">Total Amount</th>
-                <th className="p-3 text-right">Amount Paid</th>
-                <th className="p-3 text-center">Status</th>
-                <th className="p-3 text-right">Actions</th>
+                <th className="p-3">{tr('Bill #')}</th>
+                <th className="p-3">{tr('Vendor / Service Provider')}</th>
+                <th className="p-3">{tr('Bill Date')}</th>
+                <th className="p-3">{tr('Due Date')}</th>
+                <th className="p-3 text-right">{tr('Total Amount')}</th>
+                <th className="p-3 text-right">{tr('Amount Paid')}</th>
+                <th className="p-3 text-center">{t('common_status', 'Status')}</th>
+                <th className="p-3 text-right">{t('common_actions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 font-mono">

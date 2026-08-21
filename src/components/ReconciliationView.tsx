@@ -26,8 +26,10 @@ import {
   Link2,
 } from 'lucide-react';
 import { UPLOAD_TEMPLATES, downloadCsvFile } from '../utils/templateGenerator';
+import { useLanguage } from '../context/LanguageContext';
 
 export const ReconciliationView: React.FC = () => {
+  const { t, tr } = useLanguage();
   const {
     activeTenant,
     bankStatements,
@@ -286,14 +288,14 @@ export const ReconciliationView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
-              <Landmark className="w-6 h-6 text-indigo-400" /> Bank Statement Matching & Treasury Reconciliation Hub
+              <Landmark className="w-6 h-6 text-indigo-400" /> {tr('Bank Statement Matching & Treasury Reconciliation Hub')}
             </h1>
             <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 font-mono text-[11px] rounded-full font-semibold border border-indigo-500/30">
               {activeTenant.name} ({activeTenant.currency})
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Automated bank feed matching, AI rule suggestions, and instant GL entry generation for seamless period-end closing.
+            {tr('Automated bank feed matching, AI rule suggestions, and instant GL entry generation for seamless period-end closing.')}
           </p>
         </div>
 
@@ -303,7 +305,7 @@ export const ReconciliationView: React.FC = () => {
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 text-indigo-400" />
-            <span>CSV Template</span>
+            <span>{tr('CSV Template')}</span>
           </button>
 
           <button
@@ -311,7 +313,7 @@ export const ReconciliationView: React.FC = () => {
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition cursor-pointer"
           >
             <UploadCloud className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Import CSV Feed</span>
+            <span>{tr('Import CSV Feed')}</span>
           </button>
           <input
             ref={fileInputRef}
@@ -330,7 +332,7 @@ export const ReconciliationView: React.FC = () => {
             className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 text-purple-400" />
-            <span>Load Sample Feed</span>
+            <span>{tr('Load Sample Feed')}</span>
           </button>
 
           <button
@@ -338,7 +340,7 @@ export const ReconciliationView: React.FC = () => {
             className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-indigo-600/20 transition cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
-            <span>Auto-Match Engine</span>
+            <span>{tr('Auto-Match Engine')}</span>
           </button>
         </div>
       </div>
@@ -372,38 +374,38 @@ export const ReconciliationView: React.FC = () => {
         {/* CARD 1: GL CASH BALANCE */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-            <span>GL Cash Account ({cashAcc?.code || '1010'})</span>
+            <span>{tr('GL Cash Account')} ({cashAcc?.code || '1010'})</span>
             <Landmark className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-xl font-black text-white font-mono">
             {activeTenant.currency} {glCashBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <p className="text-[10px] text-slate-500">{cashAcc?.name || 'Primary Operating Cash'}</p>
+          <p className="text-[10px] text-slate-500">{cashAcc?.name || tr('Primary Operating Cash')}</p>
         </div>
 
         {/* CARD 2: BANK FEED TOTAL */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-            <span>Bank Feed Statement Total</span>
+            <span>{tr('Bank Feed Statement Total')}</span>
             <FileText className="w-4 h-4 text-purple-400" />
           </div>
           <div className="text-xl font-black text-white font-mono">
             {activeTenant.currency} {totalBankFeedSum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <p className="text-[10px] text-slate-500">Total of all imported bank statement lines</p>
+          <p className="text-[10px] text-slate-500">{tr('Total of all imported bank statement lines')}</p>
         </div>
 
         {/* CARD 3: RECONCILED PROGRESS */}
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-1 shadow-sm">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-            <span>Reconciliation Progress</span>
+            <span>{tr('Reconciliation Progress')}</span>
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-xl font-black text-emerald-400 font-mono">
-            {reconciledCount} / {tenantStatements.length} <span className="text-xs font-normal text-slate-400">Lines</span>
+            {reconciledCount} / {tenantStatements.length} <span className="text-xs font-normal text-slate-400">{tr('Lines')}</span>
           </div>
           <p className="text-[10px] text-slate-500">
-            {pendingCount === 0 ? '100% Reconciled' : `${pendingCount} item(s) awaiting approval`}
+            {pendingCount === 0 ? tr('100% Reconciled') : `${pendingCount} ${tr('item(s) awaiting approval')}`}
           </p>
         </div>
 
@@ -417,7 +419,7 @@ export const ReconciliationView: React.FC = () => {
         >
           <div className="flex items-center justify-between text-xs font-semibold">
             <span className={Math.abs(discrepancy) < 0.01 ? 'text-emerald-300' : 'text-amber-300'}>
-              GL vs Bank Variance
+              {tr('GL vs Bank Variance')}
             </span>
             {Math.abs(discrepancy) < 0.01 ? (
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
@@ -429,7 +431,7 @@ export const ReconciliationView: React.FC = () => {
             {activeTenant.currency} {Math.abs(discrepancy).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <p className="text-[10px] text-slate-400">
-            {Math.abs(discrepancy) < 0.01 ? 'Perfect match! Ledger & Bank balanced.' : 'Discrepancy pending reconciliation.'}
+            {Math.abs(discrepancy) < 0.01 ? tr('Perfect match! Ledger & Bank balanced.') : tr('Discrepancy pending reconciliation.')}
           </p>
         </div>
 

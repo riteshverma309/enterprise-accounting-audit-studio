@@ -49,12 +49,14 @@ import {
   exportCustomersToCsv,
 } from '../utils/customerImportExport';
 import { downloadCsvFile } from '../utils/templateGenerator';
+import { useLanguage } from '../context/LanguageContext';
 
 export const EntityManagementView: React.FC<{
   onSelectCustomerForInvoice?: (customer: CustomerContact) => void;
   onSelectCustomerForStatement?: (customer: CustomerContact) => void;
   onSelectVendorForBill?: (vendor: VendorContact) => void;
 }> = ({ onSelectCustomerForInvoice, onSelectCustomerForStatement, onSelectVendorForBill }) => {
+  const { t, tr } = useLanguage();
   const {
     activeTenant,
     customers,
@@ -462,13 +464,13 @@ export const EntityManagementView: React.FC<{
             </div>
             <div>
               <h1 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-                Customer & Vendor Master Management
+                {tr('Customer & Vendor Master Management')}
                 <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-medium">
-                  Dynamic Schema EAV
+                  {tr('Dynamic Schema EAV')}
                 </span>
               </h1>
               <p className="text-xs text-slate-400">
-                Versatile directory engine adaptable for Schools, Housing Societies, Hospitals, SaaS & Corporate entities with extensible custom attributes.
+                {tr('Versatile directory engine adaptable for Schools, Housing Societies, Hospitals, SaaS & Corporate entities with extensible custom attributes.')}
               </p>
             </div>
           </div>
@@ -483,10 +485,10 @@ export const EntityManagementView: React.FC<{
                   type="button"
                   onClick={() => setIsDownloadMenuOpen((prev) => !prev)}
                   className="flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold shadow transition-all cursor-pointer"
-                  title="Download dynamic upload template or export active customers"
+                  title={tr('Download dynamic upload template or export active customers')}
                 >
                   <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Templates & Export</span>
+                  <span>{tr('Templates & Export')}</span>
                   <ChevronDown className="w-3 h-3 text-slate-400" />
                 </button>
 
@@ -498,7 +500,7 @@ export const EntityManagementView: React.FC<{
                     />
                     <div className="absolute right-0 mt-2 w-64 bg-slate-900 border border-slate-800 rounded-xl shadow-2xl z-30 p-2 space-y-1 text-xs">
                       <div className="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800">
-                        Dynamic Schema Templates
+                        {tr('Dynamic Schema Templates')}
                       </div>
                       <button
                         type="button"
@@ -506,13 +508,13 @@ export const EntityManagementView: React.FC<{
                           const csv = generateCustomerCsvTemplate(activeTenant.name, activeTenant.currency, customerAttributes, true);
                           downloadCsvFile(`${activeTenant.code.toLowerCase()}_customer_upload_template.csv`, csv);
                           setIsDownloadMenuOpen(false);
-                          showNotification('Downloaded dynamic CSV upload template with active custom attributes.');
+                          showNotification(tr('Downloaded dynamic CSV upload template with active custom attributes.'));
                         }}
                         className="w-full text-left px-2.5 py-2 hover:bg-slate-800 rounded-lg text-slate-200 flex items-center justify-between transition cursor-pointer"
                       >
                         <span className="flex items-center gap-2">
                           <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-                          Download CSV Template
+                          {tr('Download CSV Template')}
                         </span>
                         <span className="text-[10px] font-mono text-emerald-400">.csv</span>
                       </button>
@@ -522,13 +524,13 @@ export const EntityManagementView: React.FC<{
                           const json = generateCustomerJsonTemplate(customerAttributes);
                           downloadCsvFile(`${activeTenant.code.toLowerCase()}_customer_upload_template.json`, json);
                           setIsDownloadMenuOpen(false);
-                          showNotification('Downloaded dynamic JSON upload template with active custom attributes.');
+                          showNotification(tr('Downloaded dynamic JSON upload template with active custom attributes.'));
                         }}
                         className="w-full text-left px-2.5 py-2 hover:bg-slate-800 rounded-lg text-slate-200 flex items-center justify-between transition cursor-pointer"
                       >
                         <span className="flex items-center gap-2">
                           <FileText className="w-3.5 h-3.5 text-blue-400" />
-                          Download JSON Template
+                          {tr('Download JSON Template')}
                         </span>
                         <span className="text-[10px] font-mono text-blue-400">.json</span>
                       </button>
@@ -539,15 +541,15 @@ export const EntityManagementView: React.FC<{
                           const exportCsv = exportCustomersToCsv(customers, customerAttributes);
                           downloadCsvFile(`${activeTenant.code.toLowerCase()}_customers_export_${new Date().toISOString().split('T')[0]}.csv`, exportCsv);
                           setIsDownloadMenuOpen(false);
-                          showNotification(`Exported ${customers.length} customer records to CSV.`);
+                          showNotification(tr('Exported active customers to CSV.'));
                         }}
                         className="w-full text-left px-2.5 py-2 hover:bg-slate-800 rounded-lg text-slate-200 flex items-center justify-between transition cursor-pointer"
                       >
                         <span className="flex items-center gap-2">
                           <Download className="w-3.5 h-3.5 text-indigo-400" />
-                          Export Active Customers
+                          {tr('Export Active Customers')}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">{customers.length} rows</span>
+                        <span className="text-[10px] text-slate-400 font-mono">{customers.length} {tr('rows')}</span>
                       </button>
                     </div>
                   </>
@@ -559,10 +561,10 @@ export const EntityManagementView: React.FC<{
                 type="button"
                 onClick={() => setIsBatchUploadModalOpen(true)}
                 className="flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                title="Bulk upload customer list from CSV or JSON file"
+                title={tr('Bulk upload customer list from CSV or JSON file')}
               >
                 <UploadCloud className="w-4 h-4 text-emerald-400" />
-                Upload Customer List
+                {tr('Upload Customer List')}
               </button>
 
               {/* On-The-Fly Attribute Quick Modal Button */}
@@ -570,10 +572,10 @@ export const EntityManagementView: React.FC<{
                 type="button"
                 onClick={() => setIsQuickAddAttrModalOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold transition-all cursor-pointer"
-                title="Add on-the-fly custom schema attribute (date, boolean, decimal, text, number, select)"
+                title={tr('Add on-the-fly custom schema attribute (date, boolean, decimal, text, number, select)')}
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                + Add Attribute On The Fly
+                {tr('+ Add Attribute On The Fly')}
               </button>
 
               {/* Add Customer Profile */}
@@ -583,7 +585,7 @@ export const EntityManagementView: React.FC<{
                 className="flex items-center gap-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                Add Customer
+                {tr('Add Customer')}
               </button>
             </>
           )}
@@ -593,7 +595,7 @@ export const EntityManagementView: React.FC<{
               className="flex items-center gap-2 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-purple-600/20 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              Add Vendor / Supplier
+              {tr('Add Vendor / Supplier')}
             </button>
           )}
           {activeTab === 'schema_designer' && (
@@ -602,7 +604,7 @@ export const EntityManagementView: React.FC<{
               className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              Add Custom Attribute
+              {tr('Add Custom Attribute')}
             </button>
           )}
         </div>
@@ -627,11 +629,11 @@ export const EntityManagementView: React.FC<{
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-amber-400" />
             <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300">
-              One-Click Industry Archetype Presets
+              {tr('One-Click Industry Archetype Presets')}
             </h3>
           </div>
           <span className="text-[11px] text-slate-400 font-mono">
-            {tenantAttributes.length} Active Schema Attributes
+            {tenantAttributes.length} {tr('Active Schema Attributes')}
           </span>
         </div>
 
@@ -641,17 +643,17 @@ export const EntityManagementView: React.FC<{
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 text-indigo-400">
                 <Building2 className="w-4 h-4" />
-                <span className="text-xs font-bold text-slate-200">Housing Society / HOA</span>
+                <span className="text-xs font-bold text-slate-200">{tr('Housing Society / HOA')}</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Unit / Flat No, Wing/Block, Carpet Area (sq ft), Parking Bays, Owner Occupancy, Maintenance Rate ($/sq ft).
+                {tr('Unit / Flat No, Wing/Block, Carpet Area (sq ft), Parking Bays, Owner Occupancy, Maintenance Rate ($/sq ft).')}
               </p>
             </div>
             <button
               onClick={() => handleApplyPreset('HOUSING_SOCIETY', 'Housing Society & HOA')}
               className="mt-3 w-full py-1.5 px-2.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 text-[11px] font-medium transition-all flex items-center justify-center gap-1.5"
             >
-              <Check className="w-3 h-3" /> Apply Housing Fields
+              <Check className="w-3 h-3" /> {tr('Apply Housing Fields')}
             </button>
           </div>
 
@@ -660,17 +662,17 @@ export const EntityManagementView: React.FC<{
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 text-emerald-400">
                 <GraduationCap className="w-4 h-4" />
-                <span className="text-xs font-bold text-slate-200">School & Academy</span>
+                <span className="text-xs font-bold text-slate-200">{tr('School & Academy')}</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Student Roll No, Grade / Batch, Bus Transport Route, Scholarship Discount %, Hostel Boarding status.
+                {tr('Student Roll No, Grade / Batch, Bus Transport Route, Scholarship Discount %, Hostel Boarding status.')}
               </p>
             </div>
             <button
               onClick={() => handleApplyPreset('SCHOOL', 'School & Academy')}
               className="mt-3 w-full py-1.5 px-2.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white border border-emerald-500/30 text-[11px] font-medium transition-all flex items-center justify-center gap-1.5"
             >
-              <Check className="w-3 h-3" /> Apply School Fields
+              <Check className="w-3 h-3" /> {tr('Apply School Fields')}
             </button>
           </div>
 
@@ -679,17 +681,17 @@ export const EntityManagementView: React.FC<{
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 text-rose-400">
                 <HeartPulse className="w-4 h-4" />
-                <span className="text-xs font-bold text-slate-200">Hospital & Clinic</span>
+                <span className="text-xs font-bold text-slate-200">{tr('Hospital & Clinic')}</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Patient MRN, Admission Care Type, Ward & Bed No, Attending Doctor, Insurance Policy ID, Daily Bed Tariff.
+                {tr('Patient MRN, Admission Care Type, Ward & Bed No, Attending Doctor, Insurance Policy ID, Daily Bed Tariff.')}
               </p>
             </div>
             <button
               onClick={() => handleApplyPreset('HOSPITAL', 'Hospital & Healthcare')}
               className="mt-3 w-full py-1.5 px-2.5 rounded-lg bg-rose-600/20 hover:bg-rose-600 text-rose-300 hover:text-white border border-rose-500/30 text-[11px] font-medium transition-all flex items-center justify-center gap-1.5"
             >
-              <Check className="w-3 h-3" /> Apply Hospital Fields
+              <Check className="w-3 h-3" /> {tr('Apply Hospital Fields')}
             </button>
           </div>
 
@@ -698,17 +700,17 @@ export const EntityManagementView: React.FC<{
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 text-amber-400">
                 <Briefcase className="w-4 h-4" />
-                <span className="text-xs font-bold text-slate-200">Enterprise & SaaS</span>
+                <span className="text-xs font-bold text-slate-200">{tr('Enterprise & SaaS')}</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Corporate Tax ID / GSTIN, Contract SLA Tier, SSO Mandatory flag, Vendor AMC Contract Expiry Date.
+                {tr('Corporate Tax ID / GSTIN, Contract SLA Tier, SSO Mandatory flag, Vendor AMC Contract Expiry Date.')}
               </p>
             </div>
             <button
               onClick={() => handleApplyPreset('SAAS', 'Enterprise SaaS')}
               className="mt-3 w-full py-1.5 px-2.5 rounded-lg bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white border border-amber-500/30 text-[11px] font-medium transition-all flex items-center justify-center gap-1.5"
             >
-              <Check className="w-3 h-3" /> Apply Enterprise Fields
+              <Check className="w-3 h-3" /> {tr('Apply Enterprise Fields')}
             </button>
           </div>
         </div>
@@ -728,7 +730,7 @@ export const EntityManagementView: React.FC<{
           }`}
         >
           <Users className="w-4 h-4" />
-          Customers Directory ({filteredCustomers.length})
+          {tr('Customers Directory')} ({filteredCustomers.length})
         </button>
 
         <button
@@ -743,7 +745,7 @@ export const EntityManagementView: React.FC<{
           }`}
         >
           <CreditCard className="w-4 h-4" />
-          Vendors Directory ({filteredVendors.length})
+          {tr('Vendors Directory')} ({filteredVendors.length})
         </button>
 
         <button
@@ -755,7 +757,7 @@ export const EntityManagementView: React.FC<{
           }`}
         >
           <SlidersHorizontal className="w-4 h-4" />
-          Schema & Custom Attributes Designer ({tenantAttributes.length})
+          {tr('Schema & Custom Attributes Designer')} ({tenantAttributes.length})
         </button>
       </div>
 

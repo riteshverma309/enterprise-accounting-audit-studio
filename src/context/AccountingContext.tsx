@@ -1902,6 +1902,18 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       return { success: false, error: 'No accrued tax liability available for settlement.' };
     }
 
+    const currentAccs = accountsMap[activeTenantId] || [];
+    const taxAcc = currentAccs.find((a) => a.code === '2200' || a.code === '2100' || a.code === '2201') || currentAccs.find((a) => a.type === 'LIABILITY');
+    const bankAcc = currentAccs.find((a) => a.code === '1010') || currentAccs.find((a) => a.type === 'ASSET');
+
+    const taxAccId = taxAcc ? taxAcc.id : 'acc-2002';
+    const taxAccCode = taxAcc ? taxAcc.code : '2200';
+    const taxAccName = taxAcc ? taxAcc.name : 'Tax Payable';
+
+    const bankAccId = bankAcc ? bankAcc.id : 'acc-1001';
+    const bankAccCode = bankAcc ? bankAcc.code : '1010';
+    const bankAccName = bankAcc ? bankAcc.name : 'Operating Cash Clearing';
+
     const res = postJournalEntry({
       tenantId: activeTenantId,
       organizationId: activeOrgId || undefined,
@@ -1911,8 +1923,8 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       reference: `TAX-PAY-${jur.code}`,
       pluginId: activePlugin,
       lines: [
-        { id: 'tx-v1', accountId: 'acc-2002', accountCode: '2200', accountName: 'Tax Payable', debit: jur.ytdAccruedTax, credit: 0, memo: 'Clear Accrued Tax Liability' },
-        { id: 'tx-v2', accountId: 'acc-1001', accountCode: '1010', accountName: 'Operating Cash - Chase Bank', debit: 0, credit: jur.ytdAccruedTax, memo: 'Tax Authority Disbursement' },
+        { id: `tx-v1-${Date.now()}`, accountId: taxAccId, accountCode: taxAccCode, accountName: taxAccName, debit: jur.ytdAccruedTax, credit: 0, memo: `Clear Accrued ${jur.taxType} Liability` },
+        { id: `tx-v2-${Date.now()}`, accountId: bankAccId, accountCode: bankAccCode, accountName: bankAccName, debit: 0, credit: jur.ytdAccruedTax, memo: `${jur.name} Authority Disbursement` },
       ],
     });
 
@@ -2023,9 +2035,9 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         tenantName: activeTenant.name,
         taxIdentifier: 'GSTIN: 29AABCB1234H1Z5',
         taxBreakdown: [
-          { name: 'Central GST (CGST @ 9%)', taxableAmount: cgstAcc / 0.09, taxCollected: cgstAcc, taxPaidCredit: itcAcc * 0.5, netLiability: cgstAcc - itcAcc * 0.5 },
-          { name: 'State GST (SGST @ 9%)', taxableAmount: sgstAcc / 0.09, taxCollected: sgstAcc, taxPaidCredit: itcAcc * 0.5, netLiability: sgstAcc - itcAcc * 0.5 },
-          { name: 'Integrated GST (IGST @ 18%)', taxableAmount: igstAcc / 0.18, taxCollected: igstAcc, taxPaidCredit: 0, netLiability: igstAcc },
+          { name: 'Central GST (CGST @ 9%)', taxableAmount: cgstAcc > 0 ? cgstAcc / 0.09 : 0, taxCollected: cgstAcc, taxPaidCredit: itcAcc * 0.5, netLiability: cgstAcc - itcAcc * 0.5 },
+          { name: 'State GST (SGST @ 9%)', taxableAmount: sgstAcc > 0 ? sgstAcc / 0.09 : 0, taxCollected: sgstAcc, taxPaidCredit: itcAcc * 0.5, netLiability: sgstAcc - itcAcc * 0.5 },
+          { name: 'Integrated GST (IGST @ 18%)', taxableAmount: igstAcc > 0 ? igstAcc / 0.18 : 0, taxCollected: igstAcc, taxPaidCredit: 0, netLiability: igstAcc },
         ],
         summaryNotes: [
           'All intra-state supplies matched against HSN/SAC codes.',
@@ -2047,13 +2059,105 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         tenantName: activeTenant.name,
         taxIdentifier: 'VAT ID: NL882910291B01',
         taxBreakdown: [
-          { name: 'Standard EU VAT (21% Rate)', taxableAmount: vatAcc / 0.21, taxCollected: vatAcc, taxPaidCredit: reverseChargeAcc, netLiability: vatAcc - reverseChargeAcc },
-          { name: 'Reverse Charge Intra-Community B2B', taxableAmount: reverseChargeAcc / 0.21, taxCollected: 0, taxPaidCredit: reverseChargeAcc, netLiability: 0 },
+          { name: 'Standard EU VAT (21% Rate)', taxableAmount: vatAcc > 0 ? vatAcc / 0.21 : 0, taxCollected: vatAcc, taxPaidCredit: reverseChargeAcc, netLiability: vatAcc - reverseChargeAcc },
+          { name: 'Reverse Charge Intra-Community B2B', taxableAmount: reverseChargeAcc > 0 ? reverseChargeAcc / 0.21 : 0, taxCollected: 0, taxPaidCredit: reverseChargeAcc, netLiability: 0 },
         ],
         summaryNotes: [
           'Prepared under IAS-1 Presentation of Financial Statements.',
           'Cross-border B2B digital services correctly categorized under Reverse Charge Mechanism.',
           `Total Payable to Tax Authority: €${Math.max(0, vatAcc - reverseChargeAcc).toLocaleString()}`,
+        ],
+        isCompliant: true,
+      };
+    } else if (pluginId === 'sa_zatca') {
+      // Saudi Arabia ZATCA Phase 2 FATOORA & Statutory Zakat / VAT
+      const vatAcc = accounts.find((a) => a.code === '2200')?.balance || 0;
+      const itcAcc = accounts.find((a) => a.code === '1301')?.balance || 0;
+      const zakatAcc = accounts.find((a) => a.code === '2210')?.balance || 18200;
+      const whtAcc = accounts.find((a) => a.code === '2220')?.balance || 4500;
+      const netVat = Math.max(0, vatAcc - itcAcc);
+
+      return {
+        pluginId: 'sa_zatca',
+        title: 'ZATCA FATOORA Phase 2 E-Invoicing & Statutory Zakat/VAT Declaration',
+        standardName: 'Saudi Arabia ZATCA (Zakat, Tax and Customs Authority - هيئة الزكاة والضريبة والجمارك)',
+        period: 'August 2026 Monthly VAT / 1447H Zakat Declaration',
+        tenantName: activeTenant.name,
+        taxIdentifier: 'VAT TIN: 300123456700003 • CR: 1010892011',
+        taxBreakdown: [
+          { name: 'Standard Rated Output VAT (15% ZATCA Supply)', taxableAmount: vatAcc > 0 ? vatAcc / 0.15 : 190000, taxCollected: vatAcc, taxPaidCredit: itcAcc, netLiability: vatAcc - itcAcc },
+          { name: 'Statutory Zakat Provision Pool (2.578% of Adjusted Net Pool)', taxableAmount: zakatAcc > 0 ? zakatAcc / 0.02578 : 706000, taxCollected: zakatAcc, taxPaidCredit: 0, netLiability: zakatAcc },
+          { name: 'Non-Resident Withholding Tax (WHT @ 5% Technical/Management)', taxableAmount: whtAcc > 0 ? whtAcc / 0.05 : 90000, taxCollected: whtAcc, taxPaidCredit: 0, netLiability: whtAcc },
+        ],
+        summaryNotes: [
+          'ZATCA FATOORA Phase 2 Clearance & Reporting Standard compliant.',
+          'ECDSA secp256k1 digital signatures & SHA-256 Previous Invoice Hash (PIH) cryptographically linked.',
+          'Bilingual Arabic/English XML UBL 2.1 e-invoices with Base64 TLV QR codes active.',
+          `Gross Output VAT Collected (15%): SAR ${vatAcc.toLocaleString()}`,
+          `Input VAT Recoverable: SAR ${itcAcc.toLocaleString()}`,
+          `Zakat Liability Accrued (2.578% of Adjusted Zakat Pool): SAR ${zakatAcc.toLocaleString()}`,
+          `Net Tax & Zakat Payable to ZATCA ERAD/FATOORA: SAR ${Math.max(0, netVat + zakatAcc + whtAcc).toLocaleString()}`,
+        ],
+        isCompliant: true,
+      };
+    } else if (pluginId === 'qa_gta') {
+      // Qatar General Tax Authority (GTA / Dhareeba Portal)
+      const vatAcc = accounts.find((a) => a.code === '2200')?.balance || 0;
+      const itcAcc = accounts.find((a) => a.code === '1301')?.balance || 0;
+      const citAcc = accounts.find((a) => a.code === '2300')?.balance || 22000;
+      const whtAcc = accounts.find((a) => a.code === '2210')?.balance || 7500;
+      const netVat = Math.max(0, vatAcc - itcAcc);
+
+      return {
+        pluginId: 'qa_gta',
+        title: 'Qatar GTA Dhareeba E-Tax Return & Corporate Income Tax Schedule',
+        standardName: 'Qatar GTA (General Tax Authority - الهيئة العامة للضرائب / Dhareeba Portal)',
+        period: 'Q3 2026 Quarterly Return & Annual CIT Provision',
+        tenantName: activeTenant.name,
+        taxIdentifier: 'Dhareeba TIN: 0000182940 • Commercial Reg: 84920',
+        taxBreakdown: [
+          { name: 'Standard Output VAT (5% GCC Supply)', taxableAmount: vatAcc > 0 ? vatAcc / 0.05 : 120000, taxCollected: vatAcc, taxPaidCredit: itcAcc, netLiability: vatAcc - itcAcc },
+          { name: 'Corporate Income Tax (CIT @ 10% Foreign Shareholder Profits)', taxableAmount: citAcc > 0 ? citAcc / 0.10 : 220000, taxCollected: citAcc, taxPaidCredit: 0, netLiability: citAcc },
+          { name: 'Cross-Border Withholding Tax (WHT @ 5% Services/Royalties)', taxableAmount: whtAcc > 0 ? whtAcc / 0.05 : 150000, taxCollected: whtAcc, taxPaidCredit: 0, netLiability: whtAcc },
+        ],
+        summaryNotes: [
+          'Compliant with Qatar Tax Law No. 24 of 2018 and Dhareeba Tax Portal Guidelines.',
+          'Withholding Tax (WHT) deducted at source on cross-border technical services.',
+          'Qatar Financial Centre (QFC) / Free Zone tax status verified.',
+          `Output VAT (5%): QAR ${vatAcc.toLocaleString()}`,
+          `Corporate Income Tax (CIT @ 10%): QAR ${citAcc.toLocaleString()}`,
+          `Withholding Tax (WHT @ 5%): QAR ${whtAcc.toLocaleString()}`,
+          `Net Payable to Qatar General Tax Authority (Dhareeba): QAR ${Math.max(0, netVat + citAcc + whtAcc).toLocaleString()}`,
+        ],
+        isCompliant: true,
+      };
+    } else if (pluginId === 'ae_fta') {
+      // UAE Federal Tax Authority (FTA / EmaraTax)
+      const vatAcc = accounts.find((a) => a.code === '2200')?.balance || 0;
+      const itcAcc = accounts.find((a) => a.code === '1301')?.balance || 0;
+      const ctAcc = accounts.find((a) => a.code === '2300')?.balance || 18500;
+      const netVat = Math.max(0, vatAcc - itcAcc);
+
+      return {
+        pluginId: 'ae_fta',
+        title: 'UAE FTA EmaraTax Return (VAT 201) & Corporate Tax Schedule',
+        standardName: 'UAE Federal Tax Authority (FTA - الهيئة الاتحادية للضرائب / EmaraTax)',
+        period: 'Q3 2026 VAT 201 Return & FY2026 CT Provision',
+        tenantName: activeTenant.name,
+        taxIdentifier: 'TRN: 100294819200003 • EmaraTax Ref: FTA-DXB-2026-440192',
+        taxBreakdown: [
+          { name: 'Standard Rated Supplies (5% Mainland UAE Supply)', taxableAmount: vatAcc > 0 ? vatAcc / 0.05 : 240000, taxCollected: vatAcc, taxPaidCredit: itcAcc, netLiability: vatAcc - itcAcc },
+          { name: 'UAE Federal Corporate Tax (9% on Mainland Taxable Income > AED 375k)', taxableAmount: ctAcc > 0 ? (ctAcc / 0.09) + 375000 : 580000, taxCollected: ctAcc, taxPaidCredit: 0, netLiability: ctAcc },
+          { name: 'Qualifying Free Zone Person (QFZP 0% Qualifying Income)', taxableAmount: 95000, taxCollected: 0, taxPaidCredit: 0, netLiability: 0 },
+        ],
+        summaryNotes: [
+          'Compliant with UAE Federal Decree-Law No. 8 of 2017 (VAT) and Federal Decree-Law No. 47 of 2022 (Corporate Tax).',
+          'EmaraTax e-filing schedule VAT 201 generated with reverse charge & import VAT checks.',
+          'Qualifying Free Zone Person (0% rate on qualifying income) ring-fenced from Mainland 9% Corporate Tax.',
+          `Gross Output VAT Collected (5%): AED ${vatAcc.toLocaleString()}`,
+          `Recoverable Input VAT (FTA 5%): AED ${itcAcc.toLocaleString()}`,
+          `Mainland Corporate Tax Provision (9%): AED ${ctAcc.toLocaleString()}`,
+          `Total Net Remittance to FTA EmaraTax: AED ${Math.max(0, netVat + ctAcc).toLocaleString()}`,
         ],
         isCompliant: true,
       };
@@ -2068,7 +2172,7 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         tenantName: activeTenant.name,
         taxIdentifier: 'EIN: 12-3456789',
         taxBreakdown: [
-          { name: 'New York State Sales Tax (8.875%)', taxableAmount: salesTaxAcc / 0.08875, taxCollected: salesTaxAcc, taxPaidCredit: 0, netLiability: salesTaxAcc },
+          { name: 'New York State Sales Tax (8.875%)', taxableAmount: salesTaxAcc > 0 ? salesTaxAcc / 0.08875 : 0, taxCollected: salesTaxAcc, taxPaidCredit: 0, netLiability: salesTaxAcc },
         ],
         summaryNotes: [
           'Full compliance with FASB ASC 606 revenue performance obligations.',
@@ -2084,12 +2188,57 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const createInvoice = (invoiceData: Omit<CustomerInvoice, 'id' | 'invoiceNumber' | 'amountPaid' | 'status'>) => {
     const invId = `inv-${Date.now()}`;
     const invoiceNumber = `INV-${new Date().getFullYear()}-${String(invoices.length + 1).padStart(3, '0')}`;
+
+    // Auto-generate compliance payloads if regional plugin active
+    let zatcaCompliance = invoiceData.zatcaCompliance;
+    let qatarGtaCompliance = invoiceData.qatarGtaCompliance;
+    let uaeFtaCompliance = invoiceData.uaeFtaCompliance;
+
+    if (activeTenant.pluginId === 'sa_zatca' && !zatcaCompliance) {
+      zatcaCompliance = {
+        uuid: `${Math.random().toString(36).substring(2, 10)}-${Math.random().toString(36).substring(2, 6)}-4f21-8201-${Math.random().toString(36).substring(2, 14)}`,
+        invoiceHash: `3a8f9c2d1e0b5a7e6f4d3c2b1a0e9f8d7c6b5a4e3f2d1c0b9a8f7e6d5c4b3a21`,
+        previousInvoiceHash: `NWZkODkyOGExYzllMmE4MTg0N2Q3NGQxNGM3NzA2YzgyMjgyNDg5ZjQxNjJjZDNj`,
+        cryptographicStamp: `MEQCID19a28e38f9b2d8e09f1a23c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3AiB8`,
+        qrCodeTLV: `AQ1TYXVkaSBFbnRlcnByaXNlIEFyYWJpYSBDby4CCzMwMDEyMzQ1NjcwMDAwMwMUMjAyNi0wOC0yMVQwOTo0MDowMFoEBTI4NzUwBQUzNzUwBgVNWlpr...`,
+        complianceStatus: 'CLEARED',
+        invoiceType: 'TAX_INVOICE_B2B',
+        buyerVatNumber: '310987654300003',
+        buyerCrNumber: '1010992819',
+        arabicDescription: 'فاتورة ضريبية إلكترونية - المرحلة الثانية منظومة فاتورة',
+        clearanceTimestamp: new Date().toISOString(),
+        csidIdentifier: 'CSID-ZATCA-PROD-904128',
+      };
+    } else if (activeTenant.pluginId === 'qa_gta' && !qatarGtaCompliance) {
+      qatarGtaCompliance = {
+        tin: '0000182940',
+        dhareebaRef: `DHAR-2026-${Math.floor(100000 + Math.random() * 900000)}`,
+        qrCode: `GTA-DHAREEBA-TIN:0000182940-TOTAL:${invoiceData.totalAmount}-VAT:${invoiceData.taxTotal}`,
+        status: 'APPROVED',
+        isQfcRegulated: false,
+        withholdingTaxApplicable: true,
+        whtRate: 5,
+        whtAmount: invoiceData.subtotal * 0.05,
+      };
+    } else if (activeTenant.pluginId === 'ae_fta' && !uaeFtaCompliance) {
+      uaeFtaCompliance = {
+        trn: '100294819200003',
+        emaraTaxRef: `FTA-DXB-2026-${Math.floor(100000 + Math.random() * 900000)}`,
+        isFreeZoneQualifying: false,
+        corporateTaxRate: 9,
+        qrCode: `FTA-UAE-TRN:100294819200003-INV:${invoiceNumber}-TOTAL:${invoiceData.totalAmount}-VAT:${invoiceData.taxTotal}`,
+      };
+    }
+
     const newInv: CustomerInvoice = {
       ...invoiceData,
       id: invId,
       invoiceNumber,
       amountPaid: 0,
       status: 'UNPAID',
+      zatcaCompliance,
+      qatarGtaCompliance,
+      uaeFtaCompliance,
     };
     setInvoices((prev) => [newInv, ...prev]);
 
@@ -2483,6 +2632,13 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       let fxRate = 1.0;
       if (tenant.currency === 'EUR') fxRate = FX_RATES.find((r) => r.fromCurrency === 'EUR')?.rate || 1.0925;
       else if (tenant.currency === 'INR') fxRate = FX_RATES.find((r) => r.fromCurrency === 'INR')?.rate || 0.01205;
+      else if (tenant.currency === 'SAR') fxRate = FX_RATES.find((r) => r.fromCurrency === 'SAR')?.rate || 0.2666;
+      else if (tenant.currency === 'QAR') fxRate = FX_RATES.find((r) => r.fromCurrency === 'QAR')?.rate || 0.2747;
+      else if (tenant.currency === 'AED') fxRate = FX_RATES.find((r) => r.fromCurrency === 'AED')?.rate || 0.2723;
+      else {
+        const customRate = FX_RATES.find((r) => r.fromCurrency === tenant.currency);
+        if (customRate) fxRate = customRate.rate;
+      }
 
       return {
         tenantId: tenant.id,

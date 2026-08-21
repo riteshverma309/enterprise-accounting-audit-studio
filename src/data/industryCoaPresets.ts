@@ -397,4 +397,45 @@ export const INDUSTRY_COA_PRESETS: IndustryCoaPreset[] = [
       { code: '6040', name: 'Depreciation Expense', type: 'EXPENSE', subCategory: 'Depreciation', normalBalance: 'DEBIT', description: 'Periodic depreciation write-down on fixed assets', initialBalance: 6000 },
     ],
   },
+  {
+    id: 'preset-gcc-middle-east',
+    name: 'Middle East Corporate, ZATCA & GCC Commercial (KSA, Qatar, UAE)',
+    sector: 'GCC / Middle East Enterprise',
+    description: 'Specialized for Saudi Arabia ZATCA Phase 2 FATOORA (15% VAT & Zakat Base), Qatar GTA Dhareeba (5% VAT & 10% CIT / WHT), and UAE FTA EmaraTax (5% VAT & 9% Corporate Tax), with End-of-Service (EOSB) & GOSI provisions.',
+    badge: 'Middle East / GCC',
+    iconName: 'Building2',
+    standard: 'ZATCA FATOORA / Qatar GTA / UAE FTA EmaraTax / GCC IFRS',
+    accounts: [
+      // Assets
+      { code: '1010', name: 'Operating Cash - Primary Clearing Account', type: 'ASSET', subCategory: 'Current Assets', normalBalance: 'DEBIT', description: 'Primary commercial bank clearing account (SNB, Al Rajhi, QNB, FAB, ENBD)', isSystemAccount: true, initialBalance: 320000 },
+      { code: '1020', name: 'Islamic Murabaha & Mudaraba Treasury Reserves', type: 'ASSET', subCategory: 'Cash Equivalents', normalBalance: 'DEBIT', description: 'Sharia-compliant short-term liquid placements and Murabaha deposits', initialBalance: 200000 },
+      { code: '1100', name: 'Trade Accounts Receivable', type: 'ASSET', subCategory: 'Current Assets', normalBalance: 'DEBIT', description: 'Outstanding customer receivables under electronic tax invoicing', isSystemAccount: true, initialBalance: 110000 },
+      { code: '1301', name: 'Input VAT Recoverable (ZATCA / GTA / FTA)', type: 'ASSET', subCategory: 'Current Assets', normalBalance: 'DEBIT', description: 'Statutory input VAT claimable on commercial vendor purchases and import bills', initialBalance: 16500 },
+      { code: '1500', name: 'Property, Plant, Equipment & Logistics Fleet', type: 'ASSET', subCategory: 'Fixed Assets', normalBalance: 'DEBIT', description: 'Capital infrastructure, transport fleet, and commercial equipment', initialBalance: 240000 },
+      { code: '1510', name: 'Accumulated Depreciation - Capital Assets', type: 'ASSET', subCategory: 'Fixed Assets', normalBalance: 'CREDIT', description: 'Cumulative straight-line depreciation on plant and equipment', initialBalance: -45000 },
+
+      // Liabilities
+      { code: '2010', name: 'Trade Accounts Payable', type: 'LIABILITY', subCategory: 'Current Liabilities', normalBalance: 'CREDIT', description: 'Commercial supplier invoices awaiting settlement', isSystemAccount: true, initialBalance: 65000 },
+      { code: '2030', name: 'End-of-Service Benefits & Gratuity (EOSB)', type: 'LIABILITY', subCategory: 'Long-Term Liabilities', normalBalance: 'CREDIT', description: 'Statutory Labor Law provision for employee end-of-service severance indemnity', initialBalance: 78000 },
+      { code: '2200', name: 'Output VAT Payable (15% ZATCA / 5% GTA & FTA)', type: 'LIABILITY', subCategory: 'Statutory Taxes', normalBalance: 'CREDIT', description: 'Tax collected on domestic sales awaiting periodic authority remittance', initialBalance: 28500 },
+      { code: '2210', name: 'Zakat & Withholding Tax (WHT) Accrued Provision', type: 'LIABILITY', subCategory: 'Statutory Taxes', normalBalance: 'CREDIT', description: 'Zakat provision pool (2.578%) and WHT deductions on foreign technical contracts', initialBalance: 18200 },
+      { code: '2300', name: 'Corporate Income Tax Accrued (CIT / UAE CT)', type: 'LIABILITY', subCategory: 'Statutory Taxes', normalBalance: 'CREDIT', description: 'Accrued Corporate Income Tax (10% Dhareeba / 9% UAE FTA CT)', initialBalance: 22000 },
+
+      // Equity
+      { code: '3010', name: 'Paid-Up Share Capital', type: 'EQUITY', subCategory: 'Contributed Capital', normalBalance: 'CREDIT', description: 'Registered share capital under Ministry of Commerce commercial registration', isSystemAccount: true, initialBalance: 450000 },
+      { code: '3020', name: 'Statutory Capital Reserve (GCC 10% Retained)', type: 'EQUITY', subCategory: 'Statutory Reserves', normalBalance: 'CREDIT', description: 'Mandatory statutory reserve allocation pursuant to GCC Commercial Companies Regulations', initialBalance: 45000 },
+      { code: '3200', name: 'Retained Earnings', type: 'EQUITY', subCategory: 'Retained Earnings', normalBalance: 'CREDIT', description: 'Accumulated operational surplus from previous fiscal close years', isSystemAccount: true, initialBalance: 213200 },
+
+      // Revenue
+      { code: '4010', name: 'Mainland Commercial Sales Revenue (Taxable)', type: 'REVENUE', subCategory: 'Operating Revenue', normalBalance: 'CREDIT', description: 'Standard rated commercial sales, contracting, and trading revenues', isSystemAccount: true, initialBalance: 380000 },
+      { code: '4020', name: 'Qualifying Free Zone & Zero-Rated Exports', type: 'REVENUE', subCategory: 'Operating Revenue', normalBalance: 'CREDIT', description: 'Qualifying Free Zone person revenues and zero-rated international export supplies', initialBalance: 95000 },
+
+      // Expenses
+      { code: '5010', name: 'Cost of Goods Sold & Direct Contracting Costs', type: 'EXPENSE', subCategory: 'Direct Costs', normalBalance: 'DEBIT', description: 'Direct materials, freight, customs duty, and site execution expenditures', isSystemAccount: true, initialBalance: 145000 },
+      { code: '6010', name: 'Staff Payroll, GOSI & EOSB Expense', type: 'EXPENSE', subCategory: 'Payroll', normalBalance: 'DEBIT', description: 'Employee salaries, General Organization for Social Insurance (GOSI), and EOSB additions', initialBalance: 95000 },
+      { code: '6020', name: 'Zakat & Corporate Tax Expense Provision', type: 'EXPENSE', subCategory: 'Tax Expense', normalBalance: 'DEBIT', description: 'Annual statutory Zakat expense and Corporate Income Tax provisions', initialBalance: 12000 },
+      { code: '6030', name: 'General, Administrative & Office Rent', type: 'EXPENSE', subCategory: 'Administrative', normalBalance: 'DEBIT', description: 'Commercial premises leases, municipality licensing, utilities, and professional legal fees', initialBalance: 38000 },
+      { code: '6040', name: 'Depreciation on Capital Assets', type: 'EXPENSE', subCategory: 'Depreciation', normalBalance: 'DEBIT', description: 'Periodic depreciation charge on property, plant, and logistics equipment', initialBalance: 9500 },
+    ],
+  },
 ];

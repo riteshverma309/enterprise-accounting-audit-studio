@@ -7,7 +7,28 @@ export const TaxEngineView: React.FC = () => {
 
   const [statusMessage, setStatusMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const currencySymbol = activeTenant.currency === 'EUR' ? '€' : activeTenant.currency === 'INR' ? '₹' : '$';
+  const getCurrencySymbol = (curr: string) => {
+    switch (curr) {
+      case 'EUR': return '€';
+      case 'INR': return '₹';
+      case 'SAR': return 'SAR ';
+      case 'QAR': return 'QAR ';
+      case 'AED': return 'AED ';
+      case 'GBP': return '£';
+      default: return '$';
+    }
+  };
+
+  const currencySymbol = getCurrencySymbol(activeTenant.currency);
+
+  const getJurCurrencySymbol = (jurCode: string) => {
+    if (jurCode.startsWith('IN')) return '₹';
+    if (jurCode.startsWith('EU') || jurCode.startsWith('NL') || jurCode.startsWith('DE')) return '€';
+    if (jurCode.startsWith('SA') || jurCode.startsWith('ZATCA')) return 'SAR ';
+    if (jurCode.startsWith('QA') || jurCode.startsWith('GTA')) return 'QAR ';
+    if (jurCode.startsWith('AE') || jurCode.startsWith('FTA') || jurCode.startsWith('DXB')) return 'AED ';
+    return '$';
+  };
 
   const totalAccruedTax = taxJurisdictions.reduce((sum, j) => sum + j.ytdAccruedTax, 0);
 
@@ -99,7 +120,7 @@ export const TaxEngineView: React.FC = () => {
                 <div>
                   <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Accrued Tax Liability</span>
                   <div className="text-xl font-extrabold text-indigo-400 font-mono">
-                    {jur.code.startsWith('IN') ? '₹' : jur.code.startsWith('EU') ? '€' : '$'}
+                    {getJurCurrencySymbol(jur.code)}
                     {jur.ytdAccruedTax.toLocaleString()}
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Account, AccountType } from '../types';
 import { IndustryCoaPresetModal } from './IndustryCoaPresetModal';
 import { EditAccountModal } from './EditAccountModal';
@@ -41,6 +42,8 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
     activeRole,
     deleteAccount,
   } = useAccounting();
+
+  const { t, tr } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<'journal' | 'coa'>('journal');
   const [searchQuery, setSearchQuery] = useState('');
@@ -170,13 +173,13 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">General Ledger & Chart of Accounts</h1>
+            <h1 className="text-xl font-bold text-white">{t('tab_ledger', 'General Ledger & Chart of Accounts')}</h1>
             <span className="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 font-mono text-[11px] rounded font-semibold border border-indigo-500/30">
               {activeTenant.name} ({activeTenant.currency})
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Double-entry posted transactions, immutable audit vouchers, and domain-tailored Chart of Accounts.
+            {tr('Double-entry posted transactions, immutable audit vouchers, and domain-tailored Chart of Accounts.')}
           </p>
         </div>
 
@@ -188,7 +191,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
               className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium shadow-lg shadow-indigo-600/20 transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Post New Journal Entry</span>
+              <span>{t('common_new_entry', 'Post New Journal Entry')}</span>
             </button>
           ) : (
             <>
@@ -197,7 +200,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 className="flex items-center gap-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-semibold shadow-md shadow-indigo-600/20 transition cursor-pointer"
               >
                 <Sparkles className="w-4 h-4" />
-                <span>Industry Sector Presets</span>
+                <span>{tr('Industry Sector Presets')}</span>
               </button>
 
               <button
@@ -205,7 +208,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3.5 py-2.5 rounded-xl font-semibold shadow-md shadow-indigo-600/20 transition cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Add Account</span>
+                <span>{tr('Add Account')}</span>
               </button>
 
               <button
@@ -214,7 +217,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 title="Import COA from CSV or Excel"
               >
                 <Upload className="w-3.5 h-3.5" />
-                <span>Import</span>
+                <span>{tr('Import')}</span>
               </button>
 
               <button
@@ -223,7 +226,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 title="Export complete COA to Excel"
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
-                <span>Excel</span>
+                <span>{tr('Excel')}</span>
               </button>
 
               <button
@@ -232,7 +235,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 title="Download CSV"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>CSV</span>
+                <span>{tr('CSV')}</span>
               </button>
             </>
           )}
@@ -253,7 +256,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Journal Entries Log ({journalEntries.length})
+            {tr('Journal Entries')} ({journalEntries.length})
           </button>
           <button
             onClick={() => {
@@ -266,7 +269,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Chart of Accounts ({accounts.length})
+            {tr('Chart of Accounts')} ({accounts.length})
           </button>
         </div>
 
@@ -278,8 +281,8 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={
               activeTab === 'journal'
-                ? 'Search voucher, description, ref...'
-                : 'Search code, name, category, purpose...'
+                ? tr('Search voucher, description, ref...')
+                : tr('Search code, name, category, purpose...')
             }
             className="w-full bg-slate-950 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
           />
@@ -292,9 +295,9 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
           {filteredEntries.length === 0 ? (
             <div className="p-12 text-center bg-slate-900/40 rounded-2xl border border-slate-800/80">
               <BookOpenCheck className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-slate-300">No Journal Entries Found</h3>
+              <h3 className="text-sm font-semibold text-slate-300">{tr('No Journal Entries Found')}</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-                No posted general ledger vouchers match your search criteria. Post a manual voucher or batch upload transactions.
+                {tr('No posted general ledger vouchers match your search criteria. Post a manual voucher or batch upload transactions.')}
               </p>
             </div>
           ) : (
@@ -314,11 +317,11 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                         ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30'
                         : 'bg-rose-500/10 text-rose-300 border-rose-500/30'
                     }`}>
-                      {entry.status}
+                      {tr(entry.status)}
                     </span>
                     {entry.reversalOfId && (
                       <span className="text-[10px] text-amber-300 font-mono bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-                        Reversal Entry
+                        {tr('Reversal Entry')}
                       </span>
                     )}
                     <span className="text-xs font-medium text-slate-400">{entry.date}</span>
@@ -338,10 +341,10 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                       <button
                         onClick={() => setReversalEntryId(entry.id)}
                         className="text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 p-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer"
-                        title="Reverse Entry"
+                        title={tr('Reverse Entry')}
                       >
                         <RotateCcw className="w-3.5 h-3.5" />
-                        <span>Reverse</span>
+                        <span>{tr('Reverse')}</span>
                       </button>
                     )}
                   </div>
@@ -352,11 +355,11 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                   <table className="w-full text-left text-xs text-slate-300">
                     <thead className="bg-slate-950 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800">
                       <tr>
-                        <th className="p-3">Account Code</th>
-                        <th className="p-3">Account Title</th>
-                        <th className="p-3">Memo / Line Note</th>
-                        <th className="p-3 text-right">Debit ({activeTenant.currency})</th>
-                        <th className="p-3 text-right">Credit ({activeTenant.currency})</th>
+                        <th className="p-3">{tr('Account Code')}</th>
+                        <th className="p-3">{tr('Account Name')}</th>
+                        <th className="p-3">{tr('Memo / Line Note')}</th>
+                        <th className="p-3 text-right">{t('common_debit', 'Debit')} ({activeTenant.currency})</th>
+                        <th className="p-3 text-right">{t('common_credit', 'Credit')} ({activeTenant.currency})</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800/50 font-mono text-[11px]">
@@ -377,7 +380,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                     <tfoot className="bg-slate-950/60 font-mono font-bold text-xs text-slate-300 border-t border-slate-800">
                       <tr>
                         <td colSpan={3} className="p-3 text-right text-slate-400 uppercase text-[10px]">
-                          Voucher Balance Total:
+                          {t('common_total', 'Total')}:
                         </td>
                         <td className="p-3 text-right text-indigo-300">
                           {entry.lines
@@ -405,39 +408,39 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 sm:grid-cols-6 gap-3">
             <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Accounts</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{tr('Total Accounts')}</span>
               <p className="text-lg font-mono font-bold text-white mt-0.5">{totalAccountsCount}</p>
-              <span className="text-[10px] text-emerald-400 font-medium">{activeAccountsCount} Active</span>
+              <span className="text-[10px] text-emerald-400 font-medium">{activeAccountsCount} {tr('Active')}</span>
             </div>
 
             <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">Assets</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400">{t('common_assets', 'Assets')}</span>
               <p className="text-lg font-mono font-bold text-indigo-300 mt-0.5">{totalAssetCount}</p>
-              <span className="text-[10px] text-slate-400">Debit Normal</span>
+              <span className="text-[10px] text-slate-400">{tr('Debit Normal')}</span>
             </div>
 
             <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Liabilities</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">{t('common_liabilities', 'Liabilities')}</span>
               <p className="text-lg font-mono font-bold text-amber-300 mt-0.5">{totalLiabilityCount}</p>
-              <span className="text-[10px] text-slate-400">Credit Normal</span>
+              <span className="text-[10px] text-slate-400">{tr('Credit Normal')}</span>
             </div>
 
             <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">Equity</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">{t('common_equity', 'Equity')}</span>
               <p className="text-lg font-mono font-bold text-purple-300 mt-0.5">{totalEquityCount}</p>
-              <span className="text-[10px] text-slate-400">Reserves & Capital</span>
+              <span className="text-[10px] text-slate-400">{tr('Reserves & Capital')}</span>
             </div>
 
             <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Revenue</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">{t('common_revenue', 'Revenue')}</span>
               <p className="text-lg font-mono font-bold text-emerald-300 mt-0.5">{totalRevenueCount}</p>
-              <span className="text-[10px] text-slate-400">Income Accounts</span>
+              <span className="text-[10px] text-slate-400">{tr('Income Accounts')}</span>
             </div>
 
             <div className="p-3 bg-slate-900 rounded-2xl border border-slate-800 text-left">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">Expenses</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-rose-400">{t('common_expenses', 'Expenses')}</span>
               <p className="text-lg font-mono font-bold text-rose-300 mt-0.5">{totalExpenseCount}</p>
-              <span className="text-[10px] text-slate-400">COGS & Operating</span>
+              <span className="text-[10px] text-slate-400">{tr('COGS & Operating')}</span>
             </div>
           </div>
 
@@ -445,7 +448,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
           <div className="flex flex-wrap items-center justify-between gap-2 bg-slate-900/60 p-2 rounded-2xl border border-slate-800">
             <div className="flex flex-wrap items-center gap-1 text-xs">
               <span className="text-[11px] font-bold text-slate-400 px-2 flex items-center gap-1">
-                <Filter className="w-3.5 h-3.5" /> Type Filter:
+                <Filter className="w-3.5 h-3.5" /> {t('common_filter', 'Filter')}:
               </span>
               {(['ALL', 'ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE', 'ARCHIVED'] as const).map((filterVal) => (
                 <button
@@ -458,17 +461,17 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                   }`}
                 >
                   {filterVal === 'ALL'
-                    ? `All (${accounts.filter((a) => a.isActive !== false).length})`
+                    ? `${t('common_all', 'All')} (${accounts.filter((a) => a.isActive !== false).length})`
                     : filterVal === 'ARCHIVED'
-                    ? `Archived (${accounts.filter((a) => a.isActive === false).length})`
-                    : `${filterVal} (${accounts.filter((a) => a.type === filterVal && a.isActive !== false).length})`}
+                    ? `${tr('Archived')} (${accounts.filter((a) => a.isActive === false).length})`
+                    : `${tr(filterVal)} (${accounts.filter((a) => a.type === filterVal && a.isActive !== false).length})`}
                 </button>
               ))}
             </div>
 
             <div className="flex items-center gap-2 text-xs text-slate-400 pr-2">
               <span className="text-[11px]">
-                Showing <strong>{filteredAccounts.length}</strong> of {accounts.length} accounts
+                {tr('Showing')} <strong>{filteredAccounts.length}</strong> {tr('of')} {accounts.length} {tr('accounts')}
               </span>
             </div>
           </div>
@@ -479,21 +482,21 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
               <table className="w-full text-left text-xs text-slate-300">
                 <thead className="bg-slate-950 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800 sticky top-0">
                   <tr>
-                    <th className="p-3.5">Code</th>
-                    <th className="p-3.5">Account Title & Description</th>
-                    <th className="p-3.5">Major Type</th>
-                    <th className="p-3.5">Group / Sub-Category</th>
-                    <th className="p-3.5 text-center">Normal Bal</th>
-                    <th className="p-3.5 text-right">Net GL Balance</th>
-                    <th className="p-3.5 text-center">Status</th>
-                    <th className="p-3.5 text-right">Actions</th>
+                    <th className="p-3.5">{tr('Account Code')}</th>
+                    <th className="p-3.5">{tr('Account Title & Description')}</th>
+                    <th className="p-3.5">{tr('Account Type')}</th>
+                    <th className="p-3.5">{tr('Group / Sub-Category')}</th>
+                    <th className="p-3.5 text-center">{tr('Normal Bal')}</th>
+                    <th className="p-3.5 text-right">{t('common_balance', 'Net GL Balance')}</th>
+                    <th className="p-3.5 text-center">{t('common_status', 'Status')}</th>
+                    <th className="p-3.5 text-right">{t('common_actions', 'Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
                   {filteredAccounts.length === 0 ? (
                     <tr>
                       <td colSpan={8} className="p-8 text-center text-slate-500 font-sans">
-                        No accounts match the selected classification or search query.
+                        {tr('No accounts match the selected classification or search query.')}
                       </td>
                     </tr>
                   ) : (
@@ -539,7 +542,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                                   : 'bg-rose-500/20 text-rose-300'
                               }`}
                             >
-                              {acc.type}
+                              {tr(acc.type)}
                             </span>
                           </td>
                           <td className="p-3.5 font-sans text-slate-300">
@@ -549,7 +552,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                           </td>
                           <td className="p-3.5 text-center font-bold text-[10px]">
                             <span className={normalBal === 'DEBIT' ? 'text-cyan-400' : 'text-amber-400'}>
-                              {normalBal}
+                              {tr(normalBal)}
                             </span>
                           </td>
                           <td
@@ -567,11 +570,11 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                           <td className="p-3.5 text-center">
                             {isArchived ? (
                               <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-800 text-slate-400 border border-slate-700">
-                                Inactive
+                                {tr('Inactive')}
                               </span>
                             ) : (
                               <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">
-                                Active
+                                {tr('Active')}
                               </span>
                             )}
                           </td>
@@ -580,7 +583,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                               <button
                                 onClick={() => handleOpenEditAccount(acc)}
                                 className="p-1.5 text-slate-400 hover:text-amber-300 hover:bg-amber-500/10 rounded-lg transition cursor-pointer"
-                                title="Edit / Modify Account"
+                                title={t('common_edit', 'Edit / Modify Account')}
                               >
                                 <Edit3 className="w-3.5 h-3.5" />
                               </button>
@@ -590,7 +593,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                                   setDeleteError(null);
                                 }}
                                 className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition cursor-pointer"
-                                title="Delete or Archive Account"
+                                title={t('common_delete', 'Delete or Archive Account')}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>

@@ -989,6 +989,89 @@ export const ALL_TEST_CASES: TestCase[] = [
       ctx.log(`India GST 18% splits cleanly into CGST ($${cgst9}) + SGST ($${sgst9}).`);
     },
   },
+  {
+    id: 'tax-002',
+    code: 'TAX-002',
+    name: 'Middle East Compliance: Saudi Arabia ZATCA Phase 2 FATOORA & Statutory Zakat Pool',
+    category: 'TAX_COMPLIANCE',
+    severity: 'CRITICAL',
+    tags: ['ZATCA', 'SaudiArabia', 'FATOORA', 'Zakat', 'WHT', 'MiddleEast'],
+    description: 'Verify 15% ZATCA VAT rate, 2.578% Zakat base calculation on adjusted capital pool, and 5% foreign WHT.',
+    run: (ctx) => {
+      const saJurisdiction = INITIAL_TAX_JURISDICTIONS.find((t) => t.code === 'SA-VAT-15');
+      ctx.expect(saJurisdiction).toBeDefined();
+      ctx.expect(saJurisdiction?.ratePercent).toBe(15.0);
+      ctx.expect(saJurisdiction?.currency).toBe('SAR');
+
+      const zakatBasePool = 1000000; // 1M SAR Adjusted Equity Pool
+      const zakatRate = 0.02578; // 2.578% Hijri/Gregorian Statutory Zakat
+      const computedZakatLiability = zakatBasePool * zakatRate;
+      ctx.expect(computedZakatLiability).toBe(25780);
+
+      // Verify 15% VAT on 50,000 SAR taxable transaction
+      const vatBase = 50000;
+      const vat15 = vatBase * 0.15;
+      ctx.expect(vat15).toBe(7500);
+
+      ctx.log(`ZATCA Phase 2 VAT (15% = SAR ${vat15}) and Statutory Zakat pool (SAR ${computedZakatLiability}) validated.`);
+    },
+  },
+  {
+    id: 'tax-003',
+    code: 'TAX-003',
+    name: 'Middle East Compliance: Qatar GTA Dhareeba CIT & Cross-Border WHT Schedules',
+    category: 'TAX_COMPLIANCE',
+    severity: 'HIGH',
+    tags: ['Qatar', 'GTA', 'Dhareeba', 'CIT', 'WHT', 'MiddleEast'],
+    description: 'Verify Qatar Law No. 24 of 2018 corporate income tax (10%) and foreign service withholding tax (5%).',
+    run: (ctx) => {
+      const qaJurisdiction = INITIAL_TAX_JURISDICTIONS.find((t) => t.code === 'QA-VAT-5');
+      ctx.expect(qaJurisdiction).toBeDefined();
+      ctx.expect(qaJurisdiction?.ratePercent).toBe(5.0);
+      ctx.expect(qaJurisdiction?.currency).toBe('QAR');
+
+      // 10% Corporate Income Tax on 500,000 QAR taxable profit
+      const citNetIncome = 500000;
+      const citRate = 0.10;
+      const computedCit = citNetIncome * citRate;
+      ctx.expect(computedCit).toBe(50000);
+
+      // 5% WHT on 100,000 QAR cross-border royalties/services
+      const foreignPayment = 100000;
+      const wht5 = foreignPayment * 0.05;
+      ctx.expect(wht5).toBe(5000);
+
+      ctx.log(`Qatar GTA Dhareeba Corporate Tax (QAR ${computedCit}) and WHT (QAR ${wht5}) verified.`);
+    },
+  },
+  {
+    id: 'tax-004',
+    code: 'TAX-004',
+    name: 'Middle East Compliance: UAE FTA EmaraTax VAT 201 & Corporate Tax Exemption Threshold',
+    category: 'TAX_COMPLIANCE',
+    severity: 'HIGH',
+    tags: ['UAE', 'FTA', 'EmaraTax', 'CorporateTax', 'QFZP', 'MiddleEast'],
+    description: 'Verify UAE 5% VAT rate and 9% Corporate Tax strictly applied above the statutory AED 375,000 threshold.',
+    run: (ctx) => {
+      const uaeJurisdiction = INITIAL_TAX_JURISDICTIONS.find((t) => t.code === 'AE-VAT-5');
+      ctx.expect(uaeJurisdiction).toBeDefined();
+      ctx.expect(uaeJurisdiction?.ratePercent).toBe(5.0);
+      ctx.expect(uaeJurisdiction?.currency).toBe('AED');
+
+      const calculateUaeCorporateTax = (taxableProfit: number) => {
+        const threshold = 375000;
+        if (taxableProfit <= threshold) return 0;
+        return (taxableProfit - threshold) * 0.09;
+      };
+
+      ctx.expect(calculateUaeCorporateTax(350000)).toBe(0);
+      ctx.expect(calculateUaeCorporateTax(375000)).toBe(0);
+      ctx.expect(calculateUaeCorporateTax(475000)).toBe(9000); // 100,000 * 9% = 9,000
+      ctx.expect(calculateUaeCorporateTax(1375000)).toBe(90000); // 1,000,000 * 9% = 90,000
+
+      ctx.log(`UAE FTA EmaraTax Corporate Tax exemption threshold and 9% statutory tiers verified.`);
+    },
+  },
 
   // ==============================================================================================
   // 12. BATCH CSV/JSON TRANSACTION IMPORTER

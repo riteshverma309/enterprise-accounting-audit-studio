@@ -34,8 +34,10 @@ import {
   Zap,
   Code2,
   Clock,
+  ALargeSmall,
 } from 'lucide-react';
 import { TabType } from './Sidebar';
+import { FontSizeControl } from './FontSizeControl';
 
 interface HelpCenterViewProps {
   setActiveTab?: (tab: TabType) => void;
@@ -220,6 +222,15 @@ Tenant: ${activeTenant.name} (${activeTenant.currency})
       icon: <Sparkles className="w-4 h-4 text-indigo-400" />,
       description:
         'Automated journal entry anomaly detection, variance explanation, and natural-language audit inquiries.',
+    },
+    {
+      id: 'accessibility-display',
+      title: 'Display & Font Sizing Settings',
+      category: 'Accessibility',
+      badge: 'User Preferences',
+      icon: <ALargeSmall className="w-4 h-4 text-indigo-400" />,
+      description:
+        'Customize application typography scaling, compact spreadsheet density, standard layout, large audit views, or high accessibility mode.',
     },
   ];
 
@@ -1082,6 +1093,32 @@ Tenant: ${activeTenant.name} (${activeTenant.currency})
                 <p>
                   The AI Audit Copilot inspects journal lines for unusual amounts, round-trip transactions, unapproved weekend postings, and tax calculation variances.
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* ========================================================================= */}
+          {/* TOPIC 10: ACCESSIBILITY & DISPLAY SETTINGS */}
+          {/* ========================================================================= */}
+          {selectedTopicId === 'accessibility-display' && (
+            <div className="space-y-6">
+              <FontSizeControl variant="full_panel" />
+
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+                <h3 className="text-sm font-bold text-white">Font Size Scaling Architecture</h3>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  The Enterprise Audit Studio uses standard REM-based visual typography calculations. When you modify the font size in the header toolbar or in this settings panel:
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-400">
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+                    <span className="font-semibold text-slate-200">Real-Time Fluid Scaling:</span>
+                    <p>All chart labels, general ledger rows, journal inputs, and data grid tables adapt immediately without requiring page refresh.</p>
+                  </div>
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
+                    <span className="font-semibold text-slate-200">Local Browser Persistence:</span>
+                    <p>Your chosen zoom and font size preferences are automatically saved in local browser storage across all tenant entities and sessions.</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

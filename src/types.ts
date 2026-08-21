@@ -1,5 +1,5 @@
 export type Role = 'super_user' | 'entity_admin' | 'admin' | 'controller' | 'accountant' | 'junior_accountant' | 'auditor' | 'viewer' | 'vendor' | 'customer';
-export type PluginId = 'us_gaap' | 'eu_ifrs' | 'in_gst';
+export type PluginId = 'us_gaap' | 'eu_ifrs' | 'in_gst' | 'sa_zatca' | 'qa_gta' | 'ae_fta';
 
 export interface Tenant {
   id: string;
@@ -161,7 +161,15 @@ export interface AuditLogEvent {
     | 'AI_TOKEN_QUOTA_RESET'
     | 'AI_COPILOT_QUERY'
     | 'UPDATE_ROLE_MENU_ACCESS'
-    | 'RESET_ROLE_MENU_DEFAULTS';
+    | 'RESET_ROLE_MENU_DEFAULTS'
+    | 'PURCHASE_ORDER_CREATE'
+    | 'PURCHASE_ORDER_UPDATE'
+    | 'PURCHASE_ORDER_SUBMIT'
+    | 'PURCHASE_ORDER_APPROVE'
+    | 'PURCHASE_ORDER_REJECT'
+    | 'PURCHASE_ORDER_RECEIVE'
+    | 'PURCHASE_ORDER_CONVERT_BILL'
+    | 'PO_APPROVAL_MATRIX_UPDATE';
   tenantId: string;
   organizationId?: string;
   branchId?: string;
@@ -182,6 +190,40 @@ export interface InvoiceLineItem {
   amount: number;
   taxRate: number;
   unitOfMeasure?: string;
+}
+
+export interface ZatcaComplianceData {
+  uuid: string;
+  invoiceHash: string; // SHA-256 Digest
+  previousInvoiceHash: string; // Cryptographic chain PIH
+  cryptographicStamp: string; // ECDSA secp256k1 signature
+  qrCodeTLV: string; // Base64 TLV string (Seller, VAT#, Time, Total, VAT, Hash, Stamp)
+  complianceStatus: 'CLEARED' | 'REPORTED' | 'WARNING';
+  invoiceType: 'TAX_INVOICE_B2B' | 'SIMPLIFIED_B2C';
+  buyerVatNumber?: string;
+  buyerCrNumber?: string;
+  arabicDescription?: string;
+  clearanceTimestamp?: string;
+  csidIdentifier?: string;
+}
+
+export interface QatarGtaComplianceData {
+  tin: string; // Dhareeba Tax Identification Number
+  dhareebaRef: string;
+  qrCode: string;
+  status: 'APPROVED' | 'SUBMITTED';
+  isQfcRegulated?: boolean;
+  withholdingTaxApplicable?: boolean;
+  whtRate?: number;
+  whtAmount?: number;
+}
+
+export interface UaeFtaComplianceData {
+  trn: string; // Tax Registration Number (15 digits)
+  emaraTaxRef: string;
+  isFreeZoneQualifying?: boolean;
+  corporateTaxRate?: number;
+  qrCode: string;
 }
 
 export interface CustomerInvoice {
@@ -207,6 +249,9 @@ export interface CustomerInvoice {
   balanceType?: 'DR' | 'CR'; // DR = Receivable / Owes, CR = Advance / Overpayment
   fiscalYearOpening?: string;
   offsetAccountCode?: string;
+  zatcaCompliance?: ZatcaComplianceData;
+  qatarGtaCompliance?: QatarGtaComplianceData;
+  uaeFtaCompliance?: UaeFtaComplianceData;
 }
 
 export type PaymentMethodType = 'BANK_TRANSFER' | 'ACH' | 'CHECK' | 'CREDIT_CARD' | 'UPI' | 'CASH' | 'OTHER';
@@ -452,7 +497,7 @@ export interface DepartmentBudget {
 export interface ApprovalPolicy {
   id: string;
   tenantId: string;
-  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE';
+  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PURCHASE_ORDER';
   thresholdAmount: number;
   requiredRole: Role;
 }
@@ -460,7 +505,7 @@ export interface ApprovalPolicy {
 export interface ApprovalItem {
   id: string;
   tenantId: string;
-  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PAYROLL_RUN' | 'EXPENSE_CLAIM' | 'PERIOD_REOPEN' | 'BACKUP_RESTORE';
+  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PAYROLL_RUN' | 'EXPENSE_CLAIM' | 'PERIOD_REOPEN' | 'BACKUP_RESTORE' | 'PURCHASE_ORDER';
   referenceNumber: string;
   amount: number;
   currency: string;
@@ -482,10 +527,13 @@ export interface TaxJurisdiction {
   tenantId: string;
   code: string;
   name: string;
-  taxType: 'SALES_TAX' | 'VAT' | 'GST';
+  currency?: string;
+  taxType: 'SALES_TAX' | 'VAT' | 'GST' | 'ZAKAT_CIT' | 'WHT' | 'CORPORATE_TAX';
   ratePercent: number;
   filingFrequency: 'MONTHLY' | 'QUARTERLY' | 'ANNUAL';
   ytdAccruedTax: number;
+  authorityName?: string;
+  portalName?: string;
 }
 
 export type PermissionKey =
@@ -507,6 +555,17 @@ export type PermissionKey =
   | 'ap:create_bill'
   | 'ap:approve_bill'
   | 'ap:disburse_funds'
+  // Purchase Orders & Procurement
+  | 'po:view'
+  | 'po:create'
+  | 'po:edit'
+  | 'po:submit'
+  | 'po:approve_l1'
+  | 'po:approve_l2'
+  | 'po:approve_l3'
+  | 'po:receive_goods'
+  | 'po:convert_bill'
+  | 'po:configure_matrix'
   // Expenses & Mileage
   | 'expenses:submit'
   | 'expenses:approve'
@@ -635,6 +694,7 @@ export type TabType =
   | 'invoicing_ar'
   | 'recurring_billing'
   | 'payables_ap'
+  | 'purchase_orders'
   | 'expenses'
   | 'inventory'
   | 'employees'
@@ -694,7 +754,7 @@ export interface ConfigurableApprovalRule {
   id: string;
   tenantId: string;
   ruleName: string;
-  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PAYROLL_RUN' | 'EXPENSE_CLAIM' | 'PERIOD_REOPEN' | 'BACKUP_RESTORE';
+  entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PAYROLL_RUN' | 'EXPENSE_CLAIM' | 'PERIOD_REOPEN' | 'BACKUP_RESTORE' | 'PURCHASE_ORDER';
   thresholdAmount: number; // 0 means all requests require approval
   requiredRole: Role;
   requiredPermission: PermissionKey;
@@ -1373,4 +1433,125 @@ export interface IntegrationConnector {
   };
   presetTriggerSample?: any;
 }
+
+export type FontSizePreset = 'compact' | 'standard' | 'large' | 'xlarge' | 'custom';
+
+export interface FontSizeOption {
+  id: FontSizePreset;
+  label: string;
+  subLabel: string;
+  scalePercent: number; // e.g. 87.5, 100, 112.5, 125
+  basePx: number; // 14, 16, 18, 20
+  description: string;
+  recommendedFor: string;
+}
+
+// -------------------------------------------------------------
+// PURCHASE ORDER MANAGEMENT & CONFIGURABLE APPROVAL WORKFLOW
+// -------------------------------------------------------------
+
+export type PurchaseOrderStatus =
+  | 'DRAFT'
+  | 'PENDING_APPROVAL'
+  | 'APPROVED'
+  | 'REJECTED'
+  | 'SENT_TO_VENDOR'
+  | 'PARTIALLY_RECEIVED'
+  | 'RECEIVED'
+  | 'BILLED'
+  | 'CANCELLED';
+
+export interface PurchaseOrderLineItem {
+  id: string;
+  productId?: string;
+  productCode?: string;
+  description: string;
+  quantity: number;
+  receivedQuantity: number;
+  unitPrice: number;
+  taxRate: number; // Percentage, e.g. 10 for 10%
+  taxAmount: number;
+  amount: number; // Subtotal before tax or gross
+  totalAmount: number; // Inclusive of tax
+  unitOfMeasure?: string;
+  expenseAccountCode?: string;
+}
+
+export interface PurchaseOrderApprovalStep {
+  id: string;
+  level: number;
+  tierId: string;
+  tierName: string;
+  requiredRole: Role;
+  minThreshold: number;
+  maxThreshold?: number;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SKIPPED' | 'NOT_STARTED';
+  actionBy?: string; // Approver/rejecter email
+  actionRole?: Role;
+  actionDate?: string;
+  comments?: string;
+  rejectionReason?: string;
+}
+
+export interface PurchaseOrder {
+  id: string;
+  poNumber: string; // e.g. PO-2026-0001
+  tenantId: string;
+  vendorId: string;
+  vendorName: string;
+  vendorEmail?: string;
+  vendorCode?: string;
+  issueDate: string;
+  expectedDeliveryDate: string;
+  currency: string;
+  department: string;
+  requestedBy: string; // Maker email
+  requestedByName?: string;
+  requestedRole: Role;
+  items: PurchaseOrderLineItem[];
+  subtotal: number;
+  taxTotal: number;
+  totalAmount: number;
+  status: PurchaseOrderStatus;
+  currentApprovalLevel: number; // 1, 2, 3... or 0 if draft/approved
+  requiredApprovalLevels: number; // total levels needed based on threshold
+  approvalAuditTrail: PurchaseOrderApprovalStep[];
+  vendorBillId?: string; // Linked AP Vendor Bill when converted
+  vendorBillNumber?: string;
+  shippingAddress?: string;
+  billingAddress?: string;
+  paymentTerms?: string;
+  notes?: string;
+  rejectionReason?: string;
+  isFullyReceived?: boolean;
+  isFullyBilled?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PoApprovalTierConfig {
+  id: string;
+  tenantId: string;
+  level: number; // 1, 2, 3...
+  name: string; // e.g. "Tier 1: Department Manager Sign-Off"
+  description: string;
+  minAmount: number; // e.g. 0
+  maxAmount: number | null; // e.g. 5000, or null if no upper ceiling
+  requiredRole: Role;
+  requiredPermission: PermissionKey;
+  enforceMakerChecker: boolean; // Requester cannot approve their own PO
+  autoApproveBelowThreshold: boolean;
+  isEnabled: boolean;
+}
+
+export interface GoodsReceiptItem {
+  lineItemId: string;
+  description: string;
+  orderedQuantity: number;
+  previouslyReceivedQuantity: number;
+  quantityToReceive: number;
+  batchOrSerialNo?: string;
+  conditionNotes?: string;
+}
+
 

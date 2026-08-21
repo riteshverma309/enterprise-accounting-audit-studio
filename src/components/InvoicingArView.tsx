@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   Plus,
   Receipt,
@@ -90,6 +91,8 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
     getCustomerStatementData,
     processOnlineInvoicePayment,
   } = useAccounting();
+
+  const { t, tr } = useLanguage();
 
   // Online Payment Modal state
   const [onlinePayInvoice, setOnlinePayInvoice] = useState<any | null>(null);
@@ -589,10 +592,10 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
         <div>
           <h1 className="text-xl font-bold text-slate-100 flex items-center gap-2">
             <Receipt className="w-6 h-6 text-indigo-400" />
-            Accounts Receivable (AR) & Customer Invoicing
+            {t('tab_invoicing_ar', 'Accounts Receivable (AR) & Customer Invoicing')}
           </h1>
           <p className="text-xs text-slate-400">
-            Issue invoices linked to Customer Directory profiles, configure reusable line item templates, record opening FY balances, and inspect consolidated AR statements.
+            {tr('Issue invoices linked to Customer Directory profiles, configure reusable line item templates, record opening FY balances, and inspect consolidated AR statements.')}
           </p>
         </div>
 
@@ -603,7 +606,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
             className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold rounded-lg text-xs shadow-md shadow-indigo-600/30 transition cursor-pointer"
           >
             <Layers className="w-3.5 h-3.5" />
-            Bulk Generate Invoices
+            {tr('Bulk Generate Invoices')}
           </button>
 
           <button
@@ -612,7 +615,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
             className="flex items-center gap-1.5 px-3 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-semibold rounded-lg text-xs border border-amber-500/30 transition cursor-pointer"
           >
             <Calendar className="w-3.5 h-3.5 text-amber-400" />
-            Record FY Opening Balance
+            {tr('Record FY Opening Balance')}
           </button>
 
           <button
@@ -625,7 +628,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
             className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs shadow-md shadow-emerald-600/20 transition cursor-pointer"
           >
             <DollarSign className="w-3.5 h-3.5" />
-            Receive Customer Payment
+            {tr('Receive Customer Payment')}
           </button>
 
           <button
@@ -638,7 +641,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
             className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg text-xs shadow-md shadow-indigo-600/20 transition cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            Issue Customer Invoice
+            {tr('Issue Customer Invoice')}
           </button>
         </div>
       </div>
@@ -655,7 +658,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           }`}
         >
           <Receipt className="w-4 h-4" />
-          <span>Customer Invoices & Aging</span>
+          <span>{tr('Customer Invoices & Aging')}</span>
           <span
             className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
               activeTab === 'INVOICES' ? 'bg-indigo-800 text-indigo-100' : 'bg-slate-800 text-slate-400'
@@ -675,13 +678,13 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           }`}
         >
           <Layers className="w-4 h-4 text-purple-400" />
-          <span>Bulk Invoicing Engine</span>
+          <span>{tr('Bulk Invoicing Engine')}</span>
           <span
             className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
               activeTab === 'BULK_GENERATION' ? 'bg-indigo-800 text-indigo-100' : 'bg-purple-950/60 text-purple-300 border border-purple-800/50'
             }`}
           >
-            {bulkInvoiceBatches.length} Runs
+            {bulkInvoiceBatches.length} {tr('Runs')}
           </span>
         </button>
 
@@ -695,7 +698,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           }`}
         >
           <User className="w-4 h-4 text-emerald-400" />
-          <span>Customer 360 & Consolidated AR</span>
+          <span>{tr('Customer 360 & Consolidated AR')}</span>
           <span
             className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
               activeTab === 'STATEMENTS' ? 'bg-emerald-800 text-emerald-100' : 'bg-slate-800 text-slate-400'
@@ -715,7 +718,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           }`}
         >
           <FileText className="w-4 h-4" />
-          <span>Invoice Templates Master</span>
+          <span>{tr('Invoice Templates Master')}</span>
           <span
             className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
               activeTab === 'TEMPLATES' ? 'bg-indigo-800 text-indigo-100' : 'bg-slate-800 text-slate-400'
@@ -731,7 +734,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
             className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-950/40 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-500/30 transition cursor-pointer"
           >
             <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Help Guide & Simulator</span>
+            <span>{tr('Help Guide & Simulator')}</span>
           </button>
         )}
       </div>
@@ -762,35 +765,35 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-semibold">Total AR Outstanding</span>
+            <span className="text-xs font-semibold">{tr('Total AR Outstanding')}</span>
             <DollarSign className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold text-slate-100 font-mono">
             {activeTenant.currency} {totalAr.toLocaleString()}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Uncollected customer balances</p>
+          <p className="text-[11px] text-slate-500 mt-1">{tr('Uncollected customer balances')}</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-semibold">Collected Cash Payments</span>
+            <span className="text-xs font-semibold">{tr('Collected Cash Payments')}</span>
             <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-emerald-400 font-mono">
             {activeTenant.currency} {paidAr.toLocaleString()}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Settled into General Ledger bank accounts</p>
+          <p className="text-[11px] text-slate-500 mt-1">{tr('Settled into General Ledger bank accounts')}</p>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl">
           <div className="flex items-center justify-between text-slate-400 mb-1">
-            <span className="text-xs font-semibold">Overdue Receivables Risk</span>
+            <span className="text-xs font-semibold">{tr('Overdue Receivables Risk')}</span>
             <AlertCircle className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold text-amber-400 font-mono">
             {activeTenant.currency} {overdueAr.toLocaleString()}
           </div>
-          <p className="text-[11px] text-slate-500 mt-1">Invoices past standard payment terms</p>
+          <p className="text-[11px] text-slate-500 mt-1">{tr('Invoices past standard payment terms')}</p>
         </div>
       </div>
 
@@ -800,13 +803,13 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           <div className="flex items-center gap-3">
             <div>
               <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-                <span>Customer Invoice Register</span>
+                <span>{tr('Customer Invoice Register')}</span>
                 <span className="text-[11px] font-normal px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
-                  {filteredInvoices.length} of {tenantInvoices.length} Invoices
+                  {filteredInvoices.length} {tr('of')} {tenantInvoices.length} {tr('Invoices')}
                 </span>
               </h2>
               <p className="text-[11px] text-slate-400 mt-0.5">
-                Sub-ledger transaction register with aging analysis and GL integration
+                {tr('Sub-ledger transaction register with aging analysis and GL integration')}
               </p>
             </div>
           </div>
@@ -821,7 +824,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 type="text"
                 value={invoiceSearchTerm}
                 onChange={(e) => setInvoiceSearchTerm(e.target.value)}
-                placeholder="Search invoice #, customer..."
+                placeholder={tr('Search invoice #, customer...')}
                 className="w-full pl-8 pr-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500 transition"
               />
               {invoiceSearchTerm && (
@@ -846,15 +849,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  {st === 'ALL'
-                    ? 'All'
-                    : st === 'UNPAID'
-                    ? 'Unpaid'
-                    : st === 'PARTIALLY_PAID'
-                    ? 'Part Paid'
-                    : st === 'PAID'
-                    ? 'Paid'
-                    : 'Overdue'}
+                  {st === 'ALL' ? t('common_all', 'All') : tr(st)}
                 </button>
               ))}
             </div>
@@ -865,10 +860,10 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 id="btn-export-invoices-excel"
                 onClick={() => setShowExportDropdown(!showExportDropdown)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 transition shadow-2xs cursor-pointer"
-                title="Export customer invoices & aging to Excel (.xlsx)"
+                title={tr('Export customer invoices & aging to Excel (.xlsx)')}
               >
                 <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Export to Excel</span>
+                <span>{tr('Export to Excel')}</span>
                 <ChevronDown className="w-3.5 h-3.5 text-emerald-400" />
               </button>
 
@@ -878,7 +873,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="px-3 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800">
-                    Export Financial Data
+                    {tr('Export Financial Data')}
                   </div>
 
                   <button
@@ -888,8 +883,8 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   >
                     <FileSpreadsheet className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-slate-100">Customer Invoices Register (.xlsx)</div>
-                      <div className="text-[10px] text-slate-400">All {tenantInvoices.length} invoices with line items & aging status</div>
+                      <div className="font-semibold text-slate-100">{tr('Customer Invoices Register (.xlsx)')}</div>
+                      <div className="text-[10px] text-slate-400">{tr('All invoices with line items & aging status')}</div>
                     </div>
                   </button>
 
@@ -900,8 +895,8 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   >
                     <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-slate-100">AR Aging Matrix & Schedule (.xlsx)</div>
-                      <div className="text-[10px] text-slate-400">Customer portfolio matrix + itemized aging buckets</div>
+                      <div className="font-semibold text-slate-100">{tr('AR Aging Matrix & Schedule (.xlsx)')}</div>
+                      <div className="text-[10px] text-slate-400">{tr('Customer portfolio matrix + itemized aging buckets')}</div>
                     </div>
                   </button>
 
@@ -913,8 +908,8 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                     >
                       <Filter className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
                       <div>
-                        <div className="font-semibold text-slate-100">Filtered Invoices Only (.xlsx)</div>
-                        <div className="text-[10px] text-slate-400">Export active search & filter ({filteredInvoices.length} records)</div>
+                        <div className="font-semibold text-slate-100">{tr('Filtered Invoices Only (.xlsx)')}</div>
+                        <div className="text-[10px] text-slate-400">{tr('Export active search & filter records')}</div>
                       </div>
                     </button>
                   ) : null}
@@ -926,8 +921,8 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   >
                     <FileDown className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                     <div>
-                      <div className="font-semibold text-slate-100">Export Invoices as CSV (.csv)</div>
-                      <div className="text-[10px] text-slate-400">Standard delimited format for pipelines</div>
+                      <div className="font-semibold text-slate-100">{tr('Export Invoices as CSV (.csv)')}</div>
+                      <div className="text-[10px] text-slate-400">{tr('Standard delimited format for pipelines')}</div>
                     </div>
                   </button>
                 </div>
@@ -940,14 +935,14 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] tracking-wider">
               <tr>
-                <th className="p-3">Invoice #</th>
-                <th className="p-3">Customer / Entity</th>
-                <th className="p-3">Issue Date</th>
-                <th className="p-3">Due Date</th>
-                <th className="p-3 text-right">Total Amount</th>
-                <th className="p-3 text-right">Amount Paid</th>
-                <th className="p-3 text-center">Status</th>
-                <th className="p-3 text-right">Actions</th>
+                <th className="p-3">{tr('Invoice #')}</th>
+                <th className="p-3">{tr('Customer / Entity')}</th>
+                <th className="p-3">{tr('Issue Date')}</th>
+                <th className="p-3">{tr('Due Date')}</th>
+                <th className="p-3 text-right">{tr('Total Amount')}</th>
+                <th className="p-3 text-right">{tr('Amount Paid')}</th>
+                <th className="p-3 text-center">{t('common_status', 'Status')}</th>
+                <th className="p-3 text-right">{t('common_actions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 font-mono">
@@ -1022,7 +1017,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                                 : 'bg-amber-500/10 text-amber-400 border border-amber-500/30'
                             }`}
                           >
-                            {inv.status}
+                            {tr(inv.status)}
                           </span>
                         </td>
                         <td className="p-3 text-right font-sans">
@@ -1035,9 +1030,9 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                                     setOnlinePaySuccessMessage(null);
                                   }}
                                   className="px-2.5 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded text-[11px] font-semibold shadow transition cursor-pointer flex items-center gap-1"
-                                  title="Open Online Customer Checkout & Payment Portal"
+                                  title={tr('Open Online Customer Checkout & Payment Portal')}
                                 >
-                                  <CreditCard className="w-3 h-3" /> Pay Online
+                                  <CreditCard className="w-3 h-3" /> {tr('Pay Online')}
                                 </button>
                                 <button
                                   onClick={() => {
@@ -1047,11 +1042,11 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                                   }}
                                   className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[11px] font-semibold shadow transition cursor-pointer"
                                 >
-                                  Receive Payment
+                                  {tr('Receive Payment')}
                                 </button>
                               </>
                             ) : (
-                              <span className="text-slate-500 text-[11px] px-2 py-0.5">Settled</span>
+                              <span className="text-slate-500 text-[11px] px-2 py-0.5">{tr('Settled')}</span>
                             )}
                             <button
                               onClick={() => {
@@ -1059,7 +1054,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                                 setActiveTab('STATEMENTS');
                               }}
                               className="p-1 text-slate-400 hover:text-emerald-400 hover:bg-slate-800 rounded transition cursor-pointer"
-                              title="View Customer Statement"
+                              title={tr('View Customer Statement')}
                             >
                               <FileText className="w-3.5 h-3.5" />
                             </button>
@@ -1504,7 +1499,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
               </div>
 
               <div className="p-3 bg-indigo-950/30 border border-indigo-800/40 rounded-xl text-[11px] text-indigo-300">
-                <span className="font-semibold">Automated Double-Entry Posting:</span> Debit Accounts Receivable (1100), Credit Revenue Account ({revenueAccCode}), Credit Tax Liability Account.
+                <span className="font-semibold">{tr('Automated Double-Entry Posting')}:</span> {tr('Debit Accounts Receivable (1100), Credit Revenue Account')}, {tr('Credit Tax Liability Account')}.
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
@@ -1513,13 +1508,13 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   onClick={() => setShowCreateModal(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer"
                 >
-                  Cancel
+                  {t('common_cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 cursor-pointer"
                 >
-                  Issue & Post Invoice
+                  {tr('Issue & Post Invoice')}
                 </button>
               </div>
             </form>
@@ -1533,13 +1528,13 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-emerald-400" />
-              Receive Payment for Invoice
+              {tr('Receive Payment for Invoice')}
             </h3>
 
             <form onSubmit={handleReceivePaymentSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Payment Amount ({activeTenant.currency})
+                  {tr('Payment Amount')} ({activeTenant.currency})
                 </label>
                 <input
                   type="number"
@@ -1553,7 +1548,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Deposit to GL Bank Account
+                  {tr('Deposit to GL Bank Account')}
                 </label>
                 <select
                   value={bankAccountId}
@@ -1571,7 +1566,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
               </div>
 
               <div className="p-3 bg-emerald-950/30 border border-emerald-800/40 rounded-xl text-[11px] text-emerald-300">
-                <span className="font-semibold">Automated Double-Entry Posting:</span> Debit Selected Bank Account, Credit Accounts Receivable (1100).
+                <span className="font-semibold">{tr('Automated Double-Entry Posting')}:</span> {tr('Debit Selected Bank Account, Credit Accounts Receivable (1100).')}
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
@@ -1580,13 +1575,13 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   onClick={() => setPaymentModalInvoice(null)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer"
                 >
-                  Cancel
+                  {t('common_cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/20 cursor-pointer"
                 >
-                  Record & Post Receipt
+                  {tr('Record & Post Receipt')}
                 </button>
               </div>
             </form>

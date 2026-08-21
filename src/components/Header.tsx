@@ -1,7 +1,10 @@
 import React, { useMemo, useEffect } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage } from '../context/LanguageContext';
 import { Building2, ShieldCheck, UserCheck, Scale, Globe2, ChevronDown, Plus, BookOpen, HelpCircle, HardDriveDownload, User, ShieldAlert } from 'lucide-react';
 import { Role } from '../types';
+import { FontSizeControl } from './FontSizeControl';
+import { LanguageSelector } from './LanguageSelector';
 
 interface HeaderProps {
   onOpenCreateTenantModal: () => void;
@@ -137,6 +140,8 @@ export const Header: React.FC<HeaderProps> = ({
     downloadCompanyBackup,
   } = useAccounting();
 
+  const { t, currentLanguageInfo } = useLanguage();
+
   // Identify currently simulated/active user from enterprise directory
   const currentUserObj = useMemo(() => {
     const users = enterpriseUsers || [];
@@ -243,13 +248,13 @@ export const Header: React.FC<HeaderProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-lg tracking-tight text-white">
-                  Enterprise Audit Studio
+                  {t('app_name')}
                 </span>
                 <span className="px-2 py-0.5 text-[10px] uppercase font-mono font-bold tracking-wider rounded bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                  API v1.4
+                  {t('api_version')}
                 </span>
               </div>
-              <p className="text-xs text-slate-400">Double-Entry Engine & Multi-Standard Auditor</p>
+              <p className="text-xs text-slate-400">{t('app_tagline')}</p>
             </div>
           </div>
 
@@ -263,13 +268,13 @@ export const Header: React.FC<HeaderProps> = ({
                 value={activeTenant.id}
                 onChange={(e) => handleTenantSelect(e.target.value)}
                 className="bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs rounded-lg px-3 py-1.5 border border-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer pr-8"
-                title={`Provisioned Entities (${allowedTenants.length} of ${tenants.length} available to ${currentUserObj?.name || 'user'})`}
+                title={`${t('provisioned_entities')} (${allowedTenants.length} of ${tenants.length} available to ${currentUserObj?.name || 'user'})`}
               >
-                {allowedTenants.map((t) => {
-                  const scopeRole = currentUserObj?.tenantScopes?.find((s) => s.tenantId === t.id)?.role;
+                {allowedTenants.map((tItem) => {
+                  const scopeRole = currentUserObj?.tenantScopes?.find((s) => s.tenantId === tItem.id)?.role;
                   return (
-                    <option key={t.id} value={t.id}>
-                      {t.name} ({t.code}) - {t.currency} {scopeRole ? `• [${scopeRole.replace('_', ' ')}]` : ''}
+                    <option key={tItem.id} value={tItem.id}>
+                      {tItem.name} ({tItem.code}) - {tItem.currency} {scopeRole ? `• [${scopeRole.replace('_', ' ')}]` : ''}
                     </option>
                   );
                 })}
@@ -281,7 +286,7 @@ export const Header: React.FC<HeaderProps> = ({
               className="hidden xl:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono bg-slate-800/80 text-slate-300 border border-slate-700 whitespace-nowrap"
               title={`${currentUserObj?.name || 'Selected user'} is provisioned for ${allowedTenants.length} out of ${tenants.length} total corporate entities.`}
             >
-              {allowedTenants.length === tenants.length ? 'Global Scope' : `${allowedTenants.length} of ${tenants.length} Entities`}
+              {allowedTenants.length === tenants.length ? t('global_scope') : `${allowedTenants.length} of ${tenants.length} ${t('entities_count')}`}
             </span>
 
             {/* Org / Branch Selectors */}
@@ -309,7 +314,7 @@ export const Header: React.FC<HeaderProps> = ({
             {(activeRole === 'super_user' || activeRole === 'admin') && (
               <button
                 onClick={onOpenCreateTenantModal}
-                title="Add New Tenant Entity"
+                title={t('add_tenant')}
                 className="p-1.5 bg-slate-800 hover:bg-indigo-600/30 text-slate-300 hover:text-indigo-300 rounded-lg border border-slate-700 transition"
               >
                 <Plus className="w-4 h-4" />
@@ -318,14 +323,14 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* Right: Request Context Headers, Plugin Standard, & User Role Simulation */}
-        <div className="flex items-center flex-wrap gap-3 text-xs">
+        {/* Right: Language Selector, Scale Control, Request Context, & User Role Simulation */}
+        <div className="flex items-center flex-wrap gap-2.5 text-xs">
           
           {/* Double-Entry Ledger Health Indicator OR SOX ITGC Indicator */}
           {activeRole === 'super_user' ? (
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full font-mono font-medium text-[11px] bg-purple-500/10 text-purple-300 border border-purple-500/30">
               <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
-              <span>SOX 404 SoD: SETUP ONLY</span>
+              <span>{t('sox_setup_only')}</span>
             </div>
           ) : (
             <div
@@ -336,8 +341,8 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <div className={`w-2 h-2 rounded-full ${balanceSheet.isBalanced ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
-              <span className="hidden xl:inline">{balanceSheet.isBalanced ? 'DEBITS = CREDITS BALANCED' : 'IMBALANCE DETECTED'}</span>
-              <span className="xl:hidden">{balanceSheet.isBalanced ? 'BALANCED' : 'IMBALANCE'}</span>
+              <span className="hidden xl:inline">{balanceSheet.isBalanced ? t('debits_credits_balanced') : t('imbalance_detected')}</span>
+              <span className="xl:hidden">{balanceSheet.isBalanced ? t('balanced_short') : t('imbalance_short')}</span>
             </div>
           )}
 
@@ -352,7 +357,7 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Simulated User Profile & User Switcher Dropdown */}
-          <div className="flex items-center gap-2.5 bg-slate-800/90 hover:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-sm transition">
+          <div className="flex items-center gap-2 bg-slate-800/90 hover:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-700/80 shadow-sm transition">
             {/* User Avatar with Initials */}
             <div
               className={`w-7 h-7 rounded-full bg-gradient-to-tr ${roleDetails.avatarGradient} flex items-center justify-center font-bold text-[11px] text-white shadow-inner shrink-0 ring-1 ring-white/10`}
@@ -371,7 +376,7 @@ export const Header: React.FC<HeaderProps> = ({
                   {roleDetails.roleLabel}
                 </span>
               </div>
-              <span className="text-[10px] text-slate-400 font-mono mt-0.5 leading-none truncate max-w-[140px] hidden sm:inline">
+              <span className="text-[10px] text-slate-400 font-mono mt-0.5 leading-none truncate max-w-[130px] hidden sm:inline">
                 {currentUserObj?.email || roleDetails.email}
               </span>
             </div>
@@ -383,8 +388,8 @@ export const Header: React.FC<HeaderProps> = ({
               <select
                 value={currentUserObj?.id || ''}
                 onChange={(e) => handleUserSelect(e.target.value)}
-                className="bg-slate-900/90 hover:bg-slate-900 text-slate-200 text-xs font-semibold rounded-lg pl-2.5 pr-7 py-1 border border-slate-700/80 focus:ring-1 focus:ring-indigo-500 outline-none cursor-pointer"
-                title="Select Active User & Simulate Provisioned Tenant Access"
+                className="bg-slate-900/90 hover:bg-slate-900 text-slate-200 text-xs font-semibold rounded-lg pl-2 pr-6 py-1 border border-slate-700/80 focus:ring-1 focus:ring-indigo-500 outline-none cursor-pointer max-w-[120px] truncate"
+                title={`${t('switch_user')}: ${currentUserObj?.name || 'Selected user'}`}
               >
                 {enterpriseUsers.map((u) => {
                   const scopeCount = u.defaultRole === 'super_user' ? 'Global' : `${u.tenantScopes?.length || 0} Entities`;
@@ -395,20 +400,25 @@ export const Header: React.FC<HeaderProps> = ({
                   );
                 })}
               </select>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 pointer-events-none" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-1.5 pointer-events-none" />
             </div>
           </div>
+
+          {/* Multilingual Language Selector at Top */}
+          <LanguageSelector variant="header_button" />
+
+          {/* Font Size & Display Scaling Control */}
+          <FontSizeControl variant="header_button" />
 
           {/* Backup & Restore Data Button */}
           {onOpenBackupModal && (
             <button
               onClick={onOpenBackupModal}
               title="1-Click Company Data Backup & Point-in-Time Restore"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
             >
               <HardDriveDownload className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="hidden sm:inline">Backup & Restore</span>
-              <span className="sm:hidden">Backup</span>
+              <span className="hidden sm:inline">{t('backup_restore_btn')}</span>
             </button>
           )}
 
@@ -417,10 +427,10 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenHelpCenter}
               title="Open Application Help Center & User Guide"
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
+              className="flex items-center gap-1.5 px-2.5 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5 text-indigo-400" />
-              <span>User Guide</span>
+              <span className="hidden sm:inline">{t('user_guide_btn')}</span>
             </button>
           )}
         </div>

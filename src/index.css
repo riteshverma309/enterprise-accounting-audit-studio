@@ -1,1 +1,9 @@
 @import "tailwindcss";
+
+:root {
+  --app-font-scale: 100%;
+}
+
+html {
+  transition: font-size 0.15s ease-out;
+}

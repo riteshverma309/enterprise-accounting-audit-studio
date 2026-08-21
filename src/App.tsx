@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AccountingProvider, useAccounting } from './context/AccountingContext';
+import { FontSizeProvider } from './context/FontSizeContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { Header } from './components/Header';
 import { Sidebar, TabType, SUPER_ADMIN_ALLOWED_TABS } from './components/Sidebar';
 import { SoxRestrictedBusinessDataView } from './components/SoxRestrictedBusinessDataView';
@@ -242,8 +244,12 @@ function MainLayout() {
 
 export default function App() {
   return (
-    <AccountingProvider>
-      <MainLayout />
-    </AccountingProvider>
+    <LanguageProvider>
+      <FontSizeProvider>
+        <AccountingProvider>
+          <MainLayout />
+        </AccountingProvider>
+      </FontSizeProvider>
+    </LanguageProvider>
   );
 }
