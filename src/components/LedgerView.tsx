@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { Account, AccountType } from '../types';
 import { IndustryCoaPresetModal } from './IndustryCoaPresetModal';
 import { EditAccountModal } from './EditAccountModal';
@@ -34,6 +34,7 @@ interface LedgerViewProps {
 }
 
 export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal }) => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     accounts,
@@ -42,8 +43,6 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
     activeRole,
     deleteAccount,
   } = useAccounting();
-
-  const { t, tr } = useLanguage();
 
   const [activeTab, setActiveTab] = useState<'journal' | 'coa'>('journal');
   const [searchQuery, setSearchQuery] = useState('');
@@ -214,7 +213,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
               <button
                 onClick={() => setShowImportModal(true)}
                 className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs px-3 py-2.5 rounded-xl border border-slate-700 transition cursor-pointer"
-                title="Import COA from CSV or Excel"
+                title={tr('Import COA from CSV or Excel')}
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>{tr('Import')}</span>
@@ -223,7 +222,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
               <button
                 onClick={() => exportChartOfAccountsExcel({ tenant: activeTenant, accounts })}
                 className="flex items-center gap-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs px-3 py-2.5 rounded-xl border border-emerald-500/30 transition cursor-pointer"
-                title="Export complete COA to Excel"
+                title={tr('Export complete COA to Excel')}
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
                 <span>{tr('Excel')}</span>
@@ -232,7 +231,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
               <button
                 onClick={() => downloadChartOfAccountsCsv(activeTenant, accounts)}
                 className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2.5 rounded-xl border border-slate-700 transition cursor-pointer"
-                title="Download CSV"
+                title={tr('Download CSV')}
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>{tr('CSV')}</span>
@@ -616,17 +615,13 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <RotateCcw className="w-5 h-5 text-rose-400" />
-                Immutable Journal Entry Reversal
-              </h3>
+                <RotateCcw className="w-5 h-5 text-rose-400" />{tr('Immutable Journal Entry Reversal')}</h3>
               <button onClick={() => setReversalEntryId(null)} className="text-slate-400 hover:text-white cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-xs text-slate-300">
-              In accordance with enterprise accounting immutability rules, posted entries cannot be deleted. Reversing creates an equal and opposite entry in the General Ledger.
-            </p>
+            <p className="text-xs text-slate-300">{tr('In accordance with enterprise accounting immutability rules, posted entries cannot be deleted. Reversing creates an equal and opposite entry in the General Ledger.')}</p>
 
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">Reason for Reversal *</label>
@@ -634,7 +629,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
                 type="text"
                 value={reversalReason}
                 onChange={(e) => setReversalReason(e.target.value)}
-                placeholder="e.g., Duplicate billing correction, Client credit memo"
+                placeholder={tr('e.g., Duplicate billing correction, Client credit memo')}
                 className="w-full bg-slate-950 text-slate-100 text-xs p-2.5 rounded-xl border border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
             </div>
@@ -643,16 +638,12 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
               <button
                 onClick={() => setReversalEntryId(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl transition cursor-pointer"
-              >
-                Cancel
-              </button>
+              >{tr('Cancel')}</button>
               <button
                 disabled={!reversalReason.trim()}
                 onClick={handleConfirmReversal}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-600/20 transition cursor-pointer"
-              >
-                Confirm Reversal
-              </button>
+              >{tr('Confirm Reversal')}</button>
             </div>
           </div>
         </div>
@@ -664,9 +655,7 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
           <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl animate-in fade-in zoom-in-95">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Trash2 className="w-5 h-5 text-rose-400" />
-                Remove or Archive Account
-              </h3>
+                <Trash2 className="w-5 h-5 text-rose-400" />{tr('Remove or Archive Account')}</h3>
               <button onClick={() => setDeleteConfirmAccount(null)} className="text-slate-400 hover:text-white cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
@@ -680,38 +669,32 @@ export const LedgerView: React.FC<LedgerViewProps> = ({ onOpenNewJournalModal })
 
             <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-1 font-mono text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500">Account:</span>
+                <span className="text-slate-500">{tr("Account:")}</span>
                 <span className="text-indigo-300 font-bold">[{deleteConfirmAccount.code}] {deleteConfirmAccount.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Type:</span>
+                <span className="text-slate-500">{tr("Type:")}</span>
                 <span className="text-slate-300">{deleteConfirmAccount.type}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Current Balance:</span>
+                <span className="text-slate-500">{tr("Current Balance:")}</span>
                 <span className="text-slate-300">{activeTenant.currency} {(deleteConfirmAccount.balance || 0).toFixed(2)}</span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed">
-              If this account has historical journal transactions, it will be <strong>archived/deactivated</strong> to preserve legal double-entry ledger audit compliance.
-            </p>
+            <p className="text-xs text-slate-400 leading-relaxed">{tr('If this account has historical journal transactions, it will be')}<strong>{tr('archived/deactivated')}</strong>{tr('to preserve legal double-entry ledger audit compliance.')}</p>
 
             <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 type="button"
                 onClick={() => setDeleteConfirmAccount(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer"
-              >
-                Cancel
-              </button>
+              >{tr('Cancel')}</button>
               <button
                 type="button"
                 onClick={() => handleConfirmDelete(false)}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-rose-600/20 transition cursor-pointer"
-              >
-                Confirm Deactivate / Delete
-              </button>
+              >{tr('Confirm Deactivate / Delete')}</button>
             </div>
           </div>
         </div>

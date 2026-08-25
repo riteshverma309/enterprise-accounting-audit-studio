@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   Webhook,
   Activity,
@@ -30,6 +31,7 @@ import { useAccounting } from '../context/AccountingContext';
 import { WebhookEndpoint, WebhookDeliveryLog, WebhookEventType } from '../types';
 
 export const WebhooksDispatcherDashboard: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     activeRole,
@@ -347,16 +349,11 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                <Zap className="w-3 h-3" /> Real-Time Outbound Event Gateway
-              </span>
-              <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono">
-                HMAC-SHA256 Signed
-              </span>
+                <Zap className="w-3 h-3" />{tr('Real-Time Outbound Event Gateway')}</span>
+              <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-mono">{tr('HMAC-SHA256 Signed')}</span>
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Interactive Webhooks Dispatcher & Logs</h1>
-            <p className="text-sm text-slate-400 max-w-2xl">
-              Broadcast high-fidelity JSON event payloads in real-time to external web servers, Zapier, Make.com, Slack bots, and internal data lakes.
-            </p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">{tr('Interactive Webhooks Dispatcher & Logs')}</h1>
+            <p className="text-sm text-slate-400 max-w-2xl">{tr('Broadcast high-fidelity JSON event payloads in real-time to external web servers, Zapier, Make.com, Slack bots, and internal data lakes.')}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -369,14 +366,14 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
               className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-purple-300 px-4 py-2.5 rounded-xl border border-slate-700 font-medium text-xs shadow transition cursor-pointer"
             >
               <Send className="w-4 h-4 text-purple-400" />
-              <span>Test Payload Simulator</span>
+              <span>{tr('Test Payload Simulator')}</span>
             </button>
             <button
               onClick={handleOpenCreate}
               className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-purple-600/20 transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Register Webhook Endpoint</span>
+              <span>{tr('Register Webhook Endpoint')}</span>
             </button>
           </div>
         </div>
@@ -384,7 +381,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
         {/* METRICS STRIP */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/80">
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Active Subscriptions</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Active Subscriptions')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-white">{filteredEndpoints.filter((e) => e.isActive).length}</span>
               <span className="text-xs text-slate-500 font-mono">/ {filteredEndpoints.length} registered</span>
@@ -392,7 +389,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Delivery Success Rate</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Delivery Success Rate')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-emerald-400">{successRate}%</span>
               <span className="text-xs text-emerald-500/80 font-mono">({successfulDeliveries} ok)</span>
@@ -400,20 +397,20 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Failed Deliveries</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Failed Deliveries')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className={`text-xl font-bold ${failedDeliveries > 0 ? 'text-rose-400' : 'text-slate-300'}`}>
                 {failedDeliveries}
               </span>
-              <span className="text-xs text-slate-500 font-mono">retries auto-queued</span>
+              <span className="text-xs text-slate-500 font-mono">{tr('retries auto-queued')}</span>
             </div>
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Average HTTP Latency</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Average HTTP Latency')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-indigo-300 font-mono">{avgLatency} ms</span>
-              <span className="text-xs text-slate-500 font-mono">p95 &lt; 280ms</span>
+              <span className="text-xs text-slate-500 font-mono">{tr('p95 &lt; 280ms')}</span>
             </div>
           </div>
         </div>
@@ -457,7 +454,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
             }`}
           >
             <Play className="w-3.5 h-3.5" />
-            <span>Interactive Test Dispatcher</span>
+            <span>{tr('Interactive Test Dispatcher')}</span>
           </button>
         </div>
 
@@ -467,7 +464,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
             <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
             <input
               type="text"
-              placeholder="Filter by name, URL, or event..."
+              placeholder={tr('Filter by name, URL, or event...')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-900 text-slate-200 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-800 focus:border-purple-500 outline-none"
@@ -479,7 +476,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
             onChange={(e) => setSelectedEventFilter(e.target.value)}
             className="bg-slate-900 text-slate-300 text-xs px-3 py-2 rounded-xl border border-slate-800 focus:border-purple-500 outline-none"
           >
-            <option value="ALL">All Event Types</option>
+            <option value="ALL">{tr('All Event Types')}</option>
             {availableEvents.map((ev) => (
               <option key={ev.event} value={ev.event}>
                 {ev.label}
@@ -493,10 +490,10 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
               onChange={(e) => setSelectedStatusFilter(e.target.value)}
               className="bg-slate-900 text-slate-300 text-xs px-3 py-2 rounded-xl border border-slate-800 focus:border-purple-500 outline-none"
             >
-              <option value="ALL">All Statuses</option>
-              <option value="SUCCESS">Success (2xx)</option>
-              <option value="FAILED">Failed / Error</option>
-              <option value="RETRYING">Retrying</option>
+              <option value="ALL">{tr('All Statuses')}</option>
+              <option value="SUCCESS">{tr('Success (2xx)')}</option>
+              <option value="FAILED">{tr('Failed / Error')}</option>
+              <option value="RETRYING">{tr('Retrying')}</option>
             </select>
           )}
         </div>
@@ -511,17 +508,15 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                 <Webhook className="w-7 h-7" />
               </div>
               <div className="space-y-1 max-w-md mx-auto">
-                <h3 className="text-base font-bold text-white">No Webhook Endpoints Configured</h3>
-                <p className="text-xs text-slate-400">
-                  Register your first HTTP destination URL to start receiving instantaneous accounting events.
-                </p>
+                <h3 className="text-base font-bold text-white">{tr('No Webhook Endpoints Configured')}</h3>
+                <p className="text-xs text-slate-400">{tr('Register your first HTTP destination URL to start receiving instantaneous accounting events.')}</p>
               </div>
               <button
                 onClick={handleOpenCreate}
                 className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Register Webhook Endpoint</span>
+                <span>{tr('Register Webhook Endpoint')}</span>
               </button>
             </div>
           ) : (
@@ -568,7 +563,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
 
                     <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800/80 space-y-1.5">
                       <div className="flex items-center justify-between text-[11px] text-slate-400">
-                        <span className="font-semibold">Destination URL</span>
+                        <span className="font-semibold">{tr('Destination URL')}</span>
                         <button
                           onClick={() => copyToClipboard(ep.url, `url-${ep.id}`)}
                           className="hover:text-purple-400 flex items-center gap-1 cursor-pointer"
@@ -601,7 +596,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                       {ep.lastTriggeredAt ? (
                         <span>Last: {new Date(ep.lastTriggeredAt).toLocaleTimeString()}</span>
                       ) : (
-                        <span>Never triggered</span>
+                        <span>{tr('Never triggered')}</span>
                       )}
                     </div>
 
@@ -614,14 +609,14 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                           setActiveTab('TESTER');
                         }}
                         className="p-1.5 hover:bg-slate-800 rounded-lg text-purple-400 hover:text-purple-300 transition cursor-pointer"
-                        title="Dispatch test payload"
+                        title={tr('Dispatch test payload')}
                       >
                         <Play className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleOpenEdit(ep)}
                         className="p-1.5 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition cursor-pointer"
-                        title="Edit endpoint configuration"
+                        title={tr('Edit endpoint configuration')}
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
@@ -632,7 +627,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                           }
                         }}
                         className="p-1.5 hover:bg-rose-500/10 rounded-lg text-slate-500 hover:text-rose-400 transition cursor-pointer"
-                        title="Delete endpoint"
+                        title={tr('Delete endpoint')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -651,7 +646,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
           <div className="p-4 border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity className="w-4 h-4 text-purple-400" />
-              <h3 className="text-sm font-bold text-white">Event Delivery Stream</h3>
+              <h3 className="text-sm font-bold text-white">{tr('Event Delivery Stream')}</h3>
             </div>
             <span className="text-xs text-slate-400 font-mono">
               Showing {filteredLogs.length} of {tenantLogs.length} events
@@ -661,19 +656,19 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
           {filteredLogs.length === 0 ? (
             <div className="p-12 text-center space-y-2">
               <CheckCircle2 className="w-8 h-8 text-slate-600 mx-auto" />
-              <p className="text-sm text-slate-400">No delivery logs matching the active filter.</p>
+              <p className="text-sm text-slate-400">{tr('No delivery logs matching the active filter.')}</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-950/70 text-slate-400 font-semibold uppercase tracking-wider border-b border-slate-800">
                   <tr>
-                    <th className="py-3 px-4">Status & Code</th>
-                    <th className="py-3 px-4">Event Trigger</th>
-                    <th className="py-3 px-4">Destination Endpoint</th>
-                    <th className="py-3 px-4">Latency</th>
-                    <th className="py-3 px-4">Timestamp</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th className="py-3 px-4">{tr('Status & Code')}</th>
+                    <th className="py-3 px-4">{tr('Event Trigger')}</th>
+                    <th className="py-3 px-4">{tr('Destination Endpoint')}</th>
+                    <th className="py-3 px-4">{tr('Latency')}</th>
+                    <th className="py-3 px-4">{tr('Timestamp')}</th>
+                    <th className="py-3 px-4 text-right">{tr('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-mono text-slate-300">
@@ -727,15 +722,13 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                             <button
                               onClick={() => setSelectedLogDetail(log)}
                               className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-medium transition cursor-pointer"
-                            >
-                              Inspect Payload
-                            </button>
+                            >{tr('Inspect Payload')}</button>
                             <button
                               onClick={async () => {
                                 await retryWebhookDelivery(log.id);
                               }}
                               className="p-1 hover:bg-slate-800 text-purple-400 rounded-lg transition cursor-pointer"
-                              title="Re-dispatch payload now"
+                              title={tr('Re-dispatch payload now')}
                             >
                               <RotateCcw className="w-3.5 h-3.5" />
                             </button>
@@ -758,12 +751,12 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
               <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
                 <Send className="w-4 h-4 text-purple-400" />
-                <h3 className="text-sm font-bold text-white">Event Simulation Parameters</h3>
+                <h3 className="text-sm font-bold text-white">{tr('Event Simulation Parameters')}</h3>
               </div>
 
               <div className="space-y-3 text-xs">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Target Webhook Endpoint:</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Target Webhook Endpoint:')}</label>
                   <select
                     value={selectedEndpointForTest}
                     onChange={(e) => setSelectedEndpointForTest(e.target.value)}
@@ -778,7 +771,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Select Event Type to Simulate:</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Select Event Type to Simulate:')}</label>
                   <select
                     value={testEventType}
                     onChange={(e) => handleSelectTestEvent(e.target.value as WebhookEventType)}
@@ -794,13 +787,11 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-slate-400 font-medium">JSON Event Payload (Editable):</label>
+                    <label className="text-slate-400 font-medium">{tr('JSON Event Payload (Editable):')}</label>
                     <button
                       onClick={() => setCustomTestPayload(getSamplePayload(testEventType))}
                       className="text-purple-400 hover:text-purple-300 text-[11px] font-medium cursor-pointer"
-                    >
-                      Reset to Schema Template
-                    </button>
+                    >{tr('Reset to Schema Template')}</button>
                   </div>
                   <textarea
                     rows={12}
@@ -832,7 +823,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
               <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="flex items-center gap-2">
                   <Code2 className="w-4 h-4 text-indigo-400" />
-                  <h3 className="text-sm font-bold text-white">Live Execution Inspector</h3>
+                  <h3 className="text-sm font-bold text-white">{tr('Live Execution Inspector')}</h3>
                 </div>
                 {testResult && (
                   <span
@@ -850,7 +841,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
               {testResult ? (
                 <div className="space-y-3 text-xs">
                   <div>
-                    <span className="text-slate-400 font-bold block mb-1">Outgoing HTTP Headers Sent:</span>
+                    <span className="text-slate-400 font-bold block mb-1">{tr('Outgoing HTTP Headers Sent:')}</span>
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-slate-300 overflow-x-auto space-y-1">
                       {Object.entries(testResult.requestHeaders).map(([k, v]) => (
                         <div key={k} className="flex gap-2">
@@ -862,7 +853,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                   </div>
 
                   <div>
-                    <span className="text-slate-400 font-bold block mb-1">Destination Server Response Body:</span>
+                    <span className="text-slate-400 font-bold block mb-1">{tr('Destination Server Response Body:')}</span>
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-emerald-400 max-h-56 overflow-y-auto">
                       <pre>{testResult.responseBody}</pre>
                     </div>
@@ -871,17 +862,15 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                   <div className="p-3 bg-purple-500/10 rounded-xl border border-purple-500/20 flex items-center justify-between">
                     <div className="flex items-center gap-2 text-purple-300">
                       <Shield className="w-4 h-4 text-purple-400" />
-                      <span>HMAC-SHA256 Header Validated with Secret Key</span>
+                      <span>{tr('HMAC-SHA256 Header Validated with Secret Key')}</span>
                     </div>
-                    <span className="font-mono text-[11px] text-purple-400">RFC 2104 compliant</span>
+                    <span className="font-mono text-[11px] text-purple-400">{tr('RFC 2104 compliant')}</span>
                   </div>
                 </div>
               ) : (
                 <div className="h-72 flex flex-col items-center justify-center text-center p-6 text-slate-500 space-y-3">
                   <Activity className="w-10 h-10 text-slate-700" />
-                  <p className="text-xs max-w-sm">
-                    Select a registered endpoint on the left and click "Fire Test Webhook Payload" to view instant HTTP handshakes, headers, and destination responses.
-                  </p>
+                  <p className="text-xs max-w-sm">{tr('Select a registered endpoint on the left and click "Fire Test Webhook Payload" to view instant HTTP handshakes, headers, and destination responses.')}</p>
                 </div>
               )}
             </div>
@@ -916,11 +905,11 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
 
             <form onSubmit={handleSaveEndpoint} className="space-y-4 text-xs">
               <div className="space-y-1">
-                <label className="block text-slate-300 font-bold">Endpoint Display Name *</label>
+                <label className="block text-slate-300 font-bold">{tr('Endpoint Display Name *')}</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Zapier Lead-to-Invoice Automation"
+                  placeholder={tr('e.g. Zapier Lead-to-Invoice Automation')}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full bg-slate-950 text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:border-purple-500 outline-none"
@@ -928,11 +917,11 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="block text-slate-300 font-bold">HTTPS Destination URL *</label>
+                <label className="block text-slate-300 font-bold">{tr('HTTPS Destination URL *')}</label>
                 <input
                   type="url"
                   required
-                  placeholder="https://api.yourdomain.com/webhooks/accounting"
+                  placeholder={tr('https://api.yourdomain.com/webhooks/accounting')}
                   value={formData.url}
                   onChange={(e) => setFormData({ ...formData, url: e.target.value })}
                   className="w-full bg-slate-950 text-slate-200 font-mono p-2.5 rounded-xl border border-slate-800 focus:border-purple-500 outline-none"
@@ -940,7 +929,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="block text-slate-300 font-bold">HMAC Signature Secret Key</label>
+                <label className="block text-slate-300 font-bold">{tr('HMAC Signature Secret Key')}</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -957,20 +946,16 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                       })
                     }
                     className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl font-bold cursor-pointer transition"
-                  >
-                    Regenerate
-                  </button>
+                  >{tr('Regenerate')}</button>
                 </div>
-                <p className="text-[11px] text-slate-500">
-                  Used to compute the <code>X-Hub-Signature-256</code> header to verify payload origin.
-                </p>
+                <p className="text-[11px] text-slate-500">{tr('Used to compute the')}<code>{tr('X-Hub-Signature-256')}</code>{tr('header to verify payload origin.')}</p>
               </div>
 
               <div className="space-y-1">
-                <label className="block text-slate-300 font-bold">Description / Intended System</label>
+                <label className="block text-slate-300 font-bold">{tr('Description / Intended System')}</label>
                 <input
                   type="text"
-                  placeholder="e.g. Forwards customer invoices to HubSpot deal sync pipeline."
+                  placeholder={tr('e.g. Forwards customer invoices to HubSpot deal sync pipeline.')}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="w-full bg-slate-950 text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:border-purple-500 outline-none"
@@ -1033,9 +1018,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                   className="rounded text-purple-600 focus:ring-0 cursor-pointer"
                 />
-                <label htmlFor="ep-active-chk" className="text-slate-300 font-medium cursor-pointer">
-                  Enable active webhook event forwarding immediately
-                </label>
+                <label htmlFor="ep-active-chk" className="text-slate-300 font-medium cursor-pointer">{tr('Enable active webhook event forwarding immediately')}</label>
               </div>
 
               <div className="pt-4 border-t border-slate-800 flex items-center justify-end gap-3">
@@ -1043,9 +1026,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-purple-600/20 transition cursor-pointer"
@@ -1065,9 +1046,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Activity className="w-5 h-5 text-purple-400" />
-                <h3 className="text-base font-bold text-white">
-                  Event Delivery Audit & Payload Details
-                </h3>
+                <h3 className="text-base font-bold text-white">{tr('Event Delivery Audit & Payload Details')}</h3>
               </div>
               <button
                 onClick={() => setSelectedLogDetail(null)}
@@ -1080,11 +1059,11 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
             <div className="space-y-3 text-xs">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
-                  <span className="text-[10px] text-slate-500 block uppercase">Event Type</span>
+                  <span className="text-[10px] text-slate-500 block uppercase">{tr('Event Type')}</span>
                   <span className="font-mono text-purple-300 font-bold">{selectedLogDetail.event}</span>
                 </div>
                 <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
-                  <span className="text-[10px] text-slate-500 block uppercase">HTTP Response</span>
+                  <span className="text-[10px] text-slate-500 block uppercase">{tr('HTTP Response')}</span>
                   <span
                     className={`font-mono font-bold ${
                       selectedLogDetail.status === 'SUCCESS' ? 'text-emerald-400' : 'text-rose-400'
@@ -1094,24 +1073,24 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
                   </span>
                 </div>
                 <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
-                  <span className="text-[10px] text-slate-500 block uppercase">Round-Trip Latency</span>
+                  <span className="text-[10px] text-slate-500 block uppercase">{tr('Round-Trip Latency')}</span>
                   <span className="font-mono text-indigo-300 font-bold">{selectedLogDetail.latencyMs} ms</span>
                 </div>
                 <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
-                  <span className="text-[10px] text-slate-500 block uppercase">Attempt Count</span>
+                  <span className="text-[10px] text-slate-500 block uppercase">{tr('Attempt Count')}</span>
                   <span className="font-mono text-amber-300 font-bold">#{selectedLogDetail.attemptNumber}</span>
                 </div>
               </div>
 
               <div>
-                <span className="text-slate-400 font-bold block mb-1">Delivered JSON Payload:</span>
+                <span className="text-slate-400 font-bold block mb-1">{tr('Delivered JSON Payload:')}</span>
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-emerald-400 max-h-52 overflow-y-auto">
                   <pre>{JSON.stringify(selectedLogDetail.payload, null, 2)}</pre>
                 </div>
               </div>
 
               <div>
-                <span className="text-slate-400 font-bold block mb-1">Server Response Body:</span>
+                <span className="text-slate-400 font-bold block mb-1">{tr('Server Response Body:')}</span>
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono text-slate-300 max-h-32 overflow-y-auto">
                   <pre>{selectedLogDetail.responseBody}</pre>
                 </div>
@@ -1122,9 +1101,7 @@ export const WebhooksDispatcherDashboard: React.FC = () => {
               <button
                 onClick={() => setSelectedLogDetail(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl font-bold transition cursor-pointer text-xs"
-              >
-                Close Inspector
-              </button>
+              >{tr('Close Inspector')}</button>
             </div>
           </div>
         </div>

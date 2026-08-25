@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   ShieldCheck,
@@ -21,6 +22,7 @@ import {
 import { ApprovalItem, ConfigurableApprovalRule, Role, PermissionKey } from '../types';
 
 export const ApprovalsView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     approvalItems,
     approvalRules,
@@ -134,17 +136,14 @@ export const ApprovalsView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
-              <ShieldCheck className="w-6 h-6 text-indigo-400" /> Multi-Signature Governance & Approval Engine
-            </h1>
+              <ShieldCheck className="w-6 h-6 text-indigo-400" />{tr('Multi-Signature Governance & Approval Engine')}</h1>
             {pendingCount > 0 && (
               <span className="px-2.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-full text-xs font-bold animate-pulse">
                 {pendingCount} Dual Sign-off Pending
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Enforces SOX 404 Maker-Checker authorization policies, dual-signature workflows, and configurable value thresholds.
-          </p>
+          <p className="text-xs text-slate-400 mt-1">{tr('Enforces SOX 404 Maker-Checker authorization policies, dual-signature workflows, and configurable value thresholds.')}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -183,8 +182,7 @@ export const ApprovalsView: React.FC = () => {
             }}
             className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition"
           >
-            <Plus className="w-3.5 h-3.5" /> Request Approval
-          </button>
+            <Plus className="w-3.5 h-3.5" />{tr('Request Approval')}</button>
         </div>
       </div>
 
@@ -222,7 +220,7 @@ export const ApprovalsView: React.FC = () => {
                 </div>
                 <p className="text-[11px] text-slate-500 leading-tight">{rule.description}</p>
                 <div className="pt-1 flex items-center justify-between text-[10px] text-slate-400 font-mono">
-                  <span>Authorizer: <strong className="text-indigo-300 uppercase">{rule.requiredRole}</strong></span>
+                  <span>{tr('Authorizer:')} <strong className="text-indigo-300 uppercase">{rule.requiredRole}</strong></span>
                   <span className={rule.enforceMakerChecker ? 'text-emerald-400' : 'text-amber-400'}>
                     {rule.enforceMakerChecker ? '✓ Maker-Checker (SoD)' : 'Single Signoff'}
                   </span>
@@ -236,9 +234,8 @@ export const ApprovalsView: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
               <div>
                 <h2 className="text-base font-bold text-white flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-indigo-400" /> Dual-Signature Approval Queue
-                </h2>
-                <span className="text-xs text-slate-400 font-mono">SOX Section 404 Maker-Checker Audit Trail</span>
+                  <UserCheck className="w-5 h-5 text-indigo-400" />{tr('Dual-Signature Approval Queue')}</h2>
+                <span className="text-xs text-slate-400 font-mono">{tr('SOX Section 404 Maker-Checker Audit Trail')}</span>
               </div>
 
               <div className="flex items-center gap-1.5">
@@ -283,13 +280,11 @@ export const ApprovalsView: React.FC = () => {
                         )}
                         {item.status === 'APPROVED' && (
                           <span className="px-2.5 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[10px] font-mono flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3" /> DUAL SIGNED & APPROVED
-                          </span>
+                            <CheckCircle2 className="w-3 h-3" />{tr('DUAL SIGNED & APPROVED')}</span>
                         )}
                         {item.status === 'REJECTED' && (
                           <span className="px-2.5 py-0.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-full text-[10px] font-mono flex items-center gap-1">
-                            <XCircle className="w-3 h-3" /> REJECTED
-                          </span>
+                            <XCircle className="w-3 h-3" />{tr('REJECTED')}</span>
                         )}
                       </div>
 
@@ -300,7 +295,7 @@ export const ApprovalsView: React.FC = () => {
                           <Key className="w-3 h-3 text-amber-400" />
                           1st Signature (Maker): <strong className="text-slate-200">{item.requestedBy}</strong> ({item.requestedRole || 'Accountant'})
                         </span>
-                        <span>Date: <strong className="text-slate-200">{item.requestedDate}</strong></span>
+                        <span>{tr('Date:')} <strong className="text-slate-200">{item.requestedDate}</strong></span>
                         {item.status === 'APPROVED' && (
                           <span className="text-emerald-400 font-bold flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3" />
@@ -317,7 +312,7 @@ export const ApprovalsView: React.FC = () => {
 
                     <div className="flex items-center gap-4 border-t md:border-t-0 pt-3 md:pt-0 border-slate-900 justify-between md:justify-end">
                       <div className="text-left md:text-right font-mono">
-                        <div className="text-[10px] text-slate-500 uppercase">Amount</div>
+                        <div className="text-[10px] text-slate-500 uppercase">{tr('Amount')}</div>
                         <div className="text-lg font-black text-white">
                           {item.currency === 'EUR' ? '€' : item.currency === 'INR' ? '₹' : '$'}
                           {item.amount.toLocaleString()}
@@ -333,7 +328,7 @@ export const ApprovalsView: React.FC = () => {
                           className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 transition cursor-pointer"
                         >
                           <UserCheck className="w-4 h-4 text-amber-300" />
-                          <span>Review & Execute 2nd Signature</span>
+                          <span>{tr('Review & Execute 2nd Signature')}</span>
                         </button>
                       )}
                     </div>
@@ -349,19 +344,15 @@ export const ApprovalsView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-indigo-400" /> Configurable Multi-Signature Threshold Rules
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Define the financial thresholds and role-based sign-off requirements for sensitive operations.
-              </p>
+                <Sliders className="w-5 h-5 text-indigo-400" />{tr('Configurable Multi-Signature Threshold Rules')}</h2>
+              <p className="text-xs text-slate-400 mt-0.5">{tr('Define the financial thresholds and role-based sign-off requirements for sensitive operations.')}</p>
             </div>
 
             <button
               onClick={() => setIsRuleModalOpen(true)}
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Create Threshold Rule
-            </button>
+              <Plus className="w-4 h-4" />{tr('Create Threshold Rule')}</button>
           </div>
 
           <div className="grid grid-cols-1 gap-3">
@@ -386,9 +377,9 @@ export const ApprovalsView: React.FC = () => {
                   </div>
                   <p className="text-xs text-slate-400">{rule.description}</p>
                   <div className="text-[11px] text-slate-500 font-mono flex items-center gap-3">
-                    <span>Required Checker Role: <strong className="text-slate-300 uppercase">{rule.requiredRole}</strong></span>
+                    <span>{tr('Required Checker Role:')} <strong className="text-slate-300 uppercase">{rule.requiredRole}</strong></span>
                     <span>•</span>
-                    <span>Permission Scope: <strong className="text-indigo-400">{rule.requiredPermission}</strong></span>
+                    <span>{tr('Permission Scope:')} <strong className="text-indigo-400">{rule.requiredPermission}</strong></span>
                     <span>•</span>
                     <span className={rule.enforceMakerChecker ? 'text-emerald-400' : 'text-amber-400'}>
                       {rule.enforceMakerChecker ? 'Maker-Checker Enforced (No Self-Approval)' : 'Self-Approval Permitted'}
@@ -411,7 +402,7 @@ export const ApprovalsView: React.FC = () => {
                   <button
                     onClick={() => deleteApprovalRule(rule.id)}
                     className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-xl transition"
-                    title="Delete rule"
+                    title={tr('Delete rule')}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -429,7 +420,7 @@ export const ApprovalsView: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-base font-bold text-white">Execute 2nd Signature (Checker Authorizer)</h3>
+                <h3 className="text-base font-bold text-white">{tr('Execute 2nd Signature (Checker Authorizer)')}</h3>
               </div>
               <button
                 onClick={() => setSelectedItemForSignoff(null)}
@@ -441,12 +432,12 @@ export const ApprovalsView: React.FC = () => {
 
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 text-xs">
               <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <span className="text-slate-400">Voucher Reference:</span>
+                <span className="text-slate-400">{tr('Voucher Reference:')}</span>
                 <span className="font-mono font-bold text-white">{selectedItemForSignoff.referenceNumber}</span>
               </div>
 
               <div className="flex justify-between items-center pb-2 border-b border-slate-800">
-                <span className="text-slate-400">Amount & Currency:</span>
+                <span className="text-slate-400">{tr('Amount & Currency:')}</span>
                 <span className="font-mono font-bold text-emerald-400 text-sm">
                   {selectedItemForSignoff.currency === 'EUR' ? '€' : selectedItemForSignoff.currency === 'INR' ? '₹' : '$'}
                   {selectedItemForSignoff.amount.toLocaleString()}
@@ -454,7 +445,7 @@ export const ApprovalsView: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <span className="text-slate-400">Description / Memo:</span>
+                <span className="text-slate-400">{tr('Description / Memo:')}</span>
                 <p className="text-slate-200 font-sans">{selectedItemForSignoff.description}</p>
               </div>
 
@@ -464,7 +455,7 @@ export const ApprovalsView: React.FC = () => {
                   <span className="flex items-center gap-1">
                     <CheckCircle2 className="w-3.5 h-3.5" /> 1st Digital Signature (Maker):
                   </span>
-                  <span className="font-mono text-[10px]">VERIFIED</span>
+                  <span className="font-mono text-[10px]">{tr('VERIFIED')}</span>
                 </div>
                 <div className="text-slate-300 font-mono text-[11px]">
                   Maker User: {selectedItemForSignoff.requestedBy} • Date: {selectedItemForSignoff.requestedDate}
@@ -501,15 +492,13 @@ export const ApprovalsView: React.FC = () => {
               <button
                 onClick={() => handleExecuteDualSignature('REJECTED')}
                 className="px-4 py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 border border-rose-500/30 text-xs font-bold rounded-xl cursor-pointer"
-              >
-                Reject Voucher
-              </button>
+              >{tr('Reject Voucher')}</button>
               <button
                 onClick={() => handleExecuteDualSignature('APPROVED')}
                 className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-emerald-600/20 cursor-pointer flex items-center gap-1.5"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Execute 2nd Signature & Authorize Post</span>
+                <span>{tr('Execute 2nd Signature & Authorize Post')}</span>
               </button>
             </div>
           </div>
@@ -522,39 +511,38 @@ export const ApprovalsView: React.FC = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-indigo-400" /> Create Multi-Signature Threshold Rule
-              </h3>
+                <Sliders className="w-5 h-5 text-indigo-400" />{tr('Create Multi-Signature Threshold Rule')}</h3>
               <button onClick={() => setIsRuleModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
             </div>
 
             <form onSubmit={handleCreateRuleSubmit} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="text-slate-300 font-semibold">Rule Name *</label>
+                <label className="text-slate-300 font-semibold">{tr('Rule Name *')}</label>
                 <input
                   type="text"
                   required
                   value={newRuleName}
                   onChange={(e) => setNewRuleName(e.target.value)}
-                  placeholder="e.g. Executive Treasury Wire Approval"
+                  placeholder={tr('e.g. Executive Treasury Wire Approval')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-semibold">Entity Type</label>
+                  <label className="text-slate-300 font-semibold">{tr('Entity Type')}</label>
                   <select
                     value={newRuleEntityType}
                     onChange={(e) => setNewRuleEntityType(e.target.value as any)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="JOURNAL_ENTRY">Journal Entry</option>
-                    <option value="VENDOR_BILL">Vendor Bill</option>
-                    <option value="INVOICE">Customer Invoice</option>
-                    <option value="PAYROLL_RUN">Payroll Run</option>
-                    <option value="EXPENSE_CLAIM">Expense Claim</option>
-                    <option value="PERIOD_REOPEN">Fiscal Period Re-open</option>
-                    <option value="BACKUP_RESTORE">Disaster Recovery Restore</option>
+                    <option value="JOURNAL_ENTRY">{tr('Journal Entry')}</option>
+                    <option value="VENDOR_BILL">{tr('Vendor Bill')}</option>
+                    <option value="INVOICE">{tr('Customer Invoice')}</option>
+                    <option value="PAYROLL_RUN">{tr('Payroll Run')}</option>
+                    <option value="EXPENSE_CLAIM">{tr('Expense Claim')}</option>
+                    <option value="PERIOD_REOPEN">{tr('Fiscal Period Re-open')}</option>
+                    <option value="BACKUP_RESTORE">{tr('Disaster Recovery Restore')}</option>
                   </select>
                 </div>
 
@@ -572,22 +560,22 @@ export const ApprovalsView: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-semibold">Required Checker Role</label>
+                  <label className="text-slate-300 font-semibold">{tr('Required Checker Role')}</label>
                   <select
                     value={newRuleRole}
                     onChange={(e) => setNewRuleRole(e.target.value as Role)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="super_user">⚡ Super User</option>
-                    <option value="entity_admin">🏢 Entity Admin</option>
-                    <option value="admin">Financial Admin</option>
-                    <option value="controller">Controller</option>
-                    <option value="accountant">Senior Accountant</option>
+                    <option value="super_user">{tr('⚡ Super User')}</option>
+                    <option value="entity_admin">{tr('🏢 Entity Admin')}</option>
+                    <option value="admin">{tr('Financial Admin')}</option>
+                    <option value="controller">{tr('Controller')}</option>
+                    <option value="accountant">{tr('Senior Accountant')}</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-semibold">Required Permission Key</label>
+                  <label className="text-slate-300 font-semibold">{tr('Required Permission Key')}</label>
                   <input
                     type="text"
                     value={newRulePermission}
@@ -605,18 +593,16 @@ export const ApprovalsView: React.FC = () => {
                   onChange={(e) => setNewRuleMakerChecker(e.target.checked)}
                   className="rounded border-slate-700 text-indigo-600 focus:ring-0"
                 />
-                <label htmlFor="makerCheckerCheck" className="text-slate-300 font-semibold cursor-pointer">
-                  Enforce Segregation of Duties (Maker cannot approve their own submission)
-                </label>
+                <label htmlFor="makerCheckerCheck" className="text-slate-300 font-semibold cursor-pointer">{tr('Enforce Segregation of Duties (Maker cannot approve their own submission)')}</label>
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-300 font-semibold">Description</label>
+                <label className="text-slate-300 font-semibold">{tr('Description')}</label>
                 <textarea
                   rows={2}
                   value={newRuleDescription}
                   onChange={(e) => setNewRuleDescription(e.target.value)}
-                  placeholder="Compliance and control description..."
+                  placeholder={tr('Compliance and control description...')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -626,15 +612,11 @@ export const ApprovalsView: React.FC = () => {
                   type="button"
                   onClick={() => setIsRuleModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-bold"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-md"
-                >
-                  Save Rule
-                </button>
+                >{tr('Save Rule')}</button>
               </div>
             </form>
           </div>
@@ -647,36 +629,35 @@ export const ApprovalsView: React.FC = () => {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Plus className="w-5 h-5 text-indigo-400" /> Submit Voucher for Approval
-              </h3>
+                <Plus className="w-5 h-5 text-indigo-400" />{tr('Submit Voucher for Approval')}</h3>
               <button onClick={() => setIsRequestModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
             </div>
 
             <form onSubmit={handleCreateRequestSubmit} className="space-y-3 text-xs">
               <div className="space-y-1">
-                <label className="text-slate-300 font-semibold">Entity Type</label>
+                <label className="text-slate-300 font-semibold">{tr('Entity Type')}</label>
                 <select
                   value={reqEntityType}
                   onChange={(e) => setReqEntityType(e.target.value as any)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500"
                 >
-                  <option value="JOURNAL_ENTRY">Journal Entry</option>
-                  <option value="VENDOR_BILL">Vendor Bill</option>
-                  <option value="INVOICE">Customer Invoice</option>
-                  <option value="PAYROLL_RUN">Payroll Run</option>
-                  <option value="EXPENSE_CLAIM">Expense Claim</option>
+                  <option value="JOURNAL_ENTRY">{tr('Journal Entry')}</option>
+                  <option value="VENDOR_BILL">{tr('Vendor Bill')}</option>
+                  <option value="INVOICE">{tr('Customer Invoice')}</option>
+                  <option value="PAYROLL_RUN">{tr('Payroll Run')}</option>
+                  <option value="EXPENSE_CLAIM">{tr('Expense Claim')}</option>
                 </select>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-slate-300 font-semibold">Reference #</label>
+                  <label className="text-slate-300 font-semibold">{tr('Reference #')}</label>
                   <input
                     type="text"
                     required
                     value={reqRef}
                     onChange={(e) => setReqRef(e.target.value)}
-                    placeholder="e.g. JE-2026-091"
+                    placeholder={tr('e.g. JE-2026-091')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white font-mono focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -694,13 +675,13 @@ export const ApprovalsView: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-slate-300 font-semibold">Description / Purpose</label>
+                <label className="text-slate-300 font-semibold">{tr('Description / Purpose')}</label>
                 <textarea
                   rows={2}
                   required
                   value={reqDesc}
                   onChange={(e) => setReqDesc(e.target.value)}
-                  placeholder="Reason for financial transaction..."
+                  placeholder={tr('Reason for financial transaction...')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -710,15 +691,11 @@ export const ApprovalsView: React.FC = () => {
                   type="button"
                   onClick={() => setIsRequestModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-bold"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-md"
-                >
-                  Submit for Signoff
-                </button>
+                >{tr('Submit for Signoff')}</button>
               </div>
             </form>
           </div>

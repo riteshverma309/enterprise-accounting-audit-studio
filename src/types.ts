@@ -1,4 +1,4 @@
-export type Role = 'super_user' | 'entity_admin' | 'admin' | 'controller' | 'accountant' | 'junior_accountant' | 'auditor' | 'viewer' | 'vendor' | 'customer';
+export type Role = 'super_user' | 'entity_admin' | 'admin' | 'controller' | 'accountant' | 'junior_accountant' | 'auditor' | 'viewer' | 'vendor' | 'customer' | 'manager' | 'cfo';
 export type PluginId = 'us_gaap' | 'eu_ifrs' | 'in_gst' | 'sa_zatca' | 'qa_gta' | 'ae_fta';
 
 export interface Tenant {
@@ -169,7 +169,15 @@ export interface AuditLogEvent {
     | 'PURCHASE_ORDER_REJECT'
     | 'PURCHASE_ORDER_RECEIVE'
     | 'PURCHASE_ORDER_CONVERT_BILL'
-    | 'PO_APPROVAL_MATRIX_UPDATE';
+    | 'PO_APPROVAL_MATRIX_UPDATE'
+    | 'PO_CREATE'
+    | 'PO_UPDATE'
+    | 'PO_DELETE'
+    | 'PO_SUBMIT_APPROVAL'
+    | 'PO_APPROVAL_DECISION'
+    | 'PO_GOODS_RECEIPT'
+    | 'PO_CONVERT_BILL'
+    | 'PO_CONFIG_TIERS';
   tenantId: string;
   organizationId?: string;
   branchId?: string;
@@ -346,6 +354,8 @@ export interface VendorBill {
   status: 'PENDING_APPROVAL' | 'APPROVED' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE';
   vendorAttributesSnapshot?: Record<string, any>;
   notes?: string;
+  purchaseOrderId?: string;
+  purchaseOrderNumber?: string;
 }
 
 export interface FiscalPeriod {
@@ -506,13 +516,17 @@ export interface ApprovalItem {
   id: string;
   tenantId: string;
   entityType: 'JOURNAL_ENTRY' | 'VENDOR_BILL' | 'INVOICE' | 'PAYROLL_RUN' | 'EXPENSE_CLAIM' | 'PERIOD_REOPEN' | 'BACKUP_RESTORE' | 'PURCHASE_ORDER';
+  entityId?: string;
   referenceNumber: string;
   amount: number;
   currency: string;
-  description: string;
+  description?: string;
+  comments?: string;
   requestedBy: string; // Maker email
   requestedRole?: Role;
   requestedDate: string;
+  requiredRole?: Role;
+  thresholdRuleId?: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   approvedBy?: string; // Checker email
   approvedRole?: Role;
@@ -1478,14 +1492,16 @@ export interface PurchaseOrderLineItem {
 }
 
 export interface PurchaseOrderApprovalStep {
-  id: string;
+  id?: string;
+  stepId?: string;
   level: number;
-  tierId: string;
-  tierName: string;
+  tierId?: string;
+  tierName?: string;
   requiredRole: Role;
-  minThreshold: number;
+  minThreshold?: number;
   maxThreshold?: number;
   status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'SKIPPED' | 'NOT_STARTED';
+  enforceMakerChecker?: boolean;
   actionBy?: string; // Approver/rejecter email
   actionRole?: Role;
   actionDate?: string;
@@ -1506,8 +1522,10 @@ export interface PurchaseOrder {
   currency: string;
   department: string;
   requestedBy: string; // Maker email
+  createdBy?: string;
   requestedByName?: string;
   requestedRole: Role;
+  creatorRole?: Role;
   items: PurchaseOrderLineItem[];
   subtotal: number;
   taxTotal: number;
@@ -1525,20 +1543,23 @@ export interface PurchaseOrder {
   rejectionReason?: string;
   isFullyReceived?: boolean;
   isFullyBilled?: boolean;
+  deliveryStatus?: 'PENDING' | 'PARTIAL' | 'DELIVERED' | 'CANCELLED';
   createdAt: string;
   updatedAt: string;
 }
 
 export interface PoApprovalTierConfig {
   id: string;
+  tierId?: string;
   tenantId: string;
   level: number; // 1, 2, 3...
   name: string; // e.g. "Tier 1: Department Manager Sign-Off"
+  tierName?: string;
   description: string;
   minAmount: number; // e.g. 0
   maxAmount: number | null; // e.g. 5000, or null if no upper ceiling
   requiredRole: Role;
-  requiredPermission: PermissionKey;
+  requiredPermission?: PermissionKey | string;
   enforceMakerChecker: boolean; // Requester cannot approve their own PO
   autoApproveBelowThreshold: boolean;
   isEnabled: boolean;

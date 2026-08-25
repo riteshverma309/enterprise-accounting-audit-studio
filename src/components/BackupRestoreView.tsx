@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   DownloadCloud,
@@ -22,6 +23,7 @@ import {
 import { BackupValidationResult } from '../types';
 
 export const BackupRestoreView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     tenants,
@@ -182,16 +184,12 @@ export const BackupRestoreView: React.FC = () => {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-bold text-slate-100 tracking-tight">
-                Company Data Backup & Point-in-Time Restore
-              </h1>
+              <h1 className="text-xl font-bold text-slate-100 tracking-tight">{tr('Company Data Backup & Point-in-Time Restore')}</h1>
               <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 1-Click Export
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Instantly export complete company datasets, sub-ledgers, and audit logs into a self-contained snapshot for point-in-time rollback.
-            </p>
+            <p className="text-xs text-slate-400 mt-0.5">{tr('Instantly export complete company datasets, sub-ledgers, and audit logs into a self-contained snapshot for point-in-time rollback.')}</p>
           </div>
         </div>
 
@@ -202,7 +200,7 @@ export const BackupRestoreView: React.FC = () => {
             className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 flex items-center gap-2 transition cursor-pointer"
           >
             <DownloadCloud className="w-4 h-4" />
-            <span>Download Active Company Data</span>
+            <span>{tr('Download Active Company Data')}</span>
           </button>
         </div>
       </div>
@@ -212,7 +210,7 @@ export const BackupRestoreView: React.FC = () => {
         <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-center gap-3 text-emerald-300">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <div className="text-xs">
-            <p className="font-bold text-emerald-200">Company Data Backup Downloaded Successfully!</p>
+            <p className="font-bold text-emerald-200">{tr('Company Data Backup Downloaded Successfully!')}</p>
             <p className="text-emerald-300/80 font-mono mt-0.5">
               Saved as: <span className="underline">{downloadSuccess.fileName}</span> ({downloadSuccess.count} sub-ledger records packaged)
             </p>
@@ -230,15 +228,15 @@ export const BackupRestoreView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <div className="flex items-center gap-2">
                 <ArrowDownToLine className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-sm font-bold text-slate-100">1-Click Company Data Export</h3>
+                <h3 className="text-sm font-bold text-slate-100">{tr('1-Click Company Data Export')}</h3>
               </div>
-              <span className="text-[11px] font-mono text-slate-400">JSON Archive v1.0</span>
+              <span className="text-[11px] font-mono text-slate-400">{tr('JSON Archive v1.0')}</span>
             </div>
 
             {/* Entity Selector */}
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-300 flex items-center justify-between">
-                <span>Select Target Company Entity:</span>
+                <span>{tr('Select Target Company Entity:')}</span>
                 <span className="text-[11px] text-slate-400 font-mono">Scope: {targetTenant.code}</span>
               </label>
               <select
@@ -275,35 +273,35 @@ export const BackupRestoreView: React.FC = () => {
               {/* Counts Grid */}
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 text-center text-xs">
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">Accounts</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('Accounts')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.accounts}</span>
                 </div>
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">Journals</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('Journals')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.journals}</span>
                 </div>
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">AR Invoices</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('AR Invoices')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.invoices}</span>
                 </div>
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">AP Bills</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('AP Bills')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.bills}</span>
                 </div>
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">Customers</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('Customers')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.customers}</span>
                 </div>
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">Vendors</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('Vendors')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.vendors}</span>
                 </div>
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">Inventory</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('Inventory')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.inventory}</span>
                 </div>
                 <div className="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block">Payroll</span>
+                  <span className="text-[10px] text-slate-400 block">{tr('Payroll')}</span>
                   <span className="font-bold text-slate-100 font-mono">{activeStats.payroll}</span>
                 </div>
               </div>
@@ -324,7 +322,7 @@ export const BackupRestoreView: React.FC = () => {
                 className="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 flex items-center justify-center gap-2 transition cursor-pointer"
               >
                 <Layers className="w-4 h-4 text-purple-400" />
-                <span>Full System Snapshot</span>
+                <span>{tr('Full System Snapshot')}</span>
               </button>
             </div>
 
@@ -346,9 +344,9 @@ export const BackupRestoreView: React.FC = () => {
             <div className="flex items-center justify-between border-b border-slate-800 pb-4">
               <div className="flex items-center gap-2">
                 <RotateCcw className="w-5 h-5 text-emerald-400" />
-                <h3 className="text-sm font-bold text-slate-100">Point-in-Time Restore</h3>
+                <h3 className="text-sm font-bold text-slate-100">{tr('Point-in-Time Restore')}</h3>
               </div>
-              <span className="text-[11px] font-mono text-emerald-400">Rollback Engine</span>
+              <span className="text-[11px] font-mono text-emerald-400">{tr('Rollback Engine')}</span>
             </div>
 
             {/* Upload Zone */}
@@ -379,10 +377,8 @@ export const BackupRestoreView: React.FC = () => {
                 <div className="w-10 h-10 rounded-xl bg-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto mb-2">
                   <UploadCloud className="w-5 h-5" />
                 </div>
-                <h4 className="text-xs font-bold text-slate-200">
-                  Select or drop backup file to restore
-                </h4>
-                <p className="text-[11px] text-slate-400 mt-1">Accepts valid *.json company snapshots</p>
+                <h4 className="text-xs font-bold text-slate-200">{tr('Select or drop backup file to restore')}</h4>
+                <p className="text-[11px] text-slate-400 mt-1">{tr('Accepts valid *.json company snapshots')}</p>
               </div>
             )}
 
@@ -392,15 +388,11 @@ export const BackupRestoreView: React.FC = () => {
                 <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-4 space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-800 pb-2">
                     <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                      <FileCheck className="w-4 h-4 text-emerald-400" />
-                      Snapshot Validated
-                    </span>
+                      <FileCheck className="w-4 h-4 text-emerald-400" />{tr('Snapshot Validated')}</span>
                     <button
                       onClick={() => setValidationResult(null)}
                       className="text-[11px] text-slate-400 hover:text-slate-200 underline cursor-pointer"
-                    >
-                      Clear
-                    </button>
+                    >{tr('Clear')}</button>
                   </div>
 
                   <div className="text-xs space-y-1">
@@ -421,7 +413,7 @@ export const BackupRestoreView: React.FC = () => {
 
                   {/* Mode select */}
                   <div className="space-y-2 pt-2 border-t border-slate-800/80">
-                    <label className="text-[11px] font-semibold text-slate-300 block">Restore Mode:</label>
+                    <label className="text-[11px] font-semibold text-slate-300 block">{tr('Restore Mode:')}</label>
                     <div className="space-y-2">
                       <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
                         <input
@@ -442,7 +434,7 @@ export const BackupRestoreView: React.FC = () => {
                           onChange={() => setRestoreMode('restore_as_new_tenant')}
                           className="text-indigo-600"
                         />
-                        <span>Restore as New Cloned Entity</span>
+                        <span>{tr('Restore as New Cloned Entity')}</span>
                       </label>
                     </div>
                   </div>
@@ -451,14 +443,14 @@ export const BackupRestoreView: React.FC = () => {
                     <div className="pt-2 space-y-2">
                       <input
                         type="text"
-                        placeholder="New Company Name"
+                        placeholder={tr('New Company Name')}
                         value={customTenantName}
                         onChange={(e) => setCustomTenantName(e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100"
                       />
                       <input
                         type="text"
-                        placeholder="New Company Code"
+                        placeholder={tr('New Company Code')}
                         value={customTenantCode}
                         onChange={(e) => setCustomTenantCode(e.target.value)}
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 uppercase font-mono"
@@ -476,7 +468,7 @@ export const BackupRestoreView: React.FC = () => {
                     ) : (
                       <RotateCcw className="w-4 h-4" />
                     )}
-                    <span>Execute Restore to this Point</span>
+                    <span>{tr('Execute Restore to this Point')}</span>
                   </button>
                 </div>
               </div>
@@ -487,7 +479,7 @@ export const BackupRestoreView: React.FC = () => {
               <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 text-xs text-emerald-300 space-y-1">
                 <div className="flex items-center gap-2 font-bold text-emerald-200">
                   <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Company Restored Successfully!</span>
+                  <span>{tr('Company Restored Successfully!')}</span>
                 </div>
                 <p className="text-emerald-300/80">
                   Loaded {restoreSuccess.count} entities for <span className="font-bold text-white">{restoreSuccess.tenantName}</span>.

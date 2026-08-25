@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   Package,
@@ -50,6 +51,7 @@ interface ProductServicesViewProps {
 export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
   onSelectProductForInvoice,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     activeRole,
@@ -414,11 +416,10 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             <span className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
               <Package className="w-5 h-5" />
             </span>
-            <h2 className="text-xl font-bold text-slate-100">Products & Services Catalog</h2>
+            <h2 className="text-xl font-bold text-slate-100">{tr('Products & Services Catalog')}</h2>
           </div>
           <p className="text-xs text-slate-400 max-w-2xl">
-            Standardized goods, subscriptions, and hourly services with complete historical price revision tracking,
-            audit logs, and instant customer invoice line-item integration.
+            {tr("Standardized goods, subscriptions, and hourly services with complete historical price revision tracking, audit logs, and instant customer invoice line-item integration.")}
           </p>
         </div>
 
@@ -428,7 +429,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             className="px-3 py-2 bg-slate-800 hover:bg-slate-750 text-indigo-300 border border-indigo-500/30 hover:border-indigo-500/50 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
           >
             <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span>Load Industry Presets</span>
+            <span>{tr('Load Industry Presets')}</span>
           </button>
 
           <button
@@ -436,7 +437,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/25 transition cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>Add Product / Service</span>
+            <span>{tr('Add Product / Service')}</span>
           </button>
         </div>
       </div>
@@ -452,7 +453,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
           }`}
         >
           <Tag className="w-4 h-4" />
-          <span>Catalog Items & Pricing ({totalCount})</span>
+          <span>{tr("Catalog Items & Pricing")} ({totalCount})</span>
         </button>
 
         <button
@@ -464,7 +465,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
           }`}
         >
           <History className="w-4 h-4" />
-          <span>Price Change Audit Trail</span>
+          <span>{tr('Price Change Audit Trail')}</span>
           <span className="px-1.5 py-0.5 rounded-full bg-slate-800 text-[10px] text-indigo-300 font-mono">
             {priceUpdatesCount}
           </span>
@@ -477,34 +478,34 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
           {/* Top Metrics Cards */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Catalog Items</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Total Catalog Items')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-slate-100">{totalCount}</span>
-                <span className="text-[11px] text-emerald-400">({activeCount} Active)</span>
+                <span className="text-[11px] text-emerald-400">({activeCount} {tr("Active")})</span>
               </div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Tangible Products</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Tangible Products')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-amber-400">{productCount}</span>
-                <span className="text-[11px] text-slate-500">Items / Goods</span>
+                <span className="text-[11px] text-slate-500">{tr('Items / Goods')}</span>
               </div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Services & Fees</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Services & Fees')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-indigo-400">{serviceCount}</span>
-                <span className="text-[11px] text-slate-500">Hourly / Recurring</span>
+                <span className="text-[11px] text-slate-500">{tr('Hourly / Recurring')}</span>
               </div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Price Revisions Tracked</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Price Revisions Tracked')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-emerald-400 font-mono">{priceUpdatesCount}</span>
-                <span className="text-[11px] text-slate-400">Audit Logs</span>
+                <span className="text-[11px] text-slate-400">{tr('Audit Logs')}</span>
               </div>
             </div>
           </div>
@@ -514,16 +515,14 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             <div className="flex items-center justify-between gap-4 mb-3">
               <div className="flex items-center gap-2">
                 <Calculator className="w-4 h-4 text-indigo-400" />
-                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-                  Quick Price & Quantity Estimator
-                </h3>
+                <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider">{tr('Quick Price & Quantity Estimator')}</h3>
               </div>
-              <span className="text-[11px] text-slate-400">Simulate line-item totals before creating invoices</span>
+              <span className="text-[11px] text-slate-400">{tr('Simulate line-item totals before creating invoices')}</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
               <div className="md:col-span-4">
-                <label className="block text-[11px] text-slate-400 mb-1">Select Catalog Item</label>
+                <label className="block text-[11px] text-slate-400 mb-1">{tr('Select Catalog Item')}</label>
                 <select
                   value={calcProductId || (tenantItems[0]?.id || '')}
                   onChange={(e) => {
@@ -546,7 +545,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
 
               <div className="md:col-span-2">
                 <label className="block text-[11px] text-slate-400 mb-1">
-                  Quantity ({selectedCalcItem?.unitOfMeasure || 'units'})
+                  {tr("Quantity")} ({selectedCalcItem?.unitOfMeasure || 'units'})
                 </label>
                 <input
                   type="number"
@@ -559,7 +558,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-[11px] text-slate-400 mb-1">Unit Price ({activeTenant.currency})</label>
+                <label className="block text-[11px] text-slate-400 mb-1">{tr("Unit Price")} ({activeTenant.currency})</label>
                 <input
                   type="number"
                   min="0"
@@ -571,7 +570,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-[11px] text-slate-400 mb-1">Tax Rate %</label>
+                <label className="block text-[11px] text-slate-400 mb-1">{tr('Tax Rate %')}</label>
                 <input
                   type="number"
                   min="0"
@@ -584,7 +583,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
 
               <div className="md:col-span-2">
                 <div className="bg-slate-950/80 border border-slate-800 rounded-lg p-2 text-right">
-                  <div className="text-[10px] text-slate-400 uppercase">Estimated Total</div>
+                  <div className="text-[10px] text-slate-400 uppercase">{tr('Estimated Total')}</div>
                   <div className="text-sm font-bold text-indigo-300 font-mono">
                     {activeTenant.currency} {calcTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
@@ -595,10 +594,10 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             {selectedCalcItem && (
               <div className="mt-3 pt-3 border-t border-slate-800/80 flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center gap-2 text-xs text-slate-400">
-                  <span>Item code: <strong className="text-slate-200 font-mono">{selectedCalcItem.code}</strong></span>
+                  <span>{tr('Item code:')} <strong className="text-slate-200 font-mono">{selectedCalcItem.code}</strong></span>
                   {selectedCalcItem.lastPriceUpdatedAt && (
                     <span className="text-[11px] text-indigo-400 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800/40">
-                      Price Effective: {selectedCalcItem.lastPriceUpdatedAt}
+                      {tr("Price Effective:")} {selectedCalcItem.lastPriceUpdatedAt}
                     </span>
                   )}
                 </div>
@@ -608,14 +607,14 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                     className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold flex items-center gap-1 transition cursor-pointer"
                   >
                     <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Update Base Price</span>
+                    <span>{tr('Update Base Price')}</span>
                   </button>
                   {onSelectProductForInvoice && (
                     <button
                       onClick={() => onSelectProductForInvoice(selectedCalcItem)}
                       className="px-3 py-1.5 bg-indigo-600/40 hover:bg-indigo-600/60 text-indigo-200 border border-indigo-500/40 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
                     >
-                      <span>Issue Customer Invoice</span>
+                      <span>{tr('Issue Customer Invoice')}</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   )}
@@ -630,7 +629,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search by SKU, item name, category..."
+                placeholder={tr('Search by SKU, item name, category...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
@@ -645,16 +644,14 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                   className={`px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer ${
                     typeFilter === 'ALL' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
                   }`}
-                >
-                  All Types
-                </button>
+                >{tr('All Types')}</button>
                 <button
                   onClick={() => setTypeFilter('PRODUCT')}
                   className={`px-2.5 py-1 rounded-md text-xs font-medium transition cursor-pointer ${
                     typeFilter === 'PRODUCT' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  📦 Products ({productCount})
+                  📦 {tr("Products")} ({productCount})
                 </button>
                 <button
                   onClick={() => setTypeFilter('SERVICE')}
@@ -662,7 +659,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                     typeFilter === 'SERVICE' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
-                  ⚙️ Services ({serviceCount})
+                  ⚙️ {tr("Services")} ({serviceCount})
                 </button>
               </div>
 
@@ -672,7 +669,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
               >
-                <option value="ALL">All Categories</option>
+                <option value="ALL">{tr('All Categories')}</option>
                 {availableCategories.map((cat) => (
                   <option key={cat} value={cat}>
                     {cat}
@@ -686,9 +683,9 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 onChange={(e) => setStatusFilter(e.target.value as any)}
                 className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
               >
-                <option value="ALL">All Status</option>
-                <option value="ACTIVE">Active Only</option>
-                <option value="INACTIVE">Inactive Only</option>
+                <option value="ALL">{tr('All Status')}</option>
+                <option value="ACTIVE">{tr('Active Only')}</option>
+                <option value="INACTIVE">{tr('Inactive Only')}</option>
               </select>
             </div>
           </div>
@@ -698,33 +695,31 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             <div className="p-4 border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Tag className="w-4 h-4 text-indigo-400" />
-                <h3 className="text-sm font-bold text-slate-200">Catalog Price List ({filteredItems.length})</h3>
+                <h3 className="text-sm font-bold text-slate-200">{tr("Catalog Price List")} ({filteredItems.length})</h3>
               </div>
-              <span className="text-xs text-slate-500 font-mono">Currency: {activeTenant.currency}</span>
+              <span className="text-xs text-slate-500 font-mono">{tr("Currency:")} {activeTenant.currency}</span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-slate-300">
                 <thead className="bg-slate-950/70 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800">
                   <tr>
-                    <th className="p-3">SKU / Code</th>
-                    <th className="p-3">Item Details</th>
-                    <th className="p-3">Type</th>
-                    <th className="p-3">Category</th>
-                    <th className="p-3 text-right">Unit Price</th>
-                    <th className="p-3 text-center">Unit of Measure</th>
-                    <th className="p-3 text-right">Tax Rate</th>
-                    <th className="p-3 text-center">Price Audit Status</th>
-                    <th className="p-3 text-center">Status</th>
-                    <th className="p-3 text-right">Actions</th>
+                    <th className="p-3">{tr('SKU / Code')}</th>
+                    <th className="p-3">{tr('Item Details')}</th>
+                    <th className="p-3">{tr('Type')}</th>
+                    <th className="p-3">{tr('Category')}</th>
+                    <th className="p-3 text-right">{tr('Unit Price')}</th>
+                    <th className="p-3 text-center">{tr('Unit of Measure')}</th>
+                    <th className="p-3 text-right">{tr('Tax Rate')}</th>
+                    <th className="p-3 text-center">{tr('Price Audit Status')}</th>
+                    <th className="p-3 text-center">{tr('Status')}</th>
+                    <th className="p-3 text-right">{tr('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-sans">
                   {filteredItems.length === 0 ? (
                     <tr>
-                      <td colSpan={10} className="p-8 text-center text-slate-500">
-                        No products or services found matching current filters. Click "Add Product / Service" or "Load Industry Presets" to populate your catalog.
-                      </td>
+                      <td colSpan={10} className="p-8 text-center text-slate-500">{tr('No products or services found matching current filters. Click "Add Product / Service" or "Load Industry Presets" to populate your catalog.')}</td>
                     </tr>
                   ) : (
                     filteredItems.map((item) => {
@@ -754,7 +749,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                                   : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/30'
                               }`}
                             >
-                              {item.type === 'PRODUCT' ? '📦 Product' : '⚙️ Service'}
+                              {item.type === 'PRODUCT' ? `📦 ${tr("Product")}` : `⚙️ ${tr("Service")}`}
                             </span>
                           </td>
                           <td className="p-3 text-slate-400">
@@ -768,7 +763,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                             </div>
                             {item.lastPriceUpdatedAt && (
                               <div className="text-[10px] text-slate-500 font-mono">
-                                Eff: {item.lastPriceUpdatedAt}
+                                {tr("Eff:")} {item.lastPriceUpdatedAt}
                               </div>
                             )}
                           </td>
@@ -781,11 +776,11 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                           <td className="p-3 text-center">
                             <button
                               onClick={() => handleOpenItemHistory(item)}
-                              title="Click to view full price change audit trail"
+                              title={tr('Click to view full price change audit trail')}
                               className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-slate-950 border border-slate-800 hover:border-indigo-500 text-[11px] text-slate-300 hover:text-indigo-300 transition cursor-pointer"
                             >
                               <History className="w-3 h-3 text-indigo-400" />
-                              <span>{itemHist.length} Revisions</span>
+                              <span>{itemHist.length} {tr("Revisions")}</span>
                             </button>
                           </td>
                           <td className="p-3 text-center">
@@ -796,14 +791,14 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                                   : 'bg-slate-700/50 text-slate-400 border border-slate-600'
                               }`}
                             >
-                              {item.status}
+                              {tr(item.status)}
                             </span>
                           </td>
                           <td className="p-3 text-right space-x-1 whitespace-nowrap">
                             {/* Update Price Button */}
                             <button
                               onClick={() => handleOpenPriceModal(item)}
-                              title="Update Price with Audit Reason"
+                              title={tr('Update Price with Audit Reason')}
                               className="p-1.5 bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-400 rounded-lg border border-emerald-500/20 transition cursor-pointer"
                             >
                               <TrendingUp className="w-3.5 h-3.5" />
@@ -811,7 +806,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                             {/* History Drawer */}
                             <button
                               onClick={() => handleOpenItemHistory(item)}
-                              title="View Audit Trail"
+                              title={tr('View Audit Trail')}
                               className="p-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 rounded-lg transition cursor-pointer"
                             >
                               <History className="w-3.5 h-3.5" />
@@ -820,7 +815,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                             {onSelectProductForInvoice && (
                               <button
                                 onClick={() => onSelectProductForInvoice(item)}
-                                title="Generate Invoice with this Item"
+                                title={tr('Generate Invoice with this Item')}
                                 className="p-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 rounded-lg transition cursor-pointer"
                               >
                                 <Receipt className="w-3.5 h-3.5" />
@@ -829,7 +824,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                             {/* General Edit */}
                             <button
                               onClick={() => handleOpenEditModal(item)}
-                              title="Edit Item Details"
+                              title={tr('Edit Item Details')}
                               className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition cursor-pointer"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
@@ -837,7 +832,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                             {/* Delete */}
                             <button
                               onClick={() => handleDelete(item.id, item.name)}
-                              title="Delete Item"
+                              title={tr('Delete Item')}
                               className="p-1.5 bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 rounded-lg transition cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
@@ -860,38 +855,38 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
           {/* Audit Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Total Price Changes</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Total Price Changes')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-slate-100">{tenantPriceHistory.length}</span>
-                <span className="text-[11px] text-indigo-400">Recorded</span>
+                <span className="text-[11px] text-indigo-400">{tr('Recorded')}</span>
               </div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Price Increases</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Price Increases')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-emerald-400">
                   {tenantPriceHistory.filter((h) => h.newPrice > h.oldPrice && h.oldPrice > 0).length}
                 </span>
-                <span className="text-[11px] text-emerald-500">Upward revisions</span>
+                <span className="text-[11px] text-emerald-500">{tr('Upward revisions')}</span>
               </div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Price Reductions</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Price Reductions')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-blue-400">
                   {tenantPriceHistory.filter((h) => h.newPrice < h.oldPrice).length}
                 </span>
-                <span className="text-[11px] text-blue-500">Discounts / Lowered</span>
+                <span className="text-[11px] text-blue-500">{tr('Discounts / Lowered')}</span>
               </div>
             </div>
 
             <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
-              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Audit Compliance</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">{tr('Audit Compliance')}</p>
               <div className="flex items-baseline gap-2">
                 <span className="text-2xl font-bold text-slate-100">100%</span>
-                <span className="text-[11px] text-emerald-400">Immutable SOX Log</span>
+                <span className="text-[11px] text-emerald-400">{tr('Immutable SOX Log')}</span>
               </div>
             </div>
           </div>
@@ -902,7 +897,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search audit trail by SKU, reason, user..."
+                placeholder={tr('Search audit trail by SKU, reason, user...')}
                 value={auditSearchTerm}
                 onChange={(e) => setAuditSearchTerm(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
@@ -915,10 +910,10 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 onChange={(e) => setAuditDirectionFilter(e.target.value as any)}
                 className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
               >
-                <option value="ALL">All Price Changes</option>
-                <option value="INCREASE">Price Increases (▲)</option>
-                <option value="DECREASE">Price Decreases (▼)</option>
-                <option value="INITIAL">Initial Baseline Setup</option>
+                <option value="ALL">{tr('All Price Changes')}</option>
+                <option value="INCREASE">{tr('Price Increases (▲)')}</option>
+                <option value="DECREASE">{tr('Price Decreases (▼)')}</option>
+                <option value="INITIAL">{tr('Initial Baseline Setup')}</option>
               </select>
 
               <button
@@ -926,7 +921,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-2 transition cursor-pointer"
               >
                 <Download className="w-4 h-4 text-indigo-400" />
-                <span>Export Audit CSV</span>
+                <span>{tr('Export Audit CSV')}</span>
               </button>
             </div>
           </div>
@@ -937,33 +932,31 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <div className="flex items-center gap-2">
                 <History className="w-4 h-4 text-indigo-400" />
                 <h3 className="text-sm font-bold text-slate-200">
-                  Historical Price Revision Register ({filteredAuditHistory.length})
+                  {tr("Historical Price Revision Register")} ({filteredAuditHistory.length})
                 </h3>
               </div>
-              <span className="text-xs text-slate-500">Includes user attribution & stated business rationale</span>
+              <span className="text-xs text-slate-500">{tr('Includes user attribution & stated business rationale')}</span>
             </div>
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs text-slate-300">
                 <thead className="bg-slate-950/70 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800">
                   <tr>
-                    <th className="p-3">Audit ID</th>
-                    <th className="p-3">SKU & Item</th>
-                    <th className="p-3 text-right">Old Price</th>
-                    <th className="p-3 text-right">New Price</th>
-                    <th className="p-3 text-center">Delta / Change %</th>
-                    <th className="p-3">Effective Date</th>
-                    <th className="p-3">Changed By</th>
-                    <th className="p-3">Business Reason & Notes</th>
-                    <th className="p-3 text-right">Timestamp</th>
+                    <th className="p-3">{tr('Audit ID')}</th>
+                    <th className="p-3">{tr('SKU & Item')}</th>
+                    <th className="p-3 text-right">{tr('Old Price')}</th>
+                    <th className="p-3 text-right">{tr('New Price')}</th>
+                    <th className="p-3 text-center">{tr('Delta / Change %')}</th>
+                    <th className="p-3">{tr('Effective Date')}</th>
+                    <th className="p-3">{tr('Changed By')}</th>
+                    <th className="p-3">{tr('Business Reason & Notes')}</th>
+                    <th className="p-3 text-right">{tr('Timestamp')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-sans">
                   {filteredAuditHistory.length === 0 ? (
                     <tr>
-                      <td colSpan={9} className="p-8 text-center text-slate-500">
-                        No price change audit events match your search or filter.
-                      </td>
+                      <td colSpan={9} className="p-8 text-center text-slate-500">{tr('No price change audit events match your search or filter.')}</td>
                     </tr>
                   ) : (
                     filteredAuditHistory.map((h) => {
@@ -988,9 +981,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                           </td>
                           <td className="p-3 text-center">
                             {isInitial ? (
-                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                                Initial Setup
-                              </span>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">{tr('Initial Setup')}</span>
                             ) : isUp ? (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-mono">
                                 <ArrowUpRight className="w-3 h-3" />
@@ -1037,12 +1028,8 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-emerald-400" />
-                  Update Catalog Price & Log Audit Reason
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Every price adjustment is permanently recorded in the immutable audit log for compliance.
-                </p>
+                  <TrendingUp className="w-5 h-5 text-emerald-400" />{tr('Update Catalog Price & Log Audit Reason')}</h3>
+                <p className="text-xs text-slate-400">{tr('Every price adjustment is permanently recorded in the immutable audit log for compliance.')}</p>
               </div>
               <button
                 onClick={() => setIsPriceModalOpen(false)}
@@ -1059,12 +1046,12 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                   {priceUpdatingItem.code}
                 </span>
                 <span className="text-[11px] text-slate-400">
-                  Unit of Measure: <strong className="text-slate-200">{priceUpdatingItem.unitOfMeasure || 'unit'}</strong>
+                  {tr("Unit of Measure:")} <strong className="text-slate-200">{priceUpdatingItem.unitOfMeasure || 'unit'}</strong>
                 </span>
               </div>
               <div className="font-bold text-slate-100 text-sm">{priceUpdatingItem.name}</div>
               <div className="flex items-center justify-between text-xs text-slate-400 pt-1 border-t border-slate-800/80">
-                <span>Current Base Price:</span>
+                <span>{tr('Current Base Price:')}</span>
                 <span className="font-mono font-bold text-slate-200 text-sm">
                   {activeTenant.currency} {priceUpdatingItem.unitPrice.toFixed(2)}
                 </span>
@@ -1075,7 +1062,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               {/* New Price Input & Live Delta */}
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  New Unit Price ({activeTenant.currency}) *
+                  {tr("New Unit Price")} ({activeTenant.currency}) *
                 </label>
                 <div className="relative">
                   <input
@@ -1091,7 +1078,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
 
                 {/* Live Differential Display */}
                 <div className="mt-2 p-2.5 rounded-lg bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs">
-                  <span className="text-slate-400">Price Adjustment:</span>
+                  <span className="text-slate-400">{tr('Price Adjustment:')}</span>
                   <div className="flex items-center gap-2 font-mono">
                     <span className={modalDelta >= 0 ? 'text-emerald-400 font-bold' : 'text-blue-400 font-bold'}>
                       {modalDelta >= 0 ? '+' : ''}{activeTenant.currency} {modalDelta.toFixed(2)}
@@ -1112,7 +1099,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               {/* Effective Date & Authorization */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Effective Date *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Effective Date *')}</label>
                   <input
                     type="date"
                     required
@@ -1123,7 +1110,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Authorized User</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Authorized User')}</label>
                   <input
                     type="text"
                     disabled
@@ -1136,28 +1123,26 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               {/* Reason for Price Adjustment */}
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Audit Reason for Price Adjustment *
+                  {tr("Audit Reason for Price Adjustment *")}
                 </label>
                 <select
                   value={priceChangeReasonType}
                   onChange={(e) => setPriceChangeReasonType(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                 >
-                  <option value="Annual Contract Indexation">Annual Contract Indexation / Inflation</option>
-                  <option value="Cost of Goods / Provider Cost Realignment">Cost of Goods / Cloud / Provider Cost Realignment</option>
-                  <option value="Market Rate Realignment">Market Standard Rate Realignment</option>
-                  <option value="Promotional / Discount Tier Revision">Promotional / Volume Tier Revision</option>
-                  <option value="Regulatory & Statutory Surcharge Update">Regulatory & Statutory Surcharge Update</option>
-                  <option value="Contract Renegotiation">Contract Renegotiation / Scope Expansion</option>
-                  <option value="Other / Custom Business Reason">Other / Custom Business Reason...</option>
+                  <option value="Annual Contract Indexation">{tr('Annual Contract Indexation / Inflation')}</option>
+                  <option value="Cost of Goods / Provider Cost Realignment">{tr('Cost of Goods / Cloud / Provider Cost Realignment')}</option>
+                  <option value="Market Rate Realignment">{tr('Market Standard Rate Realignment')}</option>
+                  <option value="Promotional / Discount Tier Revision">{tr('Promotional / Volume Tier Revision')}</option>
+                  <option value="Regulatory & Statutory Surcharge Update">{tr('Regulatory & Statutory Surcharge Update')}</option>
+                  <option value="Contract Renegotiation">{tr('Contract Renegotiation / Scope Expansion')}</option>
+                  <option value="Other / Custom Business Reason">{tr('Other / Custom Business Reason...')}</option>
                 </select>
               </div>
 
               {/* Custom Reason Details or Notes */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Audit Notes / Detailed Justification
-                </label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Audit Notes / Detailed Justification')}</label>
                 <textarea
                   rows={2}
                   value={priceChangeCustomReason || priceChangeNotes}
@@ -1168,7 +1153,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                       setPriceChangeNotes(e.target.value);
                     }
                   }}
-                  placeholder="Provide reference to board resolution, customer amendment, or CPI index..."
+                  placeholder={tr('Provide reference to board resolution, customer amendment, or CPI index...')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1178,7 +1163,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2">
                   <div className="flex items-center gap-2 text-amber-300 text-xs font-bold">
                     <ShieldAlert className="w-4 h-4" />
-                    <span>Significant Price Revision Detected ({modalDeltaPct > 0 ? `+${modalDeltaPct.toFixed(1)}%` : `${modalDeltaPct.toFixed(1)}%`})</span>
+                    <span>{tr("Significant Price Revision Detected")} ({modalDeltaPct > 0 ? `+${modalDeltaPct.toFixed(1)}%` : `${modalDeltaPct.toFixed(1)}%`})</span>
                   </div>
                   <label className="flex items-start gap-2 text-xs text-slate-300 cursor-pointer">
                     <input
@@ -1187,9 +1172,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                       onChange={(e) => setConfirmSignificantChange(e.target.checked)}
                       className="mt-0.5 text-amber-600 rounded"
                     />
-                    <span>
-                      I confirm this price revision is deliberate and complies with the tenant's pricing policy and customer notification terms.
-                    </span>
+                    <span>{tr('I confirm this price revision is deliberate and complies with the tenant\'s pricing policy and customer notification terms.')}</span>
                   </label>
                 </div>
               )}
@@ -1200,15 +1183,13 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                   type="button"
                   onClick={() => setIsPriceModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/30 cursor-pointer flex items-center gap-2"
                 >
                   <TrendingUp className="w-4 h-4" />
-                  <span>Commit Price Revision</span>
+                  <span>{tr('Commit Price Revision')}</span>
                 </button>
               </div>
             </form>
@@ -1224,11 +1205,9 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
                   <History className="w-5 h-5 text-indigo-400" />
-                  Price Revision History: [{historyDrawerItem.code}] {historyDrawerItem.name}
+                  {tr("Price Revision History:")} [{historyDrawerItem.code}] {historyDrawerItem.name}
                 </h3>
-                <p className="text-xs text-slate-400">
-                  Chronological price changes recorded for this item with user attribution.
-                </p>
+                <p className="text-xs text-slate-400">{tr('Chronological price changes recorded for this item with user attribution.')}</p>
               </div>
               <button
                 onClick={() => setIsHistoryDrawerOpen(false)}
@@ -1241,7 +1220,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             {/* Current Status Header */}
             <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between flex-wrap gap-3">
               <div>
-                <div className="text-[11px] text-slate-400 uppercase">Current Unit Price</div>
+                <div className="text-[11px] text-slate-400 uppercase">{tr('Current Unit Price')}</div>
                 <div className="text-xl font-bold font-mono text-emerald-400">
                   {activeTenant.currency} {historyDrawerItem.unitPrice.toFixed(2)}
                   <span className="text-xs text-slate-400 font-normal"> / {historyDrawerItem.unitOfMeasure || 'unit'}</span>
@@ -1256,15 +1235,13 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer"
               >
                 <TrendingUp className="w-3.5 h-3.5" />
-                <span>Adjust Price Now</span>
+                <span>{tr('Adjust Price Now')}</span>
               </button>
             </div>
 
             {/* Timeline */}
             <div className="space-y-3">
-              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                Price Timeline & Audit Trail
-              </h4>
+              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider">{tr('Price Timeline & Audit Trail')}</h4>
 
               {(() => {
                 const itemHistory = tenantPriceHistory.filter(
@@ -1273,9 +1250,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
 
                 if (itemHistory.length === 0) {
                   return (
-                    <div className="p-6 text-center text-slate-500 bg-slate-950 rounded-xl border border-slate-800">
-                      No separate price adjustment events found. The initial base price is currently active.
-                    </div>
+                    <div className="p-6 text-center text-slate-500 bg-slate-950 rounded-xl border border-slate-800">{tr('No separate price adjustment events found. The initial base price is currently active.')}</div>
                   );
                 }
 
@@ -1293,9 +1268,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                           <div className="flex items-center justify-between flex-wrap gap-2">
                             <div className="flex items-center gap-2">
                               {isInitial ? (
-                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                                  Initial Baseline
-                                </span>
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">{tr('Initial Baseline')}</span>
                               ) : isUp ? (
                                 <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1 font-mono">
                                   <ArrowUpRight className="w-3 h-3" />
@@ -1315,14 +1288,14 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                             </div>
 
                             <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
-                              <span>Eff: <strong>{h.effectiveDate || h.changeDate.split('T')[0]}</strong></span>
+                              <span>{tr('Eff:')} <strong>{h.effectiveDate || h.changeDate.split('T')[0]}</strong></span>
                               <span>•</span>
                               <span>{h.changeDate.split('T')[0]}</span>
                             </div>
                           </div>
 
                           <div className="text-xs text-slate-300 font-medium">
-                            <strong>Reason:</strong> {h.reason}
+                            <strong>{tr('Reason:')}</strong> {h.reason}
                           </div>
 
                           {h.notes && (
@@ -1332,8 +1305,8 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                           )}
 
                           <div className="text-[10px] text-slate-500 flex items-center justify-between pt-1 border-t border-slate-800/60">
-                            <span>Authorized by: <strong className="text-slate-400">{h.changedBy}</strong> ({h.changedRole || 'accountant'})</span>
-                            <span className="font-mono">Log ID: {h.id.substring(0, 10)}</span>
+                            <span>{tr('Authorized by:')} <strong className="text-slate-400">{h.changedBy}</strong> ({h.changedRole || 'accountant'})</span>
+                            <span className="font-mono">{tr("Log ID:")} {h.id.substring(0, 10)}</span>
                           </div>
                         </div>
                       );
@@ -1347,9 +1320,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <button
                 onClick={() => setIsHistoryDrawerOpen(false)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
-              >
-                Close
-              </button>
+              >{tr('Close')}</button>
             </div>
           </div>
         </div>
@@ -1363,11 +1334,9 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
                   <Package className="w-5 h-5 text-indigo-400" />
-                  {editingItem ? 'Edit Product / Service Specifications' : 'Add New Product / Service'}
+                  {editingItem ? tr('Edit Product / Service Specifications') : tr('Add New Product / Service')}
                 </h3>
-                <p className="text-xs text-slate-400">
-                  Configure catalog codes, default prices, and tax rates for automatic invoicing.
-                </p>
+                <p className="text-xs text-slate-400">{tr('Configure catalog codes, default prices, and tax rates for automatic invoicing.')}</p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -1380,7 +1349,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             <form onSubmit={handleSaveItem} className="space-y-4">
               {/* Type Switcher */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1.5">Item Classification</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1.5">{tr('Item Classification')}</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
@@ -1393,8 +1362,8 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                   >
                     <span className="text-lg">⚙️</span>
                     <div className="text-left">
-                      <div className="text-xs font-bold">Service / Fee</div>
-                      <div className="text-[10px] text-slate-400">Hourly, maintenance, tuition, consultation</div>
+                      <div className="text-xs font-bold">{tr('Service / Fee')}</div>
+                      <div className="text-[10px] text-slate-400">{tr('Hourly, maintenance, tuition, consultation')}</div>
                     </div>
                   </button>
 
@@ -1409,8 +1378,8 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                   >
                     <span className="text-lg">📦</span>
                     <div className="text-left">
-                      <div className="text-xs font-bold">Physical / Digital Product</div>
-                      <div className="text-[10px] text-slate-400">Goods, uniforms, software licenses, kits</div>
+                      <div className="text-xs font-bold">{tr('Physical / Digital Product')}</div>
+                      <div className="text-[10px] text-slate-400">{tr('Goods, uniforms, software licenses, kits')}</div>
                     </div>
                   </button>
                 </div>
@@ -1419,25 +1388,25 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               {/* SKU & Name */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">SKU / Item Code *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('SKU / Item Code *')}</label>
                   <input
                     type="text"
                     required
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                    placeholder="e.g. SRV-CONSULT"
+                    placeholder={tr('e.g. SRV-CONSULT')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500 uppercase"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Item Title / Name *</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Item Title / Name *')}</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="e.g. Monthly Maintenance Fee / Senior Advisory"
+                    placeholder={tr('e.g. Monthly Maintenance Fee / Senior Advisory')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -1445,12 +1414,12 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
 
               {/* Description */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Description</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Description')}</label>
                 <textarea
                   rows={2}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  placeholder="Detailed breakdown shown on customer invoices..."
+                  placeholder={tr('Detailed breakdown shown on customer invoices...')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1458,34 +1427,34 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               {/* Category & Unit of Measure */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Category</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Category')}</label>
                   <input
                     type="text"
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    placeholder="e.g. Professional Services, Tuition, HOA"
+                    placeholder={tr('e.g. Professional Services, Tuition, HOA')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Unit of Measure</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Unit of Measure')}</label>
                   <select
                     value={formData.unitOfMeasure}
                     onChange={(e) => setFormData({ ...formData, unitOfMeasure: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500 font-mono"
                   >
-                    <option value="unit">unit (Single count)</option>
-                    <option value="hour">hour (Time based)</option>
-                    <option value="sq ft">sq ft (Area maintenance)</option>
-                    <option value="month">month (Recurring)</option>
-                    <option value="user/mo">user/mo (Seat license)</option>
-                    <option value="term">term (School semester)</option>
-                    <option value="bed/day">bed/day (Hospital ward)</option>
-                    <option value="session">session (Consultation)</option>
-                    <option value="set">set (Uniform / Pack)</option>
-                    <option value="event/day">event/day (Facility booking)</option>
-                    <option value="kWh">kWh (Utility electric)</option>
+                    <option value="unit">{tr('unit (Single count)')}</option>
+                    <option value="hour">{tr('hour (Time based)')}</option>
+                    <option value="sq ft">{tr('sq ft (Area maintenance)')}</option>
+                    <option value="month">{tr('month (Recurring)')}</option>
+                    <option value="user/mo">{tr('user/mo (Seat license)')}</option>
+                    <option value="term">{tr('term (School semester)')}</option>
+                    <option value="bed/day">{tr('bed/day (Hospital ward)')}</option>
+                    <option value="session">{tr('session (Consultation)')}</option>
+                    <option value="set">{tr('set (Uniform / Pack)')}</option>
+                    <option value="event/day">{tr('event/day (Facility booking)')}</option>
+                    <option value="kWh">{tr('kWh (Utility electric)')}</option>
                   </select>
                 </div>
               </div>
@@ -1494,7 +1463,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Unit Price ({activeTenant.currency}) *
+                    {tr("Unit Price")} ({activeTenant.currency}) *
                   </label>
                   <input
                     type="number"
@@ -1508,7 +1477,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Default Tax %</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Default Tax %')}</label>
                   <input
                     type="number"
                     step="any"
@@ -1520,21 +1489,21 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Revenue Account</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Revenue Account')}</label>
                   <select
                     value={formData.defaultRevenueAccountCode}
                     onChange={(e) => setFormData({ ...formData, defaultRevenueAccountCode: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="4010">4010 - Core Sales & Operations</option>
-                    <option value="4020">4020 - Consulting & Services</option>
+                    <option value="4010">{tr('4010 - Core Sales & Operations')}</option>
+                    <option value="4020">{tr('4020 - Consulting & Services')}</option>
                   </select>
                 </div>
               </div>
 
               {/* Status */}
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Catalog Status</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Catalog Status')}</label>
                 <div className="flex items-center gap-4 text-xs text-slate-300">
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
@@ -1543,7 +1512,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                       onChange={() => setFormData({ ...formData, status: 'ACTIVE' })}
                       className="text-indigo-600"
                     />
-                    <span>Active (Available in Invoicing)</span>
+                    <span>{tr('Active (Available in Invoicing)')}</span>
                   </label>
                   <label className="flex items-center gap-1.5 cursor-pointer">
                     <input
@@ -1552,7 +1521,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                       onChange={() => setFormData({ ...formData, status: 'INACTIVE' })}
                       className="text-indigo-600"
                     />
-                    <span>Inactive (Archived)</span>
+                    <span>{tr('Inactive (Archived)')}</span>
                   </label>
                 </div>
               </div>
@@ -1562,14 +1531,12 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/30 cursor-pointer"
                 >
-                  {editingItem ? 'Save Changes' : 'Create Item'}
+                  {editingItem ? tr('Save Changes') : tr('Create Item')}
                 </button>
               </div>
             </form>
@@ -1584,12 +1551,8 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-indigo-400" />
-                  Load Industry Products & Services
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Select an industry archetype to instantly seed standardized pricing models, service descriptions, and units of measure.
-                </p>
+                  <Sparkles className="w-5 h-5 text-indigo-400" />{tr('Load Industry Products & Services')}</h3>
+                <p className="text-xs text-slate-400">{tr('Select an industry archetype to instantly seed standardized pricing models, service descriptions, and units of measure.')}</p>
               </div>
               <button
                 onClick={() => setIsPresetModalOpen(false)}
@@ -1607,11 +1570,9 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               >
                 <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs">
                   <Building2 className="w-4 h-4" />
-                  <span>Housing Society & HOA</span>
+                  <span>{tr('Housing Society & HOA')}</span>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Maintenance assessments per sq ft, parking bay charges, banquet hall bookings, EV charging.
-                </p>
+                <p className="text-[11px] text-slate-400">{tr('Maintenance assessments per sq ft, parking bay charges, banquet hall bookings, EV charging.')}</p>
               </button>
 
               {/* School & University */}
@@ -1621,11 +1582,9 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               >
                 <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
                   <GraduationCap className="w-4 h-4" />
-                  <span>School & University</span>
+                  <span>{tr('School & University')}</span>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Semester tuition fees, bus transport routes, STEM robotics lab fees, uniform blazer sets.
-                </p>
+                <p className="text-[11px] text-slate-400">{tr('Semester tuition fees, bus transport routes, STEM robotics lab fees, uniform blazer sets.')}</p>
               </button>
 
               {/* Hospital & Healthcare */}
@@ -1635,11 +1594,9 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               >
                 <div className="flex items-center gap-2 text-rose-400 font-bold text-xs">
                   <HeartPulse className="w-4 h-4" />
-                  <span>Hospital & Healthcare</span>
+                  <span>{tr('Hospital & Healthcare')}</span>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Specialist physician consults, deluxe inpatient bed tariffs, MRI diagnostic scans, surgical packs.
-                </p>
+                <p className="text-[11px] text-slate-400">{tr('Specialist physician consults, deluxe inpatient bed tariffs, MRI diagnostic scans, surgical packs.')}</p>
               </button>
 
               {/* SaaS & Enterprise */}
@@ -1649,11 +1606,9 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               >
                 <div className="flex items-center gap-2 text-amber-400 font-bold text-xs">
                   <Briefcase className="w-4 h-4" />
-                  <span>SaaS & Enterprise</span>
+                  <span>{tr('SaaS & Enterprise')}</span>
                 </div>
-                <p className="text-[11px] text-slate-400">
-                  Annual platform licenses, user per-seat additions, cloud architecture advisory, SOX audit audits.
-                </p>
+                <p className="text-[11px] text-slate-400">{tr('Annual platform licenses, user per-seat additions, cloud architecture advisory, SOX audit audits.')}</p>
               </button>
             </div>
 
@@ -1661,9 +1616,7 @@ export const ProductServicesView: React.FC<ProductServicesViewProps> = ({
               <button
                 onClick={() => setIsPresetModalOpen(false)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold cursor-pointer"
-              >
-                Cancel
-              </button>
+              >{tr('Cancel')}</button>
             </div>
           </div>
         </div>

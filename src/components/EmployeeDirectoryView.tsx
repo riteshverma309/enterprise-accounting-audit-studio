@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   PayrollEmployee,
@@ -58,10 +59,10 @@ interface EmployeeDirectoryViewProps {
   onNavigateToExpenses?: () => void;
 }
 
-export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
-  onNavigateToPayroll,
+export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({ onNavigateToPayroll,
   onNavigateToExpenses,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     payrollEmployees,
@@ -507,10 +508,8 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900">Employee Directory & Workforce Management</h1>
-              <p className="text-sm text-slate-500">
-                Manage employee master profiles, tax withholding elections, direct deposit accounts, and linked payroll/expense records.
-              </p>
+              <h1 className="text-xl font-bold text-slate-900">{tr('Employee Directory & Workforce Management')}</h1>
+              <p className="text-sm text-slate-500">{tr('Manage employee master profiles, tax withholding elections, direct deposit accounts, and linked payroll/expense records.')}</p>
             </div>
           </div>
         </div>
@@ -521,26 +520,20 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               onClick={onNavigateToPayroll}
               className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition"
             >
-              <FileSpreadsheet className="w-4 h-4 text-slate-500" />
-              Payroll & Pay Runs
-            </button>
+              <FileSpreadsheet className="w-4 h-4 text-slate-500" />{tr('Payroll & Pay Runs')}</button>
           )}
           <button
             id="btn-export-employees-csv"
             onClick={handleExportCSV}
             className="inline-flex items-center gap-2 px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-medium transition"
           >
-            <Download className="w-4 h-4 text-slate-500" />
-            Export CSV
-          </button>
+            <Download className="w-4 h-4 text-slate-500" />{tr('Export CSV')}</button>
           <button
             id="btn-add-new-employee"
             onClick={handleOpenAddModal}
             className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium shadow-sm transition"
           >
-            <Plus className="w-4 h-4" />
-            Add Employee
-          </button>
+            <Plus className="w-4 h-4" />{tr('Add Employee')}</button>
         </div>
       </div>
 
@@ -548,7 +541,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Workforce</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{tr('Total Workforce')}</p>
             <h3 className="text-2xl font-bold text-slate-900 mt-1">{metrics.total} Staff</h3>
             <p className="text-xs text-emerald-600 mt-1 font-medium flex items-center gap-1">
               <UserCheck className="w-3.5 h-3.5" /> {metrics.active} Active ({Math.round((metrics.active / (metrics.total || 1)) * 100)}%)
@@ -561,11 +554,11 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Annualized Payroll</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{tr('Annualized Payroll')}</p>
             <h3 className="text-2xl font-bold text-slate-900 mt-1">
               {activeTenant.currency} {metrics.totalAnnualPayroll.toLocaleString()}
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Active staff base liability</p>
+            <p className="text-xs text-slate-500 mt-1">{tr('Active staff base liability')}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
             <DollarSign className="w-6 h-6" />
@@ -574,11 +567,11 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Average Compensation</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{tr('Average Compensation')}</p>
             <h3 className="text-2xl font-bold text-slate-900 mt-1">
               {activeTenant.currency} {metrics.avgSalary.toLocaleString()}/yr
             </h3>
-            <p className="text-xs text-slate-500 mt-1">Across full & part-time staff</p>
+            <p className="text-xs text-slate-500 mt-1">{tr('Across full & part-time staff')}</p>
           </div>
           <div className="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
             <BadgeDollarSign className="w-6 h-6" />
@@ -587,7 +580,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
         <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Leave & Contractors</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{tr('Leave & Contractors')}</p>
             <h3 className="text-2xl font-bold text-slate-900 mt-1">
               {metrics.onLeave} Leave / {metrics.contractors} 1099
             </h3>
@@ -607,7 +600,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
           <input
             id="input-search-employees"
             type="text"
-            placeholder="Search by name, email, job title, or ID..."
+            placeholder={tr('Search by name, email, job title, or ID...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-slate-50/50"
@@ -623,7 +616,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
             onChange={(e) => setSelectedDept(e.target.value)}
             className="px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           >
-            <option value="ALL">All Departments</option>
+            <option value="ALL">{tr('All Departments')}</option>
             {departments.map((d) => (
               <option key={d} value={d}>
                 {d}
@@ -638,10 +631,10 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
             onChange={(e) => setSelectedStatus(e.target.value)}
             className="px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           >
-            <option value="ALL">All Statuses</option>
-            <option value="ACTIVE">Active Only</option>
-            <option value="ON_LEAVE">On Leave</option>
-            <option value="TERMINATED">Terminated</option>
+            <option value="ALL">{tr('All Statuses')}</option>
+            <option value="ACTIVE">{tr('Active Only')}</option>
+            <option value="ON_LEAVE">{tr('On Leave')}</option>
+            <option value="TERMINATED">{tr('Terminated')}</option>
           </select>
 
           {/* Employment Type */}
@@ -651,11 +644,11 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
             onChange={(e) => setSelectedType(e.target.value)}
             className="px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           >
-            <option value="ALL">All Employment Types</option>
-            <option value="FULL_TIME">Full Time</option>
-            <option value="PART_TIME">Part Time</option>
-            <option value="CONTRACTOR">1099 Contractor</option>
-            <option value="INTERN">Intern</option>
+            <option value="ALL">{tr('All Employment Types')}</option>
+            <option value="FULL_TIME">{tr('Full Time')}</option>
+            <option value="PART_TIME">{tr('Part Time')}</option>
+            <option value="CONTRACTOR">{tr('1099 Contractor')}</option>
+            <option value="INTERN">{tr('Intern')}</option>
           </select>
 
           {/* Pay Type */}
@@ -665,9 +658,9 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
             onChange={(e) => setSelectedPayType(e.target.value)}
             className="px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 focus:outline-none"
           >
-            <option value="ALL">All Pay Types</option>
-            <option value="SALARY">Salary</option>
-            <option value="HOURLY">Hourly Rate</option>
+            <option value="ALL">{tr('All Pay Types')}</option>
+            <option value="SALARY">{tr('Salary')}</option>
+            <option value="HOURLY">{tr('Hourly Rate')}</option>
           </select>
 
           {/* View Mode Toggle */}
@@ -678,18 +671,14 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               className={`px-3 py-1.5 text-xs font-semibold ${
                 viewMode === 'grid' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
               }`}
-            >
-              Grid
-            </button>
+            >{tr('Grid')}</button>
             <button
               id="btn-view-table"
               onClick={() => setViewMode('table')}
               className={`px-3 py-1.5 text-xs font-semibold ${
                 viewMode === 'table' ? 'bg-indigo-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
               }`}
-            >
-              Table
-            </button>
+            >{tr('Table')}</button>
           </div>
         </div>
       </div>
@@ -698,8 +687,8 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
       {filteredEmployees.length === 0 ? (
         <div className="bg-white p-12 rounded-xl border border-slate-200 text-center shadow-sm">
           <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-800">No employees match your search</h3>
-          <p className="text-sm text-slate-500 mt-1">Try clearing some filters or add a new employee profile.</p>
+          <h3 className="text-base font-bold text-slate-800">{tr('No employees match your search')}</h3>
+          <p className="text-sm text-slate-500 mt-1">{tr('Try clearing some filters or add a new employee profile.')}</p>
           <button
             onClick={() => {
               setSearchQuery('');
@@ -709,9 +698,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               setSelectedPayType('ALL');
             }}
             className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition"
-          >
-            Clear All Filters
-          </button>
+          >{tr('Clear All Filters')}</button>
         </div>
       ) : viewMode === 'grid' ? (
         /* GRID VIEW */
@@ -843,7 +830,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     <button
                       id={`btn-edit-emp-${emp.id}`}
                       onClick={() => handleOpenEditModal(emp)}
-                      title="Edit Profile"
+                      title={tr('Edit Profile')}
                       className="p-1.5 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-200 transition"
                     >
                       <Edit className="w-3.5 h-3.5" />
@@ -851,7 +838,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     <button
                       id={`btn-del-emp-${emp.id}`}
                       onClick={() => handleDeleteEmployee(emp.id, emp.name)}
-                      title="Delete Profile"
+                      title={tr('Delete Profile')}
                       className="p-1.5 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-200 transition"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -869,14 +856,14 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
             <table className="w-full text-left border-collapse text-xs">
               <thead>
                 <tr className="bg-slate-50 text-slate-600 border-b border-slate-200 font-bold uppercase tracking-wider">
-                  <th className="py-3 px-4">Employee ID</th>
-                  <th className="py-3 px-4">Full Name & Contact</th>
-                  <th className="py-3 px-4">Job Title & Dept</th>
-                  <th className="py-3 px-4">Status & Type</th>
-                  <th className="py-3 px-4">Compensation & Frequency</th>
-                  <th className="py-3 px-4">Filing Status</th>
-                  <th className="py-3 px-4">Payment Method</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4">{tr('Employee ID')}</th>
+                  <th className="py-3 px-4">{tr('Full Name & Contact')}</th>
+                  <th className="py-3 px-4">{tr('Job Title & Dept')}</th>
+                  <th className="py-3 px-4">{tr('Status & Type')}</th>
+                  <th className="py-3 px-4">{tr('Compensation & Frequency')}</th>
+                  <th className="py-3 px-4">{tr('Filing Status')}</th>
+                  <th className="py-3 px-4">{tr('Payment Method')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
@@ -938,14 +925,14 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                           <button
                             onClick={() => handleOpenEditModal(emp)}
                             className="p-1 text-slate-400 hover:text-slate-700 rounded hover:bg-slate-100"
-                            title="Edit"
+                            title={tr('Edit')}
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => handleDeleteEmployee(emp.id, emp.name)}
                             className="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-slate-100"
-                            title="Delete"
+                            title={tr('Delete')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -1005,7 +992,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                 <button
                   onClick={() => setShowSensitiveData(!showSensitiveData)}
                   className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5 transition"
-                  title="Toggle Masking for SSN & Bank details"
+                  title={tr('Toggle Masking for SSN & Bank details')}
                 >
                   {showSensitiveData ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                   {showSensitiveData ? 'Mask Sensitive Info' : 'Reveal Sensitive Info'}
@@ -1030,9 +1017,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     : 'border-transparent text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <Users className="w-4 h-4" />
-                Profile & Compensation Details
-              </button>
+                <Users className="w-4 h-4" />{tr('Profile & Compensation Details')}</button>
 
               <button
                 id="tab-profile-payruns"
@@ -1070,36 +1055,34 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     {/* Section 1: Employment & Contact Details */}
                     <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-                        <Briefcase className="w-4 h-4 text-indigo-600" />
-                        Personal & Employment Details
-                      </h4>
+                        <Briefcase className="w-4 h-4 text-indigo-600" />{tr('Personal & Employment Details')}</h4>
                       <dl className="space-y-2 text-xs">
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Work Email:</dt>
+                          <dt className="text-slate-500">{tr('Work Email:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.email}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Phone Number:</dt>
+                          <dt className="text-slate-500">{tr('Phone Number:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.phone || '+1 (555) 019-2831'}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Employment Type:</dt>
+                          <dt className="text-slate-500">{tr('Employment Type:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.employmentType.replace('_', ' ')}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Work Location:</dt>
+                          <dt className="text-slate-500">{tr('Work Location:')}</dt>
                           <dd className="font-semibold text-slate-900 text-right max-w-[200px] truncate">
                             {activeProfileEmployee.address || 'Acme HQ - 450 Lexington Ave, NY'}
                           </dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">SSN / Tax Identification:</dt>
+                          <dt className="text-slate-500">{tr('SSN / Tax Identification:')}</dt>
                           <dd className="font-mono font-semibold text-indigo-700">
                             {showSensitiveData ? '048-29-4892 (Verified)' : activeProfileEmployee.taxId || '•••-••-4892'}
                           </dd>
                         </div>
                         <div className="flex justify-between py-1">
-                          <dt className="text-slate-500">Emergency Contact:</dt>
+                          <dt className="text-slate-500">{tr('Emergency Contact:')}</dt>
                           <dd className="font-semibold text-slate-900">
                             {activeProfileEmployee.emergencyContactName || 'Robert Accountant'} ({activeProfileEmployee.emergencyContactPhone || '+1 555-9011'})
                           </dd>
@@ -1110,18 +1093,16 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     {/* Section 2: Compensation & Pay Type */}
                     <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-                        <DollarSign className="w-4 h-4 text-emerald-600" />
-                        Compensation & Pay Structure
-                      </h4>
+                        <DollarSign className="w-4 h-4 text-emerald-600" />{tr('Compensation & Pay Structure')}</h4>
                       <dl className="space-y-2 text-xs">
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Pay Model:</dt>
+                          <dt className="text-slate-500">{tr('Pay Model:')}</dt>
                           <dd className="font-bold text-slate-900">
                             {activeProfileEmployee.payType === 'HOURLY' ? 'Hourly Wage Rate' : 'Annual Base Salary'}
                           </dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Base Compensation:</dt>
+                          <dt className="text-slate-500">{tr('Base Compensation:')}</dt>
                           <dd className="font-bold text-emerald-700 text-sm">
                             {activeProfileEmployee.payType === 'HOURLY'
                               ? `${activeTenant.currency} ${activeProfileEmployee.hourlyRate || 0}/hour`
@@ -1129,15 +1110,15 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                           </dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Pay Frequency:</dt>
+                          <dt className="text-slate-500">{tr('Pay Frequency:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.payFrequency.replace('_', ' ')}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Expected Standard Hours:</dt>
+                          <dt className="text-slate-500">{tr('Expected Standard Hours:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.standardHoursPerWeek || 40} hrs/week</dd>
                         </div>
                         <div className="flex justify-between py-1">
-                          <dt className="text-slate-500">Est. Gross Per Paycheck:</dt>
+                          <dt className="text-slate-500">{tr('Est. Gross Per Paycheck:')}</dt>
                           <dd className="font-bold text-slate-900">
                             {activeTenant.currency}{' '}
                             {(
@@ -1159,30 +1140,28 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     {/* Section 3: Tax Withholding & Benefits */}
                     <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-                        <ShieldCheck className="w-4 h-4 text-purple-600" />
-                        Tax Withholding & Pre-Tax Benefits
-                      </h4>
+                        <ShieldCheck className="w-4 h-4 text-purple-600" />{tr('Tax Withholding & Pre-Tax Benefits')}</h4>
                       <dl className="space-y-2 text-xs">
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Federal Filing Status:</dt>
+                          <dt className="text-slate-500">{tr('Federal Filing Status:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.filingStatus.replace(/_/g, ' ')}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">State Filing Status:</dt>
+                          <dt className="text-slate-500">{tr('State Filing Status:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.stateFilingStatus || 'NY (Single / 1 Allowance)'}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Withholding Allowances:</dt>
+                          <dt className="text-slate-500">{tr('Withholding Allowances:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.allowances} allowances</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">401(k) Retirement Plan:</dt>
+                          <dt className="text-slate-500">{tr('401(k) Retirement Plan:')}</dt>
                           <dd className="font-semibold text-indigo-700">
                             {activeProfileEmployee.fourZeroOneKContributionRate || 6}% Employee (Match: {activeProfileEmployee.fourZeroOneKEmployerMatchRate || 4}%)
                           </dd>
                         </div>
                         <div className="flex justify-between py-1">
-                          <dt className="text-slate-500">Health & Dental Deduction:</dt>
+                          <dt className="text-slate-500">{tr('Health & Dental Deduction:')}</dt>
                           <dd className="font-semibold text-slate-900">
                             ${activeProfileEmployee.healthBenefitDeduction || 125} Health + ${activeProfileEmployee.dentalVisionDeduction || 25} Dental / period
                           </dd>
@@ -1193,32 +1172,30 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     {/* Section 4: Direct Deposit & Banking */}
                     <div className="bg-slate-50 p-5 rounded-xl border border-slate-200">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
-                        <Landmark className="w-4 h-4 text-blue-600" />
-                        Direct Deposit & Payment Details
-                      </h4>
+                        <Landmark className="w-4 h-4 text-blue-600" />{tr('Direct Deposit & Payment Details')}</h4>
                       <dl className="space-y-2 text-xs">
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Payment Method:</dt>
+                          <dt className="text-slate-500">{tr('Payment Method:')}</dt>
                           <dd className="font-bold text-slate-900">{activeProfileEmployee.paymentMethod.replace('_', ' ')}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Bank Financial Institution:</dt>
+                          <dt className="text-slate-500">{tr('Bank Financial Institution:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.bankName || 'JPMorgan Chase Bank, N.A.'}</dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Routing Number (ABA):</dt>
+                          <dt className="text-slate-500">{tr('Routing Number (ABA):')}</dt>
                           <dd className="font-mono font-semibold text-slate-900">
                             {showSensitiveData ? '021000021 (JPMC NY)' : '••••' + (activeProfileEmployee.bankRoutingNumber?.slice(-4) || '0021')}
                           </dd>
                         </div>
                         <div className="flex justify-between py-1 border-b border-slate-200/60">
-                          <dt className="text-slate-500">Account Number:</dt>
+                          <dt className="text-slate-500">{tr('Account Number:')}</dt>
                           <dd className="font-mono font-semibold text-slate-900">
                             {showSensitiveData ? '982341908234' : activeProfileEmployee.bankAccountNumber || '••••4892'}
                           </dd>
                         </div>
                         <div className="flex justify-between py-1">
-                          <dt className="text-slate-500">Account Type:</dt>
+                          <dt className="text-slate-500">{tr('Account Type:')}</dt>
                           <dd className="font-semibold text-slate-900">{activeProfileEmployee.accountType || 'CHECKING'}</dd>
                         </div>
                       </dl>
@@ -1228,7 +1205,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                   {/* Notes / HR Remarks */}
                   {activeProfileEmployee.notes && (
                     <div className="bg-amber-50/60 p-4 rounded-xl border border-amber-200 text-xs">
-                      <span className="font-bold text-amber-900 block mb-1">HR & Compliance Remarks:</span>
+                      <span className="font-bold text-amber-900 block mb-1">{tr('HR & Compliance Remarks:')}</span>
                       <p className="text-amber-800">{activeProfileEmployee.notes}</p>
                     </div>
                   )}
@@ -1239,7 +1216,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900">Historical Pay Runs & Disbursed Pay Stubs</h4>
+                      <h4 className="text-sm font-bold text-slate-900">{tr('Historical Pay Runs & Disbursed Pay Stubs')}</h4>
                       <p className="text-xs text-slate-500">All audited payroll distributions processed for {activeProfileEmployee.name}.</p>
                     </div>
                     {onNavigateToPayroll && (
@@ -1247,30 +1224,28 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                         onClick={onNavigateToPayroll}
                         className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        Run Next Payroll
-                      </button>
+                        <Plus className="w-3.5 h-3.5" />{tr('Run Next Payroll')}</button>
                     )}
                   </div>
 
                   {linkedPayRuns.length === 0 ? (
                     <div className="bg-slate-50 p-8 rounded-xl border border-slate-200 text-center">
                       <FileSpreadsheet className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                      <p className="text-xs font-semibold text-slate-700">No historical pay runs recorded yet for this employee.</p>
-                      <p className="text-[11px] text-slate-500 mt-0.5">Run a pay period in the Payroll module to generate official pay stubs.</p>
+                      <p className="text-xs font-semibold text-slate-700">{tr('No historical pay runs recorded yet for this employee.')}</p>
+                      <p className="text-[11px] text-slate-500 mt-0.5">{tr('Run a pay period in the Payroll module to generate official pay stubs.')}</p>
                     </div>
                   ) : (
                     <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
                       <table className="w-full text-left border-collapse text-xs">
                         <thead>
                           <tr className="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-                            <th className="py-2.5 px-3">Run Ref</th>
-                            <th className="py-2.5 px-3">Pay Period</th>
-                            <th className="py-2.5 px-3">Pay Date</th>
-                            <th className="py-2.5 px-3">Gross Wages</th>
-                            <th className="py-2.5 px-3">Taxes & Deductions</th>
-                            <th className="py-2.5 px-3">Net Disbursed</th>
-                            <th className="py-2.5 px-3 text-right">Pay Stub Voucher</th>
+                            <th className="py-2.5 px-3">{tr('Run Ref')}</th>
+                            <th className="py-2.5 px-3">{tr('Pay Period')}</th>
+                            <th className="py-2.5 px-3">{tr('Pay Date')}</th>
+                            <th className="py-2.5 px-3">{tr('Gross Wages')}</th>
+                            <th className="py-2.5 px-3">{tr('Taxes & Deductions')}</th>
+                            <th className="py-2.5 px-3">{tr('Net Disbursed')}</th>
+                            <th className="py-2.5 px-3 text-right">{tr('Pay Stub Voucher')}</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -1305,9 +1280,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                                   }
                                   className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 text-slate-700 rounded font-semibold text-xs transition"
                                 >
-                                  <Printer className="w-3.5 h-3.5" />
-                                  View Pay Stub
-                                </button>
+                                  <Printer className="w-3.5 h-3.5" />{tr('View Pay Stub')}</button>
                               </td>
                             </tr>
                           ))}
@@ -1322,7 +1295,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900">Expense Claims & Mileage Reimbursements</h4>
+                      <h4 className="text-sm font-bold text-slate-900">{tr('Expense Claims & Mileage Reimbursements')}</h4>
                       <p className="text-xs text-slate-500">Corporate out-of-pocket receipts, travel, and mileage logged by {activeProfileEmployee.name}.</p>
                     </div>
                     <button
@@ -1330,15 +1303,13 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       onClick={() => setIsExpenseClaimModalOpen(true)}
                       className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-xs transition"
                     >
-                      <Plus className="w-3.5 h-3.5" />
-                      File Expense Claim
-                    </button>
+                      <Plus className="w-3.5 h-3.5" />{tr('File Expense Claim')}</button>
                   </div>
 
                   {linkedExpenses.length === 0 && linkedMileage.length === 0 ? (
                     <div className="bg-slate-50 p-8 rounded-xl border border-slate-200 text-center">
                       <Receipt className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-                      <p className="text-xs font-semibold text-slate-700">No expense receipts or mileage submitted yet for this employee.</p>
+                      <p className="text-xs font-semibold text-slate-700">{tr('No expense receipts or mileage submitted yet for this employee.')}</p>
                       <button
                         onClick={() => setIsExpenseClaimModalOpen(true)}
                         className="mt-3 px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold transition"
@@ -1414,7 +1385,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                             <span className="font-bold text-emerald-600 text-sm">
                               {activeTenant.currency} {mil.totalDeductionAmount.toFixed(2)}
                             </span>
-                            <span className="text-[10px] text-slate-400 block">Reimbursable Mileage</span>
+                            <span className="text-[10px] text-slate-400 block">{tr('Reimbursable Mileage')}</span>
                           </div>
                         </div>
                       ))}
@@ -1432,16 +1403,12 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                 }}
                 className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-bold transition flex items-center gap-1.5"
               >
-                <Edit className="w-3.5 h-3.5" />
-                Edit Full Profile
-              </button>
+                <Edit className="w-3.5 h-3.5" />{tr('Edit Full Profile')}</button>
 
               <button
                 onClick={() => setActiveProfileEmployee(null)}
                 className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition"
-              >
-                Close Profile
-              </button>
+              >{tr('Close Profile')}</button>
             </div>
           </div>
         </div>
@@ -1464,9 +1431,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     <h3 className="text-base font-bold">
                       {editingEmployeeId ? `Edit Employee Record: ${formName}` : 'Add New Employee Profile'}
                     </h3>
-                    <p className="text-xs text-slate-400">
-                      Configure personal employment, compensation tier, tax withholding elections, and direct deposit.
-                    </p>
+                    <p className="text-xs text-slate-400">{tr('Configure personal employment, compensation tier, tax withholding elections, and direct deposit.')}</p>
                   </div>
                 </div>
                 <button
@@ -1533,14 +1498,13 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">
-                          Full Legal Name <span className="text-rose-500">*</span>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Full Legal Name')}<span className="text-rose-500">*</span>
                         </label>
                         <input
                           id="input-form-name"
                           type="text"
                           required
-                          placeholder="e.g. Sarah Jenkins, CPA"
+                          placeholder={tr('e.g. Sarah Jenkins, CPA')}
                           value={formName}
                           onChange={(e) => setFormName(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1548,14 +1512,13 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">
-                          Work Email Address <span className="text-rose-500">*</span>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Work Email Address')}<span className="text-rose-500">*</span>
                         </label>
                         <input
                           id="input-form-email"
                           type="email"
                           required
-                          placeholder="e.g. sarah.jenkins@acme.com"
+                          placeholder={tr('e.g. sarah.jenkins@acme.com')}
                           value={formEmail}
                           onChange={(e) => setFormEmail(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1565,7 +1528,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Employee ID / Number</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Employee ID / Number')}</label>
                         <input
                           type="text"
                           value={formEmployeeNumber}
@@ -1575,7 +1538,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Phone Number</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Phone Number')}</label>
                         <input
                           type="text"
                           placeholder="+1 (555) 019-2831"
@@ -1586,7 +1549,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">SSN / Tax ID (Masked)</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('SSN / Tax ID (Masked)')}</label>
                         <input
                           type="text"
                           placeholder="•••-••-1234"
@@ -1599,13 +1562,12 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">
-                          Job Title <span className="text-rose-500">*</span>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Job Title')}<span className="text-rose-500">*</span>
                         </label>
                         <input
                           type="text"
                           required
-                          placeholder="e.g. Senior Financial Controller"
+                          placeholder={tr('e.g. Senior Financial Controller')}
                           value={formRole}
                           onChange={(e) => setFormRole(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1613,52 +1575,52 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Department</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Department')}</label>
                         <select
                           value={formDepartment}
                           onChange={(e) => setFormDepartment(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="Engineering & R&D">Engineering & R&D</option>
-                          <option value="Finance & Compliance">Finance & Compliance</option>
-                          <option value="Sales & Marketing">Sales & Marketing</option>
-                          <option value="Product & Design">Product & Design</option>
-                          <option value="Executive & Legal">Executive & Legal</option>
-                          <option value="Customer Operations">Customer Operations</option>
+                          <option value="Engineering & R&D">{tr('Engineering & R&D')}</option>
+                          <option value="Finance & Compliance">{tr('Finance & Compliance')}</option>
+                          <option value="Sales & Marketing">{tr('Sales & Marketing')}</option>
+                          <option value="Product & Design">{tr('Product & Design')}</option>
+                          <option value="Executive & Legal">{tr('Executive & Legal')}</option>
+                          <option value="Customer Operations">{tr('Customer Operations')}</option>
                         </select>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Employment Type</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Employment Type')}</label>
                         <select
                           value={formEmploymentType}
                           onChange={(e) => setFormEmploymentType(e.target.value as EmployeeEmploymentType)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="FULL_TIME">Full Time (W-2)</option>
-                          <option value="PART_TIME">Part Time (W-2)</option>
-                          <option value="CONTRACTOR">1099 Independent Contractor</option>
-                          <option value="INTERN">Intern</option>
+                          <option value="FULL_TIME">{tr('Full Time (W-2)')}</option>
+                          <option value="PART_TIME">{tr('Part Time (W-2)')}</option>
+                          <option value="CONTRACTOR">{tr('1099 Independent Contractor')}</option>
+                          <option value="INTERN">{tr('Intern')}</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Status</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Status')}</label>
                         <select
                           value={formStatus}
                           onChange={(e) => setFormStatus(e.target.value as EmployeeStatus)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="ACTIVE">Active</option>
-                          <option value="ON_LEAVE">On Leave</option>
-                          <option value="TERMINATED">Terminated</option>
+                          <option value="ACTIVE">{tr('Active')}</option>
+                          <option value="ON_LEAVE">{tr('On Leave')}</option>
+                          <option value="TERMINATED">{tr('Terminated')}</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Hire Date</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Hire Date')}</label>
                         <input
                           type="date"
                           value={formHireDate}
@@ -1669,10 +1631,10 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     </div>
 
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1">Work Address / Location</label>
+                      <label className="font-bold text-slate-700 block mb-1">{tr('Work Address / Location')}</label>
                       <input
                         type="text"
-                        placeholder="e.g. 450 Lexington Ave, New York, NY 10017"
+                        placeholder={tr('e.g. 450 Lexington Ave, New York, NY 10017')}
                         value={formAddress}
                         onChange={(e) => setFormAddress(e.target.value)}
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1687,37 +1649,35 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     <div className="p-4 bg-indigo-50/70 rounded-xl border border-indigo-100 flex items-start gap-3">
                       <DollarSign className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
                       <div>
-                        <p className="font-bold text-indigo-950">Compensation & Wage Schedule</p>
-                        <p className="text-indigo-800 text-[11px]">
-                          Choose between fixed annual salary (divided evenly across pay runs) or hourly rate calculated on standard scheduled hours.
-                        </p>
+                        <p className="font-bold text-indigo-950">{tr('Compensation & Wage Schedule')}</p>
+                        <p className="text-indigo-800 text-[11px]">{tr('Choose between fixed annual salary (divided evenly across pay runs) or hourly rate calculated on standard scheduled hours.')}</p>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Pay Type</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Pay Type')}</label>
                         <select
                           value={formPayType}
                           onChange={(e) => setFormPayType(e.target.value as EmployeePayType)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="SALARY">Fixed Annual Salary ($/yr)</option>
-                          <option value="HOURLY">Hourly Wage Rate ($/hr)</option>
+                          <option value="SALARY">{tr('Fixed Annual Salary ($/yr)')}</option>
+                          <option value="HOURLY">{tr('Hourly Wage Rate ($/hr)')}</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Pay Frequency</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Pay Frequency')}</label>
                         <select
                           value={formPayFrequency}
                           onChange={(e) => setFormPayFrequency(e.target.value as EmployeePayFrequency)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="WEEKLY">Weekly (52 pay periods/yr)</option>
-                          <option value="BI_WEEKLY">Bi-Weekly (26 pay periods/yr)</option>
-                          <option value="SEMI_MONTHLY">Semi-Monthly (24 pay periods/yr)</option>
-                          <option value="MONTHLY">Monthly (12 pay periods/yr)</option>
+                          <option value="WEEKLY">{tr('Weekly (52 pay periods/yr)')}</option>
+                          <option value="BI_WEEKLY">{tr('Bi-Weekly (26 pay periods/yr)')}</option>
+                          <option value="SEMI_MONTHLY">{tr('Semi-Monthly (24 pay periods/yr)')}</option>
+                          <option value="MONTHLY">{tr('Monthly (12 pay periods/yr)')}</option>
                         </select>
                       </div>
                     </div>
@@ -1756,7 +1716,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="font-bold text-slate-700 block mb-1">Hourly Wage Rate ($/hr)</label>
+                          <label className="font-bold text-slate-700 block mb-1">{tr('Hourly Wage Rate ($/hr)')}</label>
                           <input
                             type="number"
                             min="0"
@@ -1768,7 +1728,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                         </div>
 
                         <div>
-                          <label className="font-bold text-slate-700 block mb-1">Standard Hours Per Week</label>
+                          <label className="font-bold text-slate-700 block mb-1">{tr('Standard Hours Per Week')}</label>
                           <input
                             type="number"
                             min="1"
@@ -1788,23 +1748,23 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Federal W-4 Filing Status</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Federal W-4 Filing Status')}</label>
                         <select
                           value={formFilingStatus}
                           onChange={(e) => setFormFilingStatus(e.target.value as EmployeeFilingStatus)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="SINGLE">Single or Married filing separately</option>
-                          <option value="MARRIED_FILING_JOINTLY">Married filing jointly</option>
-                          <option value="HEAD_OF_HOUSEHOLD">Head of Household</option>
+                          <option value="SINGLE">{tr('Single or Married filing separately')}</option>
+                          <option value="MARRIED_FILING_JOINTLY">{tr('Married filing jointly')}</option>
+                          <option value="HEAD_OF_HOUSEHOLD">{tr('Head of Household')}</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">State Tax Withholding Jurisdiction</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('State Tax Withholding Jurisdiction')}</label>
                         <input
                           type="text"
-                          placeholder="e.g. NY (Single / 1 Allowance)"
+                          placeholder={tr('e.g. NY (Single / 1 Allowance)')}
                           value={formStateFilingStatus}
                           onChange={(e) => setFormStateFilingStatus(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1814,7 +1774,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Withholding Allowances</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Withholding Allowances')}</label>
                         <input
                           type="number"
                           min="0"
@@ -1826,7 +1786,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Additional Per-Period Withholding ($)</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Additional Per-Period Withholding ($)')}</label>
                         <input
                           type="number"
                           min="0"
@@ -1846,7 +1806,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="font-semibold text-slate-600 block mb-1">401(k) Employee Contribution (%)</label>
+                          <label className="font-semibold text-slate-600 block mb-1">{tr('401(k) Employee Contribution (%)')}</label>
                           <input
                             type="number"
                             min="0"
@@ -1859,7 +1819,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                         </div>
 
                         <div>
-                          <label className="font-semibold text-slate-600 block mb-1">401(k) Employer Match (%)</label>
+                          <label className="font-semibold text-slate-600 block mb-1">{tr('401(k) Employer Match (%)')}</label>
                           <input
                             type="number"
                             min="0"
@@ -1874,7 +1834,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
                         <div>
-                          <label className="font-semibold text-slate-600 block mb-1">Health Insurance Deduction ($/period)</label>
+                          <label className="font-semibold text-slate-600 block mb-1">{tr('Health Insurance Deduction ($/period)')}</label>
                           <input
                             type="number"
                             min="0"
@@ -1886,7 +1846,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                         </div>
 
                         <div>
-                          <label className="font-semibold text-slate-600 block mb-1">Dental & Vision Deduction ($/period)</label>
+                          <label className="font-semibold text-slate-600 block mb-1">{tr('Dental & Vision Deduction ($/period)')}</label>
                           <input
                             type="number"
                             min="0"
@@ -1906,24 +1866,24 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Disbursement Method</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Disbursement Method')}</label>
                         <select
                           value={formPaymentMethod}
                           onChange={(e) => setFormPaymentMethod(e.target.value as EmployeePaymentMethod)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white font-semibold focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="DIRECT_DEPOSIT">Direct Deposit (ACH Transfer)</option>
-                          <option value="CHECK">Paper Payroll Check</option>
-                          <option value="WIRE">Wire Transfer</option>
-                          <option value="CASH">Cash Disbursement</option>
+                          <option value="DIRECT_DEPOSIT">{tr('Direct Deposit (ACH Transfer)')}</option>
+                          <option value="CHECK">{tr('Paper Payroll Check')}</option>
+                          <option value="WIRE">{tr('Wire Transfer')}</option>
+                          <option value="CASH">{tr('Cash Disbursement')}</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Bank Name</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Bank Name')}</label>
                         <input
                           type="text"
-                          placeholder="e.g. JPMorgan Chase Bank, N.A."
+                          placeholder={tr('e.g. JPMorgan Chase Bank, N.A.')}
                           value={formBankName}
                           onChange={(e) => setFormBankName(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1933,7 +1893,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Routing Number (9-digits)</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Routing Number (9-digits)')}</label>
                         <input
                           type="text"
                           placeholder="021000021"
@@ -1944,7 +1904,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Account Number</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Account Number')}</label>
                         <input
                           type="text"
                           placeholder="••••4892"
@@ -1955,24 +1915,24 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Account Type</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Account Type')}</label>
                         <select
                           value={formAccountType}
                           onChange={(e) => setFormAccountType(e.target.value as 'CHECKING' | 'SAVINGS')}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                         >
-                          <option value="CHECKING">Checking Account</option>
-                          <option value="SAVINGS">Savings Account</option>
+                          <option value="CHECKING">{tr('Checking Account')}</option>
+                          <option value="SAVINGS">{tr('Savings Account')}</option>
                         </select>
                       </div>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Emergency Contact Name</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Emergency Contact Name')}</label>
                         <input
                           type="text"
-                          placeholder="e.g. Robert Accountant (Spouse)"
+                          placeholder={tr('e.g. Robert Accountant (Spouse)')}
                           value={formEmergencyContactName}
                           onChange={(e) => setFormEmergencyContactName(e.target.value)}
                           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -1980,7 +1940,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">Emergency Contact Phone</label>
+                        <label className="font-bold text-slate-700 block mb-1">{tr('Emergency Contact Phone')}</label>
                         <input
                           type="text"
                           placeholder="+1 (555) 901-2910"
@@ -1992,10 +1952,10 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     </div>
 
                     <div>
-                      <label className="font-bold text-slate-700 block mb-1">HR & Compliance Remarks / Notes</label>
+                      <label className="font-bold text-slate-700 block mb-1">{tr('HR & Compliance Remarks / Notes')}</label>
                       <textarea
                         rows={2}
-                        placeholder="Internal notes, special certifications, SOX access, etc."
+                        placeholder={tr('Internal notes, special certifications, SOX access, etc.')}
                         value={formNotes}
                         onChange={(e) => setFormNotes(e.target.value)}
                         className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -2041,9 +2001,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                     type="button"
                     onClick={() => setIsFormModalOpen(false)}
                     className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold transition"
-                  >
-                    Cancel
-                  </button>
+                  >{tr('Cancel')}</button>
                   <button
                     id="btn-submit-employee-form"
                     type="submit"
@@ -2068,7 +2026,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               <div className="bg-slate-900 text-white p-5 flex items-center justify-between">
                 <div>
                   <h3 className="font-bold text-sm">File Expense Claim for {activeProfileEmployee.name}</h3>
-                  <p className="text-xs text-slate-400">Log employee out-of-pocket expenditure for reimbursement.</p>
+                  <p className="text-xs text-slate-400">{tr('Log employee out-of-pocket expenditure for reimbursement.')}</p>
                 </div>
                 <button
                   type="button"
@@ -2081,11 +2039,11 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
               <div className="p-5 space-y-3 text-xs">
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Merchant / Vendor Name</label>
+                  <label className="font-bold text-slate-700 block mb-1">{tr('Merchant / Vendor Name')}</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Delta Air Lines, Marriott, Amazon"
+                    placeholder={tr('e.g. Delta Air Lines, Marriott, Amazon')}
                     value={claimVendor}
                     onChange={(e) => setClaimVendor(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -2093,17 +2051,17 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Expense Category</label>
+                  <label className="font-bold text-slate-700 block mb-1">{tr('Expense Category')}</label>
                   <select
                     value={claimCategory}
                     onChange={(e) => setClaimCategory(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                   >
-                    <option value="Travel & Client Meetings">Travel & Client Meetings</option>
-                    <option value="Meals & Entertainment">Meals & Entertainment</option>
-                    <option value="Office Equipment & Hardware">Office Equipment & Hardware</option>
-                    <option value="Software Subscriptions">Software Subscriptions</option>
-                    <option value="Training & Certifications">Training & Certifications</option>
+                    <option value="Travel & Client Meetings">{tr('Travel & Client Meetings')}</option>
+                    <option value="Meals & Entertainment">{tr('Meals & Entertainment')}</option>
+                    <option value="Office Equipment & Hardware">{tr('Office Equipment & Hardware')}</option>
+                    <option value="Software Subscriptions">{tr('Software Subscriptions')}</option>
+                    <option value="Training & Certifications">{tr('Training & Certifications')}</option>
                   </select>
                 </div>
 
@@ -2121,10 +2079,10 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="font-bold text-slate-700 block mb-1">Business Purpose / Notes</label>
+                  <label className="font-bold text-slate-700 block mb-1">{tr('Business Purpose / Notes')}</label>
                   <input
                     type="text"
-                    placeholder="e.g. Client dinner with Apex Logistics executives"
+                    placeholder={tr('e.g. Client dinner with Apex Logistics executives')}
                     value={claimNotes}
                     onChange={(e) => setClaimNotes(e.target.value)}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
@@ -2137,15 +2095,11 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                   type="button"
                   onClick={() => setIsExpenseClaimModalOpen(false)}
                   className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-xs font-semibold"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold shadow-sm"
-                >
-                  Submit Expense Claim
-                </button>
+                >{tr('Submit Expense Claim')}</button>
               </div>
             </form>
           </div>
@@ -2161,9 +2115,7 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
             {/* Paystub Header */}
             <div className="bg-slate-900 text-white p-6 flex items-start justify-between">
               <div>
-                <p className="text-[10px] uppercase font-bold tracking-widest text-indigo-400 mb-1">
-                  Official Corporate Earnings Statement
-                </p>
+                <p className="text-[10px] uppercase font-bold tracking-widest text-indigo-400 mb-1">{tr('Official Corporate Earnings Statement')}</p>
                 <h3 className="text-xl font-bold">{activeTenant.name}</h3>
                 <p className="text-xs text-slate-400 mt-0.5">
                   Tenant: {activeTenant.code} &bull; Standard: {activeTenant.pluginId} &bull; Currency: {activeTenant.currency}
@@ -2182,12 +2134,12 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               {/* Employee & Pay Period Meta */}
               <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <div>
-                  <p className="text-slate-500 font-medium">Employee Name:</p>
+                  <p className="text-slate-500 font-medium">{tr('Employee Name:')}</p>
                   <p className="font-bold text-slate-900 text-sm">{selectedPaystubLine.line.employeeName}</p>
                   <p className="text-slate-500 text-[11px] mt-0.5">Department: {selectedPaystubLine.line.department}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-slate-500 font-medium">Pay Date:</p>
+                  <p className="text-slate-500 font-medium">{tr('Pay Date:')}</p>
                   <p className="font-bold text-slate-900 text-sm">{selectedPaystubLine.payDate}</p>
                   <p className="text-slate-500 text-[11px] mt-0.5">
                     Period: {selectedPaystubLine.payPeriodStart} to {selectedPaystubLine.payPeriodEnd}
@@ -2199,18 +2151,16 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Gross Earnings */}
                 <div className="border border-slate-200 rounded-xl overflow-hidden">
-                  <div className="bg-slate-100 px-3.5 py-2 font-bold text-slate-700 border-b border-slate-200">
-                    Gross Earnings
-                  </div>
+                  <div className="bg-slate-100 px-3.5 py-2 font-bold text-slate-700 border-b border-slate-200">{tr('Gross Earnings')}</div>
                   <div className="p-3.5 space-y-2">
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Base Salary / Regular Wages:</span>
+                      <span className="text-slate-600">{tr('Base Salary / Regular Wages:')}</span>
                       <span className="font-bold text-slate-900">
                         {activeTenant.currency} {selectedPaystubLine.line.grossPay.toFixed(2)}
                       </span>
                     </div>
                     <div className="border-t border-slate-100 pt-2 flex justify-between font-bold text-slate-900">
-                      <span>Total Gross Pay:</span>
+                      <span>{tr('Total Gross Pay:')}</span>
                       <span className="text-indigo-600">
                         {activeTenant.currency} {selectedPaystubLine.line.grossPay.toFixed(2)}
                       </span>
@@ -2220,36 +2170,34 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
 
                 {/* Deductions & Withholdings */}
                 <div className="border border-slate-200 rounded-xl overflow-hidden">
-                  <div className="bg-slate-100 px-3.5 py-2 font-bold text-slate-700 border-b border-slate-200">
-                    Taxes & Pre-tax Deductions
-                  </div>
+                  <div className="bg-slate-100 px-3.5 py-2 font-bold text-slate-700 border-b border-slate-200">{tr('Taxes & Pre-tax Deductions')}</div>
                   <div className="p-3.5 space-y-1.5">
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Federal Withholding Tax:</span>
+                      <span className="text-slate-600">{tr('Federal Withholding Tax:')}</span>
                       <span className="font-medium text-slate-900">
                         -{activeTenant.currency} {selectedPaystubLine.line.federalTax.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">State / Local Income Tax:</span>
+                      <span className="text-slate-600">{tr('State / Local Income Tax:')}</span>
                       <span className="font-medium text-slate-900">
                         -{activeTenant.currency} {selectedPaystubLine.line.stateTax.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Social Security (OASDI 6.2%):</span>
+                      <span className="text-slate-600">{tr('Social Security (OASDI 6.2%):')}</span>
                       <span className="font-medium text-slate-900">
                         -{activeTenant.currency} {selectedPaystubLine.line.socialSecurityTax.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Medicare Tax (1.45%):</span>
+                      <span className="text-slate-600">{tr('Medicare Tax (1.45%):')}</span>
                       <span className="font-medium text-slate-900">
                         -{activeTenant.currency} {selectedPaystubLine.line.medicareTax.toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-600">Health & 401(k) Deductions:</span>
+                      <span className="text-slate-600">{tr('Health & 401(k) Deductions:')}</span>
                       <span className="font-medium text-slate-900">
                         -{activeTenant.currency} {selectedPaystubLine.line.benefitsDeduction.toFixed(2)}
                       </span>
@@ -2261,8 +2209,8 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
               {/* Net Pay Banner */}
               <div className="bg-emerald-50 p-4 rounded-xl border border-emerald-200 flex items-center justify-between">
                 <div>
-                  <p className="text-xs uppercase font-bold text-emerald-800 tracking-wider">Net Take-Home Pay</p>
-                  <p className="text-[11px] text-emerald-700">Directly deposited to verified corporate checking account</p>
+                  <p className="text-xs uppercase font-bold text-emerald-800 tracking-wider">{tr('Net Take-Home Pay')}</p>
+                  <p className="text-[11px] text-emerald-700">{tr('Directly deposited to verified corporate checking account')}</p>
                 </div>
                 <div className="text-right">
                   <span className="text-2xl font-black text-emerald-700">
@@ -2287,16 +2235,12 @@ export const EmployeeDirectoryView: React.FC<EmployeeDirectoryViewProps> = ({
                 onClick={() => window.print()}
                 className="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-lg text-xs font-bold transition flex items-center gap-1.5"
               >
-                <Printer className="w-3.5 h-3.5" />
-                Print / Save PDF
-              </button>
+                <Printer className="w-3.5 h-3.5" />{tr('Print / Save PDF')}</button>
 
               <button
                 onClick={() => setSelectedPaystubLine(null)}
                 className="px-5 py-2 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-semibold transition"
-              >
-                Close Statement
-              </button>
+              >{tr('Close Statement')}</button>
             </div>
           </div>
         </div>

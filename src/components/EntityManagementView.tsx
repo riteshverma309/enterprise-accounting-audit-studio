@@ -49,14 +49,14 @@ import {
   exportCustomersToCsv,
 } from '../utils/customerImportExport';
 import { downloadCsvFile } from '../utils/templateGenerator';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 
 export const EntityManagementView: React.FC<{
   onSelectCustomerForInvoice?: (customer: CustomerContact) => void;
   onSelectCustomerForStatement?: (customer: CustomerContact) => void;
   onSelectVendorForBill?: (vendor: VendorContact) => void;
 }> = ({ onSelectCustomerForInvoice, onSelectCustomerForStatement, onSelectVendorForBill }) => {
-  const { t, tr } = useLanguage();
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     customers,
@@ -516,7 +516,7 @@ export const EntityManagementView: React.FC<{
                           <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
                           {tr('Download CSV Template')}
                         </span>
-                        <span className="text-[10px] font-mono text-emerald-400">.csv</span>
+                        <span className="text-[10px] font-mono text-emerald-400">{tr('.csv')}</span>
                       </button>
                       <button
                         type="button"
@@ -532,7 +532,7 @@ export const EntityManagementView: React.FC<{
                           <FileText className="w-3.5 h-3.5 text-blue-400" />
                           {tr('Download JSON Template')}
                         </span>
-                        <span className="text-[10px] font-mono text-blue-400">.json</span>
+                        <span className="text-[10px] font-mono text-blue-400">{tr('.json')}</span>
                       </button>
                       <div className="my-1 border-t border-slate-800" />
                       <button
@@ -778,27 +778,27 @@ export const EntityManagementView: React.FC<{
           <div className="flex items-center gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2 text-xs text-slate-400">
               <Filter className="w-3.5 h-3.5" />
-              <span>Category:</span>
+              <span>{tr('Category:')}</span>
             </div>
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-indigo-500"
             >
-              <option value="ALL">All Categories</option>
+              <option value="ALL">{tr('All Categories')}</option>
               {activeTab === 'customers' ? (
                 <>
-                  <option value="Housing Society Resident">Housing Society Resident</option>
-                  <option value="School Student">School Student</option>
-                  <option value="Hospital Inpatient">Hospital Inpatient</option>
-                  <option value="Enterprise Client">Enterprise Client</option>
+                  <option value="Housing Society Resident">{tr('Housing Society Resident')}</option>
+                  <option value="School Student">{tr('School Student')}</option>
+                  <option value="Hospital Inpatient">{tr('Hospital Inpatient')}</option>
+                  <option value="Enterprise Client">{tr('Enterprise Client')}</option>
                 </>
               ) : (
                 <>
-                  <option value="Facility AMC">Facility & Lift AMC</option>
-                  <option value="Student Bus Transport">Student Bus Transport</option>
-                  <option value="Medical Devices & Pharma">Medical Devices & Pharma</option>
-                  <option value="Cloud Infrastructure">Cloud Infrastructure</option>
+                  <option value="Facility AMC">{tr('Facility & Lift AMC')}</option>
+                  <option value="Student Bus Transport">{tr('Student Bus Transport')}</option>
+                  <option value="Medical Devices & Pharma">{tr('Medical Devices & Pharma')}</option>
+                  <option value="Cloud Infrastructure">{tr('Cloud Infrastructure')}</option>
                 </>
               )}
             </select>
@@ -812,14 +812,12 @@ export const EntityManagementView: React.FC<{
           {filteredCustomers.length === 0 ? (
             <div className="col-span-2 text-center py-12 bg-slate-900/40 rounded-2xl border border-slate-800">
               <Users className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-slate-300">No Customers Found</h3>
-              <p className="text-xs text-slate-500 mt-1">Try adjusting your search criteria or add a new customer.</p>
+              <h3 className="text-sm font-semibold text-slate-300">{tr('No Customers Found')}</h3>
+              <p className="text-xs text-slate-500 mt-1">{tr('Try adjusting your search criteria or add a new customer.')}</p>
               <button
                 onClick={() => handleOpenCustomerModal()}
                 className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold"
-              >
-                Add First Customer
-              </button>
+              >{tr('Add First Customer')}</button>
             </div>
           ) : (
             filteredCustomers.map((cust) => {
@@ -846,7 +844,7 @@ export const EntityManagementView: React.FC<{
                         <button
                           onClick={() => handleOpenCustomerModal(cust)}
                           className="p-1.5 text-slate-400 hover:text-indigo-300 hover:bg-indigo-500/10 rounded-lg transition-all"
-                          title="Edit Customer"
+                          title={tr('Edit Customer')}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -858,7 +856,7 @@ export const EntityManagementView: React.FC<{
                             }
                           }}
                           className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
-                          title="Delete Customer"
+                          title={tr('Delete Customer')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -888,9 +886,7 @@ export const EntityManagementView: React.FC<{
                     {/* Custom Attributes Badges */}
                     {Object.keys(attrs).length > 0 && (
                       <div className="space-y-1.5 pt-1">
-                        <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                          Specific Entity Attributes
-                        </p>
+                        <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{tr('Specific Entity Attributes')}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {Object.entries(attrs).map(([key, val]) => {
                             if (val === undefined || val === null || val === '') return null;
@@ -930,20 +926,16 @@ export const EntityManagementView: React.FC<{
                         <button
                           onClick={() => onSelectCustomerForStatement(cust)}
                           className="px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
-                          title="View Invoices, Payments, Opening Balances, and Statement of Account"
+                          title={tr('View Invoices, Payments, Opening Balances, and Statement of Account')}
                         >
-                          <Eye className="w-3.5 h-3.5" />
-                          Statement & History
-                        </button>
+                          <Eye className="w-3.5 h-3.5" />{tr('Statement & History')}</button>
                       )}
                       {onSelectCustomerForInvoice && (
                         <button
                           onClick={() => onSelectCustomerForInvoice(cust)}
                           className="px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
                         >
-                          <FileText className="w-3.5 h-3.5" />
-                          Issue Invoice
-                        </button>
+                          <FileText className="w-3.5 h-3.5" />{tr('Issue Invoice')}</button>
                       )}
                     </div>
                   </div>
@@ -960,14 +952,12 @@ export const EntityManagementView: React.FC<{
           {filteredVendors.length === 0 ? (
             <div className="col-span-2 text-center py-12 bg-slate-900/40 rounded-2xl border border-slate-800">
               <CreditCard className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-              <h3 className="text-sm font-semibold text-slate-300">No Vendors Found</h3>
-              <p className="text-xs text-slate-500 mt-1">Add a new supplier or contractor profile.</p>
+              <h3 className="text-sm font-semibold text-slate-300">{tr('No Vendors Found')}</h3>
+              <p className="text-xs text-slate-500 mt-1">{tr('Add a new supplier or contractor profile.')}</p>
               <button
                 onClick={() => handleOpenVendorModal()}
                 className="mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-xs font-semibold"
-              >
-                Add First Vendor
-              </button>
+              >{tr('Add First Vendor')}</button>
             </div>
           ) : (
             filteredVendors.map((vend) => {
@@ -994,7 +984,7 @@ export const EntityManagementView: React.FC<{
                         <button
                           onClick={() => handleOpenVendorModal(vend)}
                           className="p-1.5 text-slate-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg transition-all"
-                          title="Edit Vendor"
+                          title={tr('Edit Vendor')}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
@@ -1006,7 +996,7 @@ export const EntityManagementView: React.FC<{
                             }
                           }}
                           className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
-                          title="Delete Vendor"
+                          title={tr('Delete Vendor')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -1028,7 +1018,7 @@ export const EntityManagementView: React.FC<{
                       {vend.defaultExpenseAccountCode && (
                         <div className="flex items-center gap-2 col-span-2">
                           <Hash className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                          <span>Default Expense GL: <strong className="text-slate-200">{vend.defaultExpenseAccountCode}</strong></span>
+                          <span>{tr('Default Expense GL:')} <strong className="text-slate-200">{vend.defaultExpenseAccountCode}</strong></span>
                         </div>
                       )}
                       {vend.bankDetails && (
@@ -1042,9 +1032,7 @@ export const EntityManagementView: React.FC<{
                     {/* Custom Attributes */}
                     {Object.keys(attrs).length > 0 && (
                       <div className="space-y-1.5 pt-1">
-                        <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                          Vendor Attributes & Contracts
-                        </p>
+                        <p className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{tr('Vendor Attributes & Contracts')}</p>
                         <div className="flex flex-wrap gap-1.5">
                           {Object.entries(attrs).map(([key, val]) => {
                             if (val === undefined || val === null || val === '') return null;
@@ -1074,9 +1062,7 @@ export const EntityManagementView: React.FC<{
                         onClick={() => onSelectVendorForBill(vend)}
                         className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5"
                       >
-                        <FileSpreadsheet className="w-3.5 h-3.5" />
-                        Record Vendor Bill
-                      </button>
+                        <FileSpreadsheet className="w-3.5 h-3.5" />{tr('Record Vendor Bill')}</button>
                     )}
                   </div>
                 </div>
@@ -1091,33 +1077,27 @@ export const EntityManagementView: React.FC<{
         <div className="space-y-4">
           <div className="flex items-center justify-between bg-slate-900/60 p-4 rounded-xl border border-slate-800">
             <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                Extensible Entity Schema Definitions
-              </h3>
-              <p className="text-xs text-slate-400">
-                Define text, numerical, decimal, boolean, date, or dropdown fields. These attributes seamlessly appear on customer/vendor profiles and flow into Invoicing and Billing.
-              </p>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">{tr('Extensible Entity Schema Definitions')}</h3>
+              <p className="text-xs text-slate-400">{tr('Define text, numerical, decimal, boolean, date, or dropdown fields. These attributes seamlessly appear on customer/vendor profiles and flow into Invoicing and Billing.')}</p>
             </div>
             <button
               onClick={() => setIsAttrModalOpen(true)}
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold flex items-center gap-2 shadow"
             >
-              <Plus className="w-4 h-4" />
-              Define New Field
-            </button>
+              <Plus className="w-4 h-4" />{tr('Define New Field')}</button>
           </div>
 
           <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-900/80">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-950/60 text-slate-400 font-semibold border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Field Name & Key</th>
-                  <th className="py-3 px-4">Data Type</th>
-                  <th className="py-3 px-4">Target Entity</th>
-                  <th className="py-3 px-4">Industry Domain</th>
-                  <th className="py-3 px-4">Unit / Suffix</th>
-                  <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4">{tr('Field Name & Key')}</th>
+                  <th className="py-3 px-4">{tr('Data Type')}</th>
+                  <th className="py-3 px-4">{tr('Target Entity')}</th>
+                  <th className="py-3 px-4">{tr('Industry Domain')}</th>
+                  <th className="py-3 px-4">{tr('Unit / Suffix')}</th>
+                  <th className="py-3 px-4">{tr('Description')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800 text-slate-300">
@@ -1163,7 +1143,7 @@ export const EntityManagementView: React.FC<{
                           }
                         }}
                         className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
-                        title="Delete Attribute"
+                        title={tr('Delete Attribute')}
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1187,11 +1167,9 @@ export const EntityManagementView: React.FC<{
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-100">
-                    {editingCustomer ? 'Edit Customer Profile' : 'New Customer Profile'}
+                    {editingCustomer ? tr('Edit Customer Profile') : tr('New Customer Profile')}
                   </h3>
-                  <p className="text-xs text-slate-400">
-                    Fill core contact info and entity-specific custom attributes.
-                  </p>
+                  <p className="text-xs text-slate-400">{tr('Fill core contact info and entity-specific custom attributes.')}</p>
                 </div>
               </div>
               <button
@@ -1205,43 +1183,43 @@ export const EntityManagementView: React.FC<{
             <form onSubmit={handleSaveCustomer} className="p-5 space-y-4 overflow-y-auto flex-1 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Customer Code *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Customer Code *')}</label>
                   <input
                     type="text"
                     required
                     value={customerFormData.code}
                     onChange={(e) => setCustomerFormData({ ...customerFormData, code: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-indigo-500 focus:outline-none"
-                    placeholder="e.g. RES-402 or STU-88"
+                    placeholder={tr('e.g. RES-402 or STU-88')}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-slate-400 font-medium mb-1">Customer / Entity Name *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Customer / Entity Name *')}</label>
                   <input
                     type="text"
                     required
                     value={customerFormData.name}
                     onChange={(e) => setCustomerFormData({ ...customerFormData, name: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-indigo-500 focus:outline-none"
-                    placeholder="e.g. Alexander Sterling (Flat A-402) or Maya Lin"
+                    placeholder={tr('e.g. Alexander Sterling (Flat A-402) or Maya Lin')}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Email Address *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Email Address *')}</label>
                   <input
                     type="email"
                     required
                     value={customerFormData.email}
                     onChange={(e) => setCustomerFormData({ ...customerFormData, email: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-indigo-500 focus:outline-none"
-                    placeholder="contact@entity.org"
+                    placeholder={tr('contact@entity.org')}
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Phone Number</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Phone Number')}</label>
                   <input
                     type="text"
                     value={customerFormData.phone}
@@ -1254,31 +1232,31 @@ export const EntityManagementView: React.FC<{
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Entity Category</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Entity Category')}</label>
                   <select
                     value={customerFormData.category}
                     onChange={(e) => setCustomerFormData({ ...customerFormData, category: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-indigo-500 focus:outline-none"
                   >
-                    <option value="Housing Society Resident">Housing Society Resident</option>
-                    <option value="School Student">School Student</option>
-                    <option value="Hospital Inpatient">Hospital Inpatient</option>
-                    <option value="Enterprise Client">Enterprise Client</option>
-                    <option value="General Client">General Client</option>
+                    <option value="Housing Society Resident">{tr('Housing Society Resident')}</option>
+                    <option value="School Student">{tr('School Student')}</option>
+                    <option value="Hospital Inpatient">{tr('Hospital Inpatient')}</option>
+                    <option value="Enterprise Client">{tr('Enterprise Client')}</option>
+                    <option value="General Client">{tr('General Client')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Tax ID / GSTIN / SSN</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Tax ID / GSTIN / SSN')}</label>
                   <input
                     type="text"
                     value={customerFormData.taxId}
                     onChange={(e) => setCustomerFormData({ ...customerFormData, taxId: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-indigo-500 focus:outline-none"
-                    placeholder="Tax Reg ID"
+                    placeholder={tr('Tax Reg ID')}
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Payment Terms (Days)</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Payment Terms (Days)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -1290,13 +1268,13 @@ export const EntityManagementView: React.FC<{
               </div>
 
               <div>
-                <label className="block text-slate-400 font-medium mb-1">Billing / Residence Address</label>
+                <label className="block text-slate-400 font-medium mb-1">{tr('Billing / Residence Address')}</label>
                 <input
                   type="text"
                   value={customerFormData.billingAddress}
                   onChange={(e) => setCustomerFormData({ ...customerFormData, billingAddress: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-indigo-500 focus:outline-none"
-                  placeholder="Unit address, street, city, zip"
+                  placeholder={tr('Unit address, street, city, zip')}
                 />
               </div>
 
@@ -1305,7 +1283,7 @@ export const EntityManagementView: React.FC<{
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
                     <SlidersHorizontal className="w-3.5 h-3.5" />
-                    Dynamic Schema Custom Attributes ({customerAttributes.length})
+                    {tr('Dynamic Schema Custom Attributes')} ({customerAttributes.length})
                   </h4>
                   <button
                     type="button"
@@ -1313,12 +1291,12 @@ export const EntityManagementView: React.FC<{
                     className="px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer"
                   >
                     <Sparkles className="w-3 h-3 text-emerald-400" />
-                    + Add Field On-the-Fly
+                    {tr('+ Add Field On-the-Fly')}
                   </button>
                 </div>
 
                 {customerAttributes.length === 0 ? (
-                  <p className="text-slate-500 italic text-[11px]">No custom attributes configured for customers yet.</p>
+                  <p className="text-slate-500 italic text-[11px]">{tr('No custom attributes configured for customers yet.')}</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80">
                     {customerAttributes.map((attr) => {
@@ -1443,13 +1421,13 @@ export const EntityManagementView: React.FC<{
               </div>
 
               <div>
-                <label className="block text-slate-400 font-medium mb-1">Internal Notes & Remarks</label>
+                <label className="block text-slate-400 font-medium mb-1">{tr('Internal Notes & Remarks')}</label>
                 <textarea
                   rows={2}
                   value={customerFormData.notes}
                   onChange={(e) => setCustomerFormData({ ...customerFormData, notes: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-indigo-500 focus:outline-none"
-                  placeholder="Special billing instructions, discounts, or contacts..."
+                  placeholder={tr('Special billing instructions, discounts, or contacts...')}
                 />
               </div>
 
@@ -1458,14 +1436,12 @@ export const EntityManagementView: React.FC<{
                   type="button"
                   onClick={() => setIsCustomerModalOpen(false)}
                   className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-semibold shadow"
                 >
-                  {editingCustomer ? 'Update Profile' : 'Create Customer'}
+                  {editingCustomer ? tr('Update Profile') : tr('Create Customer')}
                 </button>
               </div>
             </form>
@@ -1484,11 +1460,9 @@ export const EntityManagementView: React.FC<{
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-slate-100">
-                    {editingVendor ? 'Edit Vendor Profile' : 'New Vendor Profile'}
+                    {editingVendor ? tr('Edit Vendor Profile') : tr('New Vendor Profile')}
                   </h3>
-                  <p className="text-xs text-slate-400">
-                    Manage contractor details, bank accounts, and SLA contracts.
-                  </p>
+                  <p className="text-xs text-slate-400">{tr('Manage contractor details, bank accounts, and SLA contracts.')}</p>
                 </div>
               </div>
               <button
@@ -1502,43 +1476,43 @@ export const EntityManagementView: React.FC<{
             <form onSubmit={handleSaveVendor} className="p-5 space-y-4 overflow-y-auto flex-1 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Vendor Code *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Vendor Code *')}</label>
                   <input
                     type="text"
                     required
                     value={vendorFormData.code}
                     onChange={(e) => setVendorFormData({ ...vendorFormData, code: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-purple-500 focus:outline-none"
-                    placeholder="e.g. VEND-OTIS"
+                    placeholder={tr('e.g. VEND-OTIS')}
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-slate-400 font-medium mb-1">Vendor / Business Name *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Vendor / Business Name *')}</label>
                   <input
                     type="text"
                     required
                     value={vendorFormData.name}
                     onChange={(e) => setVendorFormData({ ...vendorFormData, name: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-purple-500 focus:outline-none"
-                    placeholder="e.g. Otis Elevator AMC & Maintenance Corp"
+                    placeholder={tr('e.g. Otis Elevator AMC & Maintenance Corp')}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Email Address *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Email Address *')}</label>
                   <input
                     type="email"
                     required
                     value={vendorFormData.email}
                     onChange={(e) => setVendorFormData({ ...vendorFormData, email: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-purple-500 focus:outline-none"
-                    placeholder="invoicing@vendor.com"
+                    placeholder={tr('invoicing@vendor.com')}
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Phone Number</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Phone Number')}</label>
                   <input
                     type="text"
                     value={vendorFormData.phone}
@@ -1551,34 +1525,34 @@ export const EntityManagementView: React.FC<{
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Category</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Category')}</label>
                   <select
                     value={vendorFormData.category}
                     onChange={(e) => setVendorFormData({ ...vendorFormData, category: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-purple-500 focus:outline-none"
                   >
-                    <option value="Facility AMC">Facility & Lift AMC</option>
-                    <option value="Student Bus Transport">Student Bus Transport</option>
-                    <option value="Medical Devices & Pharma">Medical Devices & Pharma</option>
-                    <option value="Cloud Infrastructure">Cloud Infrastructure</option>
-                    <option value="General Supplier">General Supplier</option>
+                    <option value="Facility AMC">{tr('Facility & Lift AMC')}</option>
+                    <option value="Student Bus Transport">{tr('Student Bus Transport')}</option>
+                    <option value="Medical Devices & Pharma">{tr('Medical Devices & Pharma')}</option>
+                    <option value="Cloud Infrastructure">{tr('Cloud Infrastructure')}</option>
+                    <option value="General Supplier">{tr('General Supplier')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Default Expense GL</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Default Expense GL')}</label>
                   <select
                     value={vendorFormData.defaultExpenseAccountCode}
                     onChange={(e) => setVendorFormData({ ...vendorFormData, defaultExpenseAccountCode: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-purple-500 focus:outline-none"
                   >
-                    <option value="5010">5010 - Hosting & Infrastructure</option>
-                    <option value="5020">5020 - Engineering Staff & Personnel</option>
-                    <option value="5030">5030 - Office, Transport & Facilities</option>
-                    <option value="5040">5040 - Professional Legal & Advisory</option>
+                    <option value="5010">{tr('5010 - Hosting & Infrastructure')}</option>
+                    <option value="5020">{tr('5020 - Engineering Staff & Personnel')}</option>
+                    <option value="5030">{tr('5030 - Office, Transport & Facilities')}</option>
+                    <option value="5040">{tr('5040 - Professional Legal & Advisory')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Payment Terms (Days)</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Payment Terms (Days)')}</label>
                   <input
                     type="number"
                     min={0}
@@ -1591,20 +1565,20 @@ export const EntityManagementView: React.FC<{
 
               {/* Bank Settlement Info */}
               <div className="pt-2 border-t border-slate-800 space-y-2">
-                <h4 className="text-xs font-semibold text-slate-300">Bank Disbursement Settlement Details</h4>
+                <h4 className="text-xs font-semibold text-slate-300">{tr('Bank Disbursement Settlement Details')}</h4>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-950/40 p-3 rounded-lg border border-slate-800/60">
                   <div>
-                    <label className="block text-slate-400 text-[11px] mb-1">Bank Name</label>
+                    <label className="block text-slate-400 text-[11px] mb-1">{tr('Bank Name')}</label>
                     <input
                       type="text"
                       value={vendorFormData.bankName}
                       onChange={(e) => setVendorFormData({ ...vendorFormData, bankName: e.target.value })}
                       className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-slate-100 focus:outline-none"
-                      placeholder="e.g. Chase Bank"
+                      placeholder={tr('e.g. Chase Bank')}
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[11px] mb-1">Account Number</label>
+                    <label className="block text-slate-400 text-[11px] mb-1">{tr('Account Number')}</label>
                     <input
                       type="text"
                       value={vendorFormData.accountNumber}
@@ -1614,13 +1588,13 @@ export const EntityManagementView: React.FC<{
                     />
                   </div>
                   <div>
-                    <label className="block text-slate-400 text-[11px] mb-1">Routing Number / IFSC</label>
+                    <label className="block text-slate-400 text-[11px] mb-1">{tr('Routing Number / IFSC')}</label>
                     <input
                       type="text"
                       value={vendorFormData.routingNumber}
                       onChange={(e) => setVendorFormData({ ...vendorFormData, routingNumber: e.target.value })}
                       className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-slate-100 font-mono focus:outline-none"
-                      placeholder="Routing ID"
+                      placeholder={tr('Routing ID')}
                     />
                   </div>
                 </div>
@@ -1631,7 +1605,7 @@ export const EntityManagementView: React.FC<{
                 <div className="pt-2 border-t border-slate-800 space-y-2">
                   <h4 className="text-xs font-semibold text-purple-400 flex items-center gap-1.5">
                     <SlidersHorizontal className="w-3.5 h-3.5" />
-                    Vendor Custom Schema Fields ({vendorAttributes.length})
+                    {tr('Vendor Custom Schema Fields')} ({vendorAttributes.length})
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950/60 p-3.5 rounded-xl border border-slate-800/80">
                     {vendorAttributes.map((attr) => {
@@ -1681,13 +1655,13 @@ export const EntityManagementView: React.FC<{
               )}
 
               <div>
-                <label className="block text-slate-400 font-medium mb-1">Notes</label>
+                <label className="block text-slate-400 font-medium mb-1">{tr('Notes')}</label>
                 <textarea
                   rows={2}
                   value={vendorFormData.notes}
                   onChange={(e) => setVendorFormData({ ...vendorFormData, notes: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-purple-500 focus:outline-none"
-                  placeholder="SLA response guarantees, emergency helpline numbers..."
+                  placeholder={tr('SLA response guarantees, emergency helpline numbers...')}
                 />
               </div>
 
@@ -1696,14 +1670,12 @@ export const EntityManagementView: React.FC<{
                   type="button"
                   onClick={() => setIsVendorModalOpen(false)}
                   className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow"
                 >
-                  {editingVendor ? 'Update Vendor' : 'Create Vendor'}
+                  {editingVendor ? tr('Update Vendor') : tr('Create Vendor')}
                 </button>
               </div>
             </form>
@@ -1721,10 +1693,8 @@ export const EntityManagementView: React.FC<{
                   <SlidersHorizontal className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-slate-100">Define New Schema Attribute</h3>
-                  <p className="text-xs text-slate-400">
-                    Add custom text, numerical, boolean, or date fields to entities.
-                  </p>
+                  <h3 className="text-sm font-bold text-slate-100">{tr('Define New Schema Attribute')}</h3>
+                  <p className="text-xs text-slate-400">{tr('Add custom text, numerical, boolean, or date fields to entities.')}</p>
                 </div>
               </div>
               <button
@@ -1738,7 +1708,7 @@ export const EntityManagementView: React.FC<{
             <form onSubmit={handleSaveAttribute} className="p-5 space-y-4 text-xs">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Display Label *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Display Label *')}</label>
                   <input
                     type="text"
                     required
@@ -1753,101 +1723,101 @@ export const EntityManagementView: React.FC<{
                       });
                     }}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
-                    placeholder="e.g. Carpet Area or Bed No"
+                    placeholder={tr('e.g. Carpet Area or Bed No')}
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Internal Key *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Internal Key *')}</label>
                   <input
                     type="text"
                     required
                     value={attrFormData.key}
                     onChange={(e) => setAttrFormData({ ...attrFormData, key: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-emerald-500 focus:outline-none"
-                    placeholder="e.g. carpet_area_sqft"
+                    placeholder={tr('e.g. carpet_area_sqft')}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Data Type *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Data Type *')}</label>
                   <select
                     value={attrFormData.dataType}
                     onChange={(e) => setAttrFormData({ ...attrFormData, dataType: e.target.value as CustomAttributeDataType })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-medium"
                   >
-                    <option value="text">Text / String</option>
-                    <option value="number">Integer Number</option>
-                    <option value="decimal">Decimal Currency / Rate</option>
-                    <option value="date">Date</option>
-                    <option value="boolean">Boolean (Yes / No Toggle)</option>
-                    <option value="select">Select Dropdown Menu</option>
+                    <option value="text">{tr('Text / String')}</option>
+                    <option value="number">{tr('Integer Number')}</option>
+                    <option value="decimal">{tr('Decimal Currency / Rate')}</option>
+                    <option value="date">{tr('Date')}</option>
+                    <option value="boolean">{tr('Boolean (Yes / No Toggle)')}</option>
+                    <option value="select">{tr('Select Dropdown Menu')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Target Entity *</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Target Entity *')}</label>
                   <select
                     value={attrFormData.targetEntity}
                     onChange={(e) => setAttrFormData({ ...attrFormData, targetEntity: e.target.value as any })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
                   >
-                    <option value="CUSTOMER">Customer / Resident / Student</option>
-                    <option value="VENDOR">Vendor / Supplier</option>
-                    <option value="BOTH">Both Customers & Vendors</option>
+                    <option value="CUSTOMER">{tr('Customer / Resident / Student')}</option>
+                    <option value="VENDOR">{tr('Vendor / Supplier')}</option>
+                    <option value="BOTH">{tr('Both Customers & Vendors')}</option>
                   </select>
                 </div>
               </div>
 
               {attrFormData.dataType === 'select' && (
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Dropdown Options (one per line)</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Dropdown Options (one per line)')}</label>
                   <textarea
                     rows={3}
                     value={attrFormData.optionsText}
                     onChange={(e) => setAttrFormData({ ...attrFormData, optionsText: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none font-mono"
-                    placeholder="Tower A&#10;Tower B&#10;Tower C"
+                    placeholder={tr('Tower A&#10;Tower B&#10;Tower C')}
                   />
                 </div>
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Unit or Suffix Badge</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Unit or Suffix Badge')}</label>
                   <input
                     type="text"
                     value={attrFormData.unitOrSuffix}
                     onChange={(e) => setAttrFormData({ ...attrFormData, unitOrSuffix: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 font-mono focus:border-emerald-500 focus:outline-none"
-                    placeholder="e.g. sq ft, %, $/day, seats"
+                    placeholder={tr('e.g. sq ft, %, $/day, seats')}
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-400 font-medium mb-1">Industry Tag</label>
+                  <label className="block text-slate-400 font-medium mb-1">{tr('Industry Tag')}</label>
                   <select
                     value={attrFormData.industryPreset}
                     onChange={(e) => setAttrFormData({ ...attrFormData, industryPreset: e.target.value as IndustryPresetType })}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
                   >
-                    <option value="CUSTOM">Custom Entity</option>
-                    <option value="HOUSING_SOCIETY">Housing Society & HOA</option>
-                    <option value="SCHOOL">School & Academy</option>
-                    <option value="HOSPITAL">Hospital & Healthcare</option>
-                    <option value="SAAS">Enterprise SaaS</option>
+                    <option value="CUSTOM">{tr('Custom Entity')}</option>
+                    <option value="HOUSING_SOCIETY">{tr('Housing Society & HOA')}</option>
+                    <option value="SCHOOL">{tr('School & Academy')}</option>
+                    <option value="HOSPITAL">{tr('Hospital & Healthcare')}</option>
+                    <option value="SAAS">{tr('Enterprise SaaS')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-slate-400 font-medium mb-1">Help Description</label>
+                <label className="block text-slate-400 font-medium mb-1">{tr('Help Description')}</label>
                 <input
                   type="text"
                   value={attrFormData.description}
                   onChange={(e) => setAttrFormData({ ...attrFormData, description: e.target.value })}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
-                  placeholder="Guidance for users filling this attribute during invoicing"
+                  placeholder={tr('Guidance for users filling this attribute during invoicing')}
                 />
               </div>
 
@@ -1858,7 +1828,7 @@ export const EntityManagementView: React.FC<{
                   onChange={(e) => setAttrFormData({ ...attrFormData, isRequired: e.target.checked })}
                   className="rounded border-slate-700 bg-slate-900 text-emerald-600 focus:ring-emerald-500"
                 />
-                <span className="text-slate-300 font-medium">Mandate this attribute as Required</span>
+                <span className="text-slate-300 font-medium">{tr('Mandate this attribute as Required')}</span>
               </label>
 
               <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-2">
@@ -1866,15 +1836,11 @@ export const EntityManagementView: React.FC<{
                   type="button"
                   onClick={() => setIsAttrModalOpen(false)}
                   className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold shadow"
-                >
-                  Save Attribute
-                </button>
+                >{tr('Save Attribute')}</button>
               </div>
             </form>
           </div>

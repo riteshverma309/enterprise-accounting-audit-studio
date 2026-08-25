@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   FileSpreadsheet,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 
 export const AuditReportsView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     trialBalance,
@@ -58,7 +60,7 @@ export const AuditReportsView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">Financial Audit Reports Engine</h1>
+            <h1 className="text-xl font-bold text-white">{tr('Financial Audit Reports Engine')}</h1>
             <span className="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 font-mono text-[11px] rounded font-semibold border border-indigo-500/30">
               {activeTenant.name} ({activeTenant.currency})
             </span>
@@ -74,7 +76,7 @@ export const AuditReportsView: React.FC = () => {
             className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2.5 rounded-xl font-medium shadow-lg shadow-indigo-600/20 transition cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>Export Audit Package (JSON / Audit Pack)</span>
+            <span>{tr('Export Audit Package (JSON / Audit Pack)')}</span>
           </button>
         </div>
       </div>
@@ -90,7 +92,7 @@ export const AuditReportsView: React.FC = () => {
           }`}
         >
           <Scale className="w-4 h-4" />
-          <span>Trial Balance</span>
+          <span>{tr('Trial Balance')}</span>
         </button>
 
         <button
@@ -102,7 +104,7 @@ export const AuditReportsView: React.FC = () => {
           }`}
         >
           <FileSpreadsheet className="w-4 h-4" />
-          <span>Balance Sheet</span>
+          <span>{tr('Balance Sheet')}</span>
         </button>
 
         <button
@@ -114,7 +116,7 @@ export const AuditReportsView: React.FC = () => {
           }`}
         >
           <TrendingUp className="w-4 h-4" />
-          <span>Income Statement (P&L)</span>
+          <span>{tr('Income Statement (P&L)')}</span>
         </button>
 
         <button
@@ -126,7 +128,7 @@ export const AuditReportsView: React.FC = () => {
           }`}
         >
           <Activity className="w-4 h-4" />
-          <span>Statement of Cash Flows</span>
+          <span>{tr('Statement of Cash Flows')}</span>
         </button>
 
         <button
@@ -138,7 +140,7 @@ export const AuditReportsView: React.FC = () => {
           }`}
         >
           <HeartPulse className="w-4 h-4 text-rose-400" />
-          <span>Financial Ratios & Health Score</span>
+          <span>{tr('Financial Ratios & Health Score')}</span>
         </button>
       </div>
 
@@ -147,7 +149,7 @@ export const AuditReportsView: React.FC = () => {
         <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm overflow-hidden p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-800 gap-2">
             <div>
-              <h2 className="text-base font-bold text-white">General Ledger Trial Balance</h2>
+              <h2 className="text-base font-bold text-white">{tr('General Ledger Trial Balance')}</h2>
               <p className="text-xs text-slate-400">As of {new Date().toISOString().split('T')[0]} • Entity: {activeTenant.name}</p>
             </div>
             
@@ -163,9 +165,9 @@ export const AuditReportsView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950 text-slate-400 font-mono text-[11px] uppercase border-b border-slate-800">
                 <tr>
-                  <th className="p-3">Acc Code</th>
-                  <th className="p-3">Account Title</th>
-                  <th className="p-3">Classification</th>
+                  <th className="p-3">{tr('Acc Code')}</th>
+                  <th className="p-3">{tr('Account Title')}</th>
+                  <th className="p-3">{tr('Classification')}</th>
                   <th className="p-3 text-right">Debit Balance ({activeTenant.currency})</th>
                   <th className="p-3 text-right">Credit Balance ({activeTenant.currency})</th>
                 </tr>
@@ -191,7 +193,7 @@ export const AuditReportsView: React.FC = () => {
               </tbody>
               <tfoot className="bg-slate-950 font-mono font-bold text-sm text-slate-100 border-t-2 border-slate-800">
                 <tr>
-                  <td colSpan={3} className="p-3 text-right uppercase text-slate-400">Total Trial Balance Sums:</td>
+                  <td colSpan={3} className="p-3 text-right uppercase text-slate-400">{tr('Total Trial Balance Sums:')}</td>
                   <td className="p-3 text-right text-emerald-400">
                     {currencySymbol}{totalTbDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </td>
@@ -210,7 +212,7 @@ export const AuditReportsView: React.FC = () => {
         <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 space-y-6">
           <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-white">Statement of Financial Position (Balance Sheet)</h2>
+              <h2 className="text-base font-bold text-white">{tr('Statement of Financial Position (Balance Sheet)')}</h2>
               <p className="text-xs text-slate-400">Under {activeTenant.pluginId.toUpperCase()} • Equation: Assets = Liabilities + Equity</p>
             </div>
             
@@ -226,7 +228,7 @@ export const AuditReportsView: React.FC = () => {
             {/* ASSETS COLUMN */}
             <div className="space-y-4">
               <div className="flex items-center justify-between pb-2 border-b border-indigo-500/30">
-                <h3 className="text-sm font-extrabold text-indigo-400 uppercase tracking-wider">Total Assets</h3>
+                <h3 className="text-sm font-extrabold text-indigo-400 uppercase tracking-wider">{tr('Total Assets')}</h3>
                 <span className="font-mono text-base font-bold text-indigo-300">
                   {currencySymbol}{balanceSheet.totalAssets.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
@@ -253,7 +255,7 @@ export const AuditReportsView: React.FC = () => {
               {/* Liabilities */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between pb-2 border-b border-amber-500/30">
-                  <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">Total Liabilities</h3>
+                  <h3 className="text-sm font-extrabold text-amber-400 uppercase tracking-wider">{tr('Total Liabilities')}</h3>
                   <span className="font-mono text-base font-bold text-amber-300">
                     {currencySymbol}{balanceSheet.totalLiabilities.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
@@ -277,7 +279,7 @@ export const AuditReportsView: React.FC = () => {
               {/* Equity */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between pb-2 border-b border-emerald-500/30">
-                  <h3 className="text-sm font-extrabold text-emerald-400 uppercase tracking-wider">Total Owners Equity</h3>
+                  <h3 className="text-sm font-extrabold text-emerald-400 uppercase tracking-wider">{tr('Total Owners Equity')}</h3>
                   <span className="font-mono text-base font-bold text-emerald-300">
                     {currencySymbol}{balanceSheet.totalEquity.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </span>
@@ -300,7 +302,7 @@ export const AuditReportsView: React.FC = () => {
                   <div className="flex items-center justify-between p-2.5 bg-indigo-950/30 rounded-xl border border-indigo-800/50">
                     <div>
                       <span className="text-indigo-400 font-bold mr-2">[3200]</span>
-                      <span className="font-sans text-indigo-200 font-bold">Retained Earnings (Current Year P&L)</span>
+                      <span className="font-sans text-indigo-200 font-bold">{tr('Retained Earnings (Current Year P&L)')}</span>
                     </div>
                     <span className="font-bold text-indigo-300">
                       {currencySymbol}{balanceSheet.retainedEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -320,7 +322,7 @@ export const AuditReportsView: React.FC = () => {
         <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 space-y-6">
           <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-white">Statement of Profit & Loss (Income Statement)</h2>
+              <h2 className="text-base font-bold text-white">{tr('Statement of Profit & Loss (Income Statement)')}</h2>
               <p className="text-xs text-slate-400">Revenue Recognition under {activeTenant.pluginId.toUpperCase()}</p>
             </div>
             
@@ -334,7 +336,7 @@ export const AuditReportsView: React.FC = () => {
             {/* Revenue Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-emerald-500/30">
-                <h3 className="text-sm font-extrabold text-emerald-400 uppercase tracking-wider">1. Operating Revenues</h3>
+                <h3 className="text-sm font-extrabold text-emerald-400 uppercase tracking-wider">{tr('1. Operating Revenues')}</h3>
                 <span className="font-mono text-base font-bold text-emerald-300">
                   {currencySymbol}{incomeStatement.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
@@ -354,7 +356,7 @@ export const AuditReportsView: React.FC = () => {
             {/* Expenses Section */}
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-rose-500/30">
-                <h3 className="text-sm font-extrabold text-rose-400 uppercase tracking-wider">2. Operating Expenses</h3>
+                <h3 className="text-sm font-extrabold text-rose-400 uppercase tracking-wider">{tr('2. Operating Expenses')}</h3>
                 <span className="font-mono text-base font-bold text-rose-300">
                   {currencySymbol}{incomeStatement.totalExpense.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
@@ -374,8 +376,8 @@ export const AuditReportsView: React.FC = () => {
             {/* Net Operating Income Summary Box */}
             <div className="p-5 bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-950 rounded-2xl border border-indigo-500/40 shadow-xl flex items-center justify-between">
               <div>
-                <span className="text-xs uppercase font-extrabold tracking-wider text-indigo-400">Net Operating Profit</span>
-                <p className="text-[11px] text-slate-400 mt-0.5">Calculated as Total Revenue minus Operating Expenses</p>
+                <span className="text-xs uppercase font-extrabold tracking-wider text-indigo-400">{tr('Net Operating Profit')}</span>
+                <p className="text-[11px] text-slate-400 mt-0.5">{tr('Calculated as Total Revenue minus Operating Expenses')}</p>
               </div>
               <span className="font-mono text-2xl font-black text-white">
                 {currencySymbol}{incomeStatement.netIncome.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -391,8 +393,8 @@ export const AuditReportsView: React.FC = () => {
         <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 space-y-6">
           <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-white">Statement of Cash Flows (IAS 7 / ASC 230)</h2>
-              <p className="text-xs text-slate-400">Indirect Method reconciles Net Income to Operating, Investing, and Financing Cash Movements</p>
+              <h2 className="text-base font-bold text-white">{tr('Statement of Cash Flows (IAS 7 / ASC 230)')}</h2>
+              <p className="text-xs text-slate-400">{tr('Indirect Method reconciles Net Income to Operating, Investing, and Financing Cash Movements')}</p>
             </div>
             
             <div className="px-3 py-1.5 bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 rounded-xl font-mono text-xs font-bold">
@@ -404,7 +406,7 @@ export const AuditReportsView: React.FC = () => {
             {/* Operating Activities */}
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-indigo-500/30">
-                <h3 className="text-sm font-extrabold text-indigo-400 font-sans uppercase">1. Cash Flows from Operating Activities</h3>
+                <h3 className="text-sm font-extrabold text-indigo-400 font-sans uppercase">{tr('1. Cash Flows from Operating Activities')}</h3>
                 <span className="text-base font-bold text-indigo-300">
                   {currencySymbol}{cashFlowStatement.totalOperatingCashFlow.toLocaleString()}
                 </span>
@@ -424,7 +426,7 @@ export const AuditReportsView: React.FC = () => {
             {/* Investing Activities */}
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-purple-500/30">
-                <h3 className="text-sm font-extrabold text-purple-400 font-sans uppercase">2. Cash Flows from Investing Activities</h3>
+                <h3 className="text-sm font-extrabold text-purple-400 font-sans uppercase">{tr('2. Cash Flows from Investing Activities')}</h3>
                 <span className="text-base font-bold text-purple-300">
                   {currencySymbol}{cashFlowStatement.totalInvestingCashFlow.toLocaleString()}
                 </span>
@@ -444,7 +446,7 @@ export const AuditReportsView: React.FC = () => {
             {/* Financing Activities */}
             <div className="space-y-3">
               <div className="flex items-center justify-between pb-2 border-b border-amber-500/30">
-                <h3 className="text-sm font-extrabold text-amber-400 font-sans uppercase">3. Cash Flows from Financing Activities</h3>
+                <h3 className="text-sm font-extrabold text-amber-400 font-sans uppercase">{tr('3. Cash Flows from Financing Activities')}</h3>
                 <span className="text-base font-bold text-amber-300">
                   {currencySymbol}{cashFlowStatement.totalFinancingCashFlow.toLocaleString()}
                 </span>
@@ -464,8 +466,8 @@ export const AuditReportsView: React.FC = () => {
             {/* Total Net Cash Change Box */}
             <div className="p-4 bg-slate-950 border-2 border-emerald-500/40 rounded-2xl flex items-center justify-between font-sans">
               <div>
-                <h4 className="text-sm font-bold text-slate-100">NET INCREASE / (DECREASE) IN CASH & CASH EQUIVALENTS</h4>
-                <p className="text-[11px] text-slate-400">Sum of Operating, Investing, and Financing Cash Flows</p>
+                <h4 className="text-sm font-bold text-slate-100">{tr('NET INCREASE / (DECREASE) IN CASH & CASH EQUIVALENTS')}</h4>
+                <p className="text-[11px] text-slate-400">{tr('Sum of Operating, Investing, and Financing Cash Flows')}</p>
               </div>
               <span className="text-2xl font-extrabold text-emerald-400 font-mono">
                 {currencySymbol}{cashFlowStatement.netCashChange.toLocaleString()}
@@ -480,53 +482,53 @@ export const AuditReportsView: React.FC = () => {
         <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 space-y-6">
           <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
             <div>
-              <h2 className="text-base font-bold text-white">Financial Intelligence & Liquidity Health Score</h2>
+              <h2 className="text-base font-bold text-white">{tr('Financial Intelligence & Liquidity Health Score')}</h2>
               <p className="text-xs text-slate-400">Automated Financial Ratio Analysis & Solvency Diagnostics for {activeTenant.name}</p>
             </div>
             
             <div className="flex items-center gap-2 px-4 py-2 bg-slate-950 border border-slate-800 rounded-xl">
-              <span className="text-xs text-slate-400 font-semibold">Audit Health Index:</span>
+              <span className="text-xs text-slate-400 font-semibold">{tr('Audit Health Index:')}</span>
               <span className="text-lg font-black text-emerald-400 font-mono">{financialRatios.healthScore} / 100</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400">Current Ratio (Liquidity)</span>
+              <span className="text-[11px] font-semibold text-slate-400">{tr('Current Ratio (Liquidity)')}</span>
               <div className="text-2xl font-bold text-indigo-400 font-mono">{financialRatios.currentRatio}x</div>
-              <p className="text-[10px] text-slate-500">(Cash + AR) / Total Liabilities. Target: &gt; 1.5x</p>
+              <p className="text-[10px] text-slate-500">{tr('(Cash + AR) / Total Liabilities. Target: &gt; 1.5x')}</p>
             </div>
 
             <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400">Quick Ratio (Acid Test)</span>
+              <span className="text-[11px] font-semibold text-slate-400">{tr('Quick Ratio (Acid Test)')}</span>
               <div className="text-2xl font-bold text-indigo-400 font-mono">{financialRatios.quickRatio}x</div>
-              <p className="text-[10px] text-slate-500">Liquid Cash / Short-term Debt. Target: &gt; 1.0x</p>
+              <p className="text-[10px] text-slate-500">{tr('Liquid Cash / Short-term Debt. Target: &gt; 1.0x')}</p>
             </div>
 
             <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400">Working Capital</span>
+              <span className="text-[11px] font-semibold text-slate-400">{tr('Working Capital')}</span>
               <div className="text-2xl font-bold text-emerald-400 font-mono">
                 {currencySymbol}{financialRatios.workingCapital.toLocaleString()}
               </div>
-              <p className="text-[10px] text-slate-500">Current Assets minus Current Liabilities</p>
+              <p className="text-[10px] text-slate-500">{tr('Current Assets minus Current Liabilities')}</p>
             </div>
 
             <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400">Debt-to-Equity Ratio</span>
+              <span className="text-[11px] font-semibold text-slate-400">{tr('Debt-to-Equity Ratio')}</span>
               <div className="text-2xl font-bold text-purple-400 font-mono">{financialRatios.debtToEquity}x</div>
-              <p className="text-[10px] text-slate-500">Total Liabilities / Total Owners Equity</p>
+              <p className="text-[10px] text-slate-500">{tr('Total Liabilities / Total Owners Equity')}</p>
             </div>
 
             <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400">Gross Profit Margin</span>
+              <span className="text-[11px] font-semibold text-slate-400">{tr('Gross Profit Margin')}</span>
               <div className="text-2xl font-bold text-emerald-400 font-mono">{financialRatios.grossMarginPercentage}%</div>
-              <p className="text-[10px] text-slate-500">Gross Margin as percentage of Revenue</p>
+              <p className="text-[10px] text-slate-500">{tr('Gross Margin as percentage of Revenue')}</p>
             </div>
 
             <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl space-y-1">
-              <span className="text-[11px] font-semibold text-slate-400">Net Profit Margin</span>
+              <span className="text-[11px] font-semibold text-slate-400">{tr('Net Profit Margin')}</span>
               <div className="text-2xl font-bold text-emerald-400 font-mono">{financialRatios.netProfitMarginPercentage}%</div>
-              <p className="text-[10px] text-slate-500">Bottom-line Net Income / Total Revenue</p>
+              <p className="text-[10px] text-slate-500">{tr('Bottom-line Net Income / Total Revenue')}</p>
             </div>
           </div>
         </div>

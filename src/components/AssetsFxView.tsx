@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import { Layers, Play, DollarSign, Calendar, CheckCircle2, TrendingUp } from 'lucide-react';
 import { FX_RATES } from '../mockData';
 
 export const AssetsFxView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const { activeTenant, fixedAssets, runDepreciationForTenant } = useAccounting();
 
   const tenantAssets = fixedAssets.filter((fa) => fa.tenantId === activeTenant.id);
@@ -26,14 +28,12 @@ export const AssetsFxView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold text-white">Fixed Assets & Multi-Currency FX Engine</h1>
+            <h1 className="text-xl font-bold text-white">{tr('Fixed Assets & Multi-Currency FX Engine')}</h1>
             <span className="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 font-mono text-[11px] rounded font-semibold border border-indigo-500/30">
               {activeTenant.name} ({activeTenant.currency})
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Automated straight-line asset depreciation runs and month-end unrealized foreign exchange revaluations.
-          </p>
+          <p className="text-xs text-slate-400 mt-1">{tr('Automated straight-line asset depreciation runs and month-end unrealized foreign exchange revaluations.')}</p>
         </div>
       </div>
 
@@ -49,8 +49,8 @@ export const AssetsFxView: React.FC = () => {
       <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm overflow-hidden p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
           <div>
-            <h3 className="text-sm font-bold text-white">Fixed Assets Register (ASC 360 / IAS 16)</h3>
-            <p className="text-xs text-slate-400">Track acquisition cost, accumulated depreciation, and net book value.</p>
+            <h3 className="text-sm font-bold text-white">{tr('Fixed Assets Register (ASC 360 / IAS 16)')}</h3>
+            <p className="text-xs text-slate-400">{tr('Track acquisition cost, accumulated depreciation, and net book value.')}</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -65,7 +65,7 @@ export const AssetsFxView: React.FC = () => {
               className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-4 py-2 rounded-xl font-medium shadow transition cursor-pointer"
             >
               <Play className="w-3.5 h-3.5" />
-              <span>Run Depreciation</span>
+              <span>{tr('Run Depreciation')}</span>
             </button>
           </div>
         </div>
@@ -74,12 +74,12 @@ export const AssetsFxView: React.FC = () => {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800">
               <tr>
-                <th className="p-3">Asset #</th>
-                <th className="p-3">Asset Description</th>
-                <th className="p-3">Category</th>
+                <th className="p-3">{tr('Asset #')}</th>
+                <th className="p-3">{tr('Asset Description')}</th>
+                <th className="p-3">{tr('Category')}</th>
                 <th className="p-3 text-right">Cost ({activeTenant.currency})</th>
-                <th className="p-3 text-right">Accum Depreciation</th>
-                <th className="p-3 text-right">Net Book Value</th>
+                <th className="p-3 text-right">{tr('Accum Depreciation')}</th>
+                <th className="p-3 text-right">{tr('Net Book Value')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -106,8 +106,8 @@ export const AssetsFxView: React.FC = () => {
 
       {/* SECTION 2: MULTI-CURRENCY FX ENGINE */}
       <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-sm p-6 space-y-4">
-        <h3 className="text-sm font-bold text-white">Multi-Currency Exchange Rates & FX Engine</h3>
-        <p className="text-xs text-slate-400">Active foreign currency exchange conversion rates for revaluation</p>
+        <h3 className="text-sm font-bold text-white">{tr('Multi-Currency Exchange Rates & FX Engine')}</h3>
+        <p className="text-xs text-slate-400">{tr('Active foreign currency exchange conversion rates for revaluation')}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono text-xs">
           {FX_RATES.map((fx, idx) => (

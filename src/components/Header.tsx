@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { Building2, ShieldCheck, UserCheck, Scale, Globe2, ChevronDown, Plus, BookOpen, HelpCircle, HardDriveDownload, User, ShieldAlert } from 'lucide-react';
 import { Role } from '../types';
 import { FontSizeControl } from './FontSizeControl';
@@ -113,10 +113,27 @@ export const SIMULATED_USERS_MAP: Record<Role, SimulatedUserDetail> = {
     avatarGradient: 'from-blue-600 to-sky-700',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
   },
+  manager: {
+    name: 'Marcus Sterling',
+    email: 'marcus.manager@acme.com',
+    title: 'Procurement & Department Manager',
+    roleLabel: 'Dept Manager',
+    initials: 'MS',
+    avatarGradient: 'from-teal-600 to-emerald-600',
+    badgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/30',
+  },
+  cfo: {
+    name: 'Victoria Vance',
+    email: 'victoria.cfo@acme.com',
+    title: 'Chief Financial Officer (CFO)',
+    roleLabel: 'CFO / VP Finance',
+    initials: 'VV',
+    avatarGradient: 'from-amber-600 to-yellow-600',
+    badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+  },
 };
 
-export const Header: React.FC<HeaderProps> = ({
-  onOpenCreateTenantModal,
+export const Header: React.FC<HeaderProps> = ({ onOpenCreateTenantModal,
   onOpenHelpCenter,
   onOpenBackupModal,
 }) => {
@@ -414,7 +431,7 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenBackupModal && (
             <button
               onClick={onOpenBackupModal}
-              title="1-Click Company Data Backup & Point-in-Time Restore"
+              title={tr('1-Click Company Data Backup & Point-in-Time Restore')}
               className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
             >
               <HardDriveDownload className="w-3.5 h-3.5 text-emerald-400" />
@@ -426,7 +443,7 @@ export const Header: React.FC<HeaderProps> = ({
           {onOpenHelpCenter && (
             <button
               onClick={onOpenHelpCenter}
-              title="Open Application Help Center & User Guide"
+              title={tr('Open Application Help Center & User Guide')}
               className="flex items-center gap-1.5 px-2.5 py-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-semibold transition cursor-pointer"
             >
               <BookOpen className="w-3.5 h-3.5 text-indigo-400" />

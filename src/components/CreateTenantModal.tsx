@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { Building2, X, Download, CheckCircle2, ArrowRight, Sparkles, FileSpreadsheet, Layers } from 'lucide-react';
 import { PluginId } from '../types';
 import { UPLOAD_TEMPLATES, downloadCsvFile } from '../utils/templateGenerator';
@@ -10,11 +11,11 @@ interface CreateTenantModalProps {
   onNavigateToImporter?: () => void;
 }
 
-export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
-  isOpen,
+export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({ isOpen,
   onClose,
   onNavigateToImporter,
 }) => {
+  const { tr, t } = useLanguage();
   const { createTenant } = useAccounting();
 
   const [step, setStep] = useState<1 | 2>(1);
@@ -72,9 +73,9 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
             </div>
             <div>
               <h2 className="text-base font-bold text-white">
-                {step === 1 ? 'Create Corporate Tenant Entity' : 'Entity Initial Onboarding & Data Import Setup'}
+                {step === 1 ? tr('Create Corporate Tenant Entity') : tr('Entity Initial Onboarding & Data Import Setup')}
               </h2>
-              <p className="text-[11px] text-slate-400">Step {step} of 2 • SOX 404 Entity Provisioning</p>
+              <p className="text-[11px] text-slate-400">{tr('Step')} {step} of 2 • SOX 404 Entity Provisioning</p>
             </div>
           </div>
           <button type="button" onClick={handleReset} className="text-slate-400 hover:text-white cursor-pointer">
@@ -86,47 +87,47 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Company / Entity Name *</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Company / Entity Name')} *</label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="e.g., Tokyo Robotics Japan K.K."
+                  placeholder={tr('e.g., Tokyo Robotics Japan K.K.')}
                   className="w-full bg-slate-950 text-slate-100 text-xs p-2.5 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Entity Code (Prefix) *</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Entity Code (Prefix)')} *</label>
                 <input
                   type="text"
                   required
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder="e.g., TOKYO-JP"
+                  placeholder={tr('e.g., TOKYO-JP')}
                   className="w-full bg-slate-950 text-slate-100 text-xs font-mono p-2.5 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Functional Currency</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Functional Currency')}</label>
                   <select
                     value={currency}
                     onChange={(e) => setCurrency(e.target.value)}
                     className="w-full bg-slate-950 text-slate-100 text-xs p-2.5 rounded-xl border border-slate-800 outline-none cursor-pointer font-mono"
                   >
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="INR">INR (₹)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="JPY">JPY (¥)</option>
+                    <option value="USD">{tr('USD ($)')}</option>
+                    <option value="EUR">{tr('EUR (€)')}</option>
+                    <option value="INR">{tr('INR (₹)')}</option>
+                    <option value="GBP">{tr('GBP (£)')}</option>
+                    <option value="JPY">{tr('JPY (¥)')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Country Jurisdiction</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Country Jurisdiction')}</label>
                   <input
                     type="text"
                     value={country}
@@ -137,15 +138,15 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Localization & Tax Plugin Standard</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Localization & Tax Plugin Standard')}</label>
                 <select
                   value={pluginId}
                   onChange={(e) => setPluginId(e.target.value as PluginId)}
                   className="w-full bg-slate-950 text-slate-100 text-xs p-2.5 rounded-xl border border-slate-800 outline-none cursor-pointer font-bold text-indigo-300"
                 >
-                  <option value="us_gaap">US GAAP (SEC Form 10-K & State Sales Tax)</option>
-                  <option value="eu_ifrs">EU IFRS (IAS-1 & Cross-Border Reverse Charge VAT)</option>
-                  <option value="in_gst">India GST (GSTR-1, CGST/SGST/IGST Act 2017)</option>
+                  <option value="us_gaap">{tr('US GAAP (SEC Form 10-K & State Sales Tax)')}</option>
+                  <option value="eu_ifrs">{tr('EU IFRS (IAS-1 & Cross-Border Reverse Charge VAT)')}</option>
+                  <option value="in_gst">{tr('India GST (GSTR-1, CGST/SGST/IGST Act 2017)')}</option>
                 </select>
               </div>
             </div>
@@ -156,13 +157,13 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
                 onClick={handleReset}
                 className="px-4 py-2 bg-slate-800 text-slate-300 text-xs rounded-xl cursor-pointer"
               >
-                Cancel
+                {tr('Cancel')}
               </button>
               <button
                 type="submit"
                 className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg transition flex items-center gap-2 cursor-pointer"
               >
-                <span>Provision Entity & Next Step</span>
+                <span>{tr('Provision Entity & Next Step')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -173,7 +174,7 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
             <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl flex items-center gap-3 text-emerald-300 text-xs">
               <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
               <div>
-                <span className="font-bold">Entity Created Successfully!</span>
+                <span className="font-bold">{tr('Entity Created Successfully!')}</span>
                 <p className="text-[11px] text-emerald-200/80">
                   {createdEntityName} is now active. Standard Chart of Accounts seeded with currency {currency}.
                 </p>
@@ -183,14 +184,14 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <FileSpreadsheet className="w-4 h-4 text-indigo-400" /> Quick Data Import CSV Templates
+                  <FileSpreadsheet className="w-4 h-4 text-indigo-400" /> {tr('Quick Data Import CSV Templates')}
                 </span>
                 <button
                   type="button"
                   onClick={handleDownloadAllTemplates}
                   className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm cursor-pointer"
                 >
-                  <Download className="w-3 h-3" /> Download All (6 CSVs)
+                  <Download className="w-3 h-3" /> {tr('Download All (6 CSVs)')}
                 </button>
               </div>
 
@@ -223,7 +224,7 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
                 onClick={handleReset}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl cursor-pointer"
               >
-                Close & View Entity
+                {tr('Close')}
               </button>
               
               <button
@@ -234,7 +235,7 @@ export const CreateTenantModal: React.FC<CreateTenantModalProps> = ({
                 }}
                 className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-indigo-600 hover:from-emerald-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow-lg flex items-center gap-2 cursor-pointer"
               >
-                <Layers className="w-4 h-4" /> Launch Batch Data Importer
+                <Layers className="w-4 h-4" /> {tr('Bulk Upload Transactions')}
               </button>
             </div>
           </div>

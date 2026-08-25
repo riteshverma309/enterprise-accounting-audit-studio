@@ -26,10 +26,10 @@ import {
   Link2,
 } from 'lucide-react';
 import { UPLOAD_TEMPLATES, downloadCsvFile } from '../utils/templateGenerator';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 
 export const ReconciliationView: React.FC = () => {
-  const { t, tr } = useLanguage();
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     bankStatements,
@@ -497,7 +497,7 @@ export const ReconciliationView: React.FC = () => {
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search reference or payee..."
+                placeholder={tr('Search reference or payee...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-slate-950 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none w-48 md:w-64"
@@ -537,7 +537,7 @@ export const ReconciliationView: React.FC = () => {
               className="flex items-center gap-1.5 bg-cyan-600 hover:bg-cyan-500 text-white text-xs font-bold px-3 py-2 rounded-xl shadow transition cursor-pointer"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Connect Open Banking Feed</span>
+              <span>{tr('Connect Open Banking Feed')}</span>
             </button>
           </div>
         )}
@@ -563,23 +563,22 @@ export const ReconciliationView: React.FC = () => {
                     </div>
 
                     <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded-full font-bold border border-emerald-500/20">
-                      <Radio className="w-2.5 h-2.5 animate-pulse" /> Live
-                    </span>
+                      <Radio className="w-2.5 h-2.5 animate-pulse" />{tr('Live')}</span>
                   </div>
 
                   <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1 font-mono text-xs">
                     <div className="flex justify-between text-slate-400">
-                      <span>Available Balance:</span>
+                      <span>{tr("Available Balance:")}</span>
                       <span className="text-emerald-400 font-bold">
                         ${feed.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} {feed.currency}
                       </span>
                     </div>
                     <div className="flex justify-between text-slate-500 text-[10px]">
-                      <span>Mapped GL Account:</span>
+                      <span>{tr("Mapped GL Account:")}</span>
                       <span>{feed.glAccountCode || '1010'}</span>
                     </div>
                     <div className="flex justify-between text-slate-500 text-[10px]">
-                      <span>Last Synced:</span>
+                      <span>{tr("Last Synced:")}</span>
                       <span>{new Date(feed.lastSyncedAt).toLocaleTimeString()}</span>
                     </div>
                   </div>
@@ -597,7 +596,7 @@ export const ReconciliationView: React.FC = () => {
                     <button
                       onClick={() => disconnectBankFeed(feed.id)}
                       className="p-1.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded-lg transition"
-                      title="Disconnect Feed"
+                      title={tr('Disconnect Feed')}
                     >
                       <Unplug className="w-3.5 h-3.5" />
                     </button>
@@ -612,8 +611,7 @@ export const ReconciliationView: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-sm overflow-hidden p-6 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-white flex items-center gap-2">
-            <Landmark className="w-4 h-4 text-indigo-400" /> Bank Feed Transactions Register
-          </h3>
+            <Landmark className="w-4 h-4 text-indigo-400" />{tr('Bank Feed Transactions Register')}</h3>
           <span className="text-xs text-slate-400 font-mono">
             Showing {filteredStatements.length} of {tenantStatements.length} line(s)
           </span>
@@ -640,21 +638,19 @@ export const ReconciliationView: React.FC = () => {
                     className="rounded bg-slate-900 border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer"
                   />
                 </th>
-                <th className="p-3">Date</th>
-                <th className="p-3">Bank Reference</th>
-                <th className="p-3">Statement Narrative / Payee</th>
+                <th className="p-3">{tr('Date')}</th>
+                <th className="p-3">{tr('Bank Reference')}</th>
+                <th className="p-3">{tr('Statement Narrative / Payee')}</th>
                 <th className="p-3 text-right">Amount ({activeTenant.currency})</th>
-                <th className="p-3 text-center">Status</th>
-                <th className="p-3 text-center">GL Match Status</th>
-                <th className="p-3 text-right">Action</th>
+                <th className="p-3 text-center">{tr('Status')}</th>
+                <th className="p-3 text-center">{tr('GL Match Status')}</th>
+                <th className="p-3 text-right">{tr('Action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
               {filteredStatements.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-slate-500 font-sans">
-                    No bank statement lines match the selected filter. Click "Load Sample Feed" or "Import CSV Feed" to add statement lines.
-                  </td>
+                  <td colSpan={8} className="p-8 text-center text-slate-500 font-sans">{tr('No bank statement lines match the selected filter. Click "Load Sample Feed" or "Import CSV Feed" to add statement lines.')}</td>
                 </tr>
               ) : (
                 filteredStatements.map((line) => {
@@ -685,12 +681,10 @@ export const ReconciliationView: React.FC = () => {
                       <td className="p-3 text-center">
                         {line.reconciled ? (
                           <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full font-bold border border-emerald-500/30">
-                            <CheckCircle2 className="w-3 h-3" /> Reconciled
-                          </span>
+                            <CheckCircle2 className="w-3 h-3" />{tr('Reconciled')}</span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-[10px] bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-full font-bold border border-amber-500/30">
-                            <AlertCircle className="w-3 h-3" /> Pending
-                          </span>
+                            <AlertCircle className="w-3 h-3" />{tr('Pending')}</span>
                         )}
                       </td>
                       <td className="p-3 text-center font-sans">
@@ -699,9 +693,7 @@ export const ReconciliationView: React.FC = () => {
                             Linked JE: {line.matchedJournalEntryId || 'Manual Approval'}
                           </span>
                         ) : (
-                          <span className="text-[10px] text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                            Candidate Match Ready
-                          </span>
+                          <span className="text-[10px] text-indigo-400 font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">{tr('Candidate Match Ready')}</span>
                         )}
                       </td>
                       <td className="p-3 text-right">
@@ -714,20 +706,17 @@ export const ReconciliationView: React.FC = () => {
                                 setQuickMemo(line.description);
                               }}
                               className="bg-slate-800 hover:bg-slate-700 text-purple-300 px-2.5 py-1 rounded-lg font-bold text-[11px] border border-slate-700 flex items-center gap-1 transition cursor-pointer"
-                              title="Post missing entry to GL & reconcile immediately"
+                              title={tr('Post missing entry to GL & reconcile immediately')}
                             >
-                              <Plus className="w-3 h-3" /> Quick GL Post
-                            </button>
+                              <Plus className="w-3 h-3" />{tr('Quick GL Post')}</button>
 
                             <button
                               onClick={() => handleReconcile(line.id)}
                               className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1 rounded-lg font-bold text-[11px] shadow transition cursor-pointer"
-                            >
-                              Reconcile to GL
-                            </button>
+                            >{tr('Reconcile to GL')}</button>
                           </div>
                         ) : (
-                          <span className="text-slate-500 text-[11px]">Audit Clear</span>
+                          <span className="text-slate-500 text-[11px]">{tr('Audit Clear')}</span>
                         )}
                       </td>
                     </tr>
@@ -747,7 +736,7 @@ export const ReconciliationView: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Landmark className="w-5 h-5 text-cyan-400" />
-                <h3 className="text-sm font-bold text-white">Connect Open Banking Feed</h3>
+                <h3 className="text-sm font-bold text-white">{tr('Connect Open Banking Feed')}</h3>
               </div>
               <button
                 onClick={() => setIsConnectModalOpen(false)}
@@ -765,11 +754,11 @@ export const ReconciliationView: React.FC = () => {
                   onChange={(e) => setInstitutionName(e.target.value)}
                   className="w-full bg-slate-950 text-slate-100 p-2.5 rounded-xl border border-slate-800 focus:border-cyan-500 outline-none cursor-pointer"
                 >
-                  <option value="Chase Commercial Treasury">JPMorgan Chase Commercial Bank</option>
-                  <option value="Bank of America Corporate">Bank of America Merrill Lynch</option>
-                  <option value="Silicon Valley Bank (SVB)">Silicon Valley Bank Commercial</option>
-                  <option value="Citibank NA Treasury">Citibank Corporate Treasury</option>
-                  <option value="Wells Fargo Commercial">Wells Fargo Commercial Banking</option>
+                  <option value="Chase Commercial Treasury">{tr('JPMorgan Chase Commercial Bank')}</option>
+                  <option value="Bank of America Corporate">{tr('Bank of America Merrill Lynch')}</option>
+                  <option value="Silicon Valley Bank (SVB)">{tr('Silicon Valley Bank Commercial')}</option>
+                  <option value="Citibank NA Treasury">{tr('Citibank Corporate Treasury')}</option>
+                  <option value="Wells Fargo Commercial">{tr('Wells Fargo Commercial Banking')}</option>
                 </select>
               </div>
 
@@ -780,14 +769,14 @@ export const ReconciliationView: React.FC = () => {
                   required
                   value={accountName}
                   onChange={(e) => setAccountName(e.target.value)}
-                  placeholder="e.g. Operating Payroll Checking"
+                  placeholder={tr('e.g. Operating Payroll Checking')}
                   className="w-full bg-slate-950 text-slate-100 p-2.5 rounded-xl border border-slate-800 focus:border-cyan-500 outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-slate-300 font-bold mb-1">Masked Number</label>
+                  <label className="block text-slate-300 font-bold mb-1">{tr('Masked Number')}</label>
                   <input
                     type="text"
                     value={accountNumberMasked}
@@ -819,15 +808,12 @@ export const ReconciliationView: React.FC = () => {
                   type="button"
                   onClick={() => setIsConnectModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-bold shadow-lg shadow-cyan-600/20 transition cursor-pointer flex items-center gap-1.5"
                 >
-                  <Link2 className="w-4 h-4" /> Establish Connection
-                </button>
+                  <Link2 className="w-4 h-4" />{tr('Establish Connection')}</button>
               </div>
             </form>
           </div>
@@ -842,7 +828,7 @@ export const ReconciliationView: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Plus className="w-5 h-5 text-purple-400" />
-                <h3 className="text-sm font-bold text-white">Quick Create GL Entry & Reconcile</h3>
+                <h3 className="text-sm font-bold text-white">{tr('Quick Create GL Entry & Reconcile')}</h3>
               </div>
               <button
                 onClick={() => setQuickPostStatementId(null)}
@@ -854,15 +840,15 @@ export const ReconciliationView: React.FC = () => {
 
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs space-y-1 font-mono">
               <div className="flex justify-between text-slate-400">
-                <span>Bank Reference:</span>
+                <span>{tr("Bank Reference:")}</span>
                 <span className="text-indigo-400 font-bold">{currentStatementForModal.reference}</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Statement Date:</span>
+                <span>{tr("Statement Date:")}</span>
                 <span className="text-white">{currentStatementForModal.date}</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Bank Statement Amount:</span>
+                <span>{tr("Bank Statement Amount:")}</span>
                 <span
                   className={`font-bold text-sm ${
                     currentStatementForModal.amount >= 0 ? 'text-emerald-400' : 'text-slate-100'
@@ -895,12 +881,12 @@ export const ReconciliationView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-slate-300 font-bold mb-1">Journal Entry Description / Memo:</label>
+                <label className="block text-slate-300 font-bold mb-1">{tr("Journal Entry Description / Memo:")}</label>
                 <input
                   type="text"
                   value={quickMemo}
                   onChange={(e) => setQuickMemo(e.target.value)}
-                  placeholder="e.g. Bank Fee / Office Expense / Revenue Adjustment"
+                  placeholder={tr('e.g. Bank Fee / Office Expense / Revenue Adjustment')}
                   className="w-full bg-slate-950 text-slate-100 p-2.5 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none font-sans"
                 />
               </div>
@@ -910,15 +896,12 @@ export const ReconciliationView: React.FC = () => {
               <button
                 onClick={() => setQuickPostStatementId(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl cursor-pointer"
-              >
-                Cancel
-              </button>
+              >{tr('Cancel')}</button>
               <button
                 onClick={handleExecuteQuickPost}
                 className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold rounded-xl shadow cursor-pointer flex items-center gap-1.5"
               >
-                <Check className="w-4 h-4" /> Post GL & Reconcile
-              </button>
+                <Check className="w-4 h-4" />{tr('Post GL & Reconcile')}</button>
             </div>
 
           </div>

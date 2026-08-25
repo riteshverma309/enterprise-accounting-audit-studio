@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import { IndustryCoaPreset } from '../data/industryCoaPresets';
 import {
@@ -45,6 +46,7 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { tr, t } = useLanguage();
   const { activeTenant, accounts, industryCoaPresets, applyIndustryPresetCOA } = useAccounting();
 
   const [selectedPresetId, setSelectedPresetId] = useState<string>(industryCoaPresets[0]?.id || '');
@@ -116,14 +118,14 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-bold text-white">Pre-Configured Industry Chart of Accounts</h2>
+                <h2 className="text-lg font-bold text-white">{tr('Pre-Configured Industry Chart of Accounts')}</h2>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono font-semibold border border-indigo-500/30">
-                  {industryCoaPresets.length} Industry Sectors
+                  {industryCoaPresets.length} {tr('Industry Sectors')}
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Select a domain-tailored Chart of Accounts (CoA) template for <strong>{activeTenant.name}</strong> ({activeTenant.currency}).
-                You can customize and modify every account after selection.
+                {tr('Select a domain-tailored Chart of Accounts (CoA) template for')} <strong>{activeTenant.name}</strong> ({activeTenant.currency}).
+                {' '}{tr('You can customize and modify every account after selection.')}
               </p>
             </div>
           </div>
@@ -146,12 +148,12 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search sector, industry, or model..."
+                placeholder={tr('Search sector, industry, or model...')}
                 className="w-full bg-slate-950 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
             </div>
 
-            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-1">Available Sector Blueprints</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 px-1">{tr('Available Sector Blueprints')}</p>
 
             <div className="space-y-2">
               {filteredPresets.map((preset) => {
@@ -180,21 +182,21 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                           {icon}
                         </div>
                         <div>
-                          <h4 className="text-xs font-bold text-slate-100">{preset.name}</h4>
-                          <p className="text-[10px] font-mono text-slate-400">{preset.sector}</p>
+                          <h4 className="text-xs font-bold text-slate-100">{tr(preset.name)}</h4>
+                          <p className="text-[10px] font-mono text-slate-400">{tr(preset.sector)}</p>
                         </div>
                       </div>
                       <span className="text-[9px] px-2 py-0.5 rounded-full font-mono font-bold bg-slate-800 text-indigo-300 border border-slate-700">
-                        {preset.badge}
+                        {tr(preset.badge)}
                       </span>
                     </div>
 
                     <p className="text-[11px] text-slate-400 mt-2 line-clamp-2 leading-relaxed">
-                      {preset.description}
+                      {tr(preset.description)}
                     </p>
 
                     <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-800/60 text-[10px] text-slate-400 font-mono">
-                      <span>{preset.accounts.length} Standard Accounts</span>
+                      <span>{preset.accounts.length} {tr('Standard Accounts')}</span>
                       <span className="text-indigo-400 font-semibold">{preset.standard}</span>
                     </div>
                   </div>
@@ -212,23 +214,23 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                        {selectedPreset.name}
+                        {tr(selectedPreset.name)}
                       </h3>
-                      <p className="text-xs text-slate-400 mt-0.5 font-mono">{selectedPreset.sector}</p>
+                      <p className="text-xs text-slate-400 mt-0.5 font-mono">{tr(selectedPreset.sector)}</p>
                     </div>
                     <span className="text-xs px-2.5 py-1 rounded-xl bg-emerald-500/10 text-emerald-300 font-mono font-semibold border border-emerald-500/20">
-                      Standard: {selectedPreset.standard}
+                      {tr('Standard:')} {selectedPreset.standard}
                     </span>
                   </div>
 
                   <p className="text-xs text-slate-300 leading-relaxed bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/60">
-                    {selectedPreset.description}
+                    {tr(selectedPreset.description)}
                   </p>
 
                   {/* Mode Selector */}
                   <div className="pt-2 border-t border-slate-800/80 space-y-2">
                     <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                      Template Import Strategy:
+                      {tr('Template Import Strategy:')}
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       <button
@@ -242,10 +244,10 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                       >
                         <div className="flex items-center gap-1.5 font-semibold text-xs text-slate-100">
                           <CheckCircle2 className={`w-3.5 h-3.5 ${applicationMode === 'merge' ? 'text-indigo-400' : 'text-slate-500'}`} />
-                          Smart Merge & Append
+                          {tr('Smart Merge & Append')}
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-                          Retains all existing accounts & balances; adds <strong>{newAccountsCount}</strong> new industry-specific accounts.
+                          {tr('Retains all existing accounts & balances; adds')} <strong>{newAccountsCount}</strong> {tr('new industry-specific accounts.')}
                         </p>
                       </button>
 
@@ -260,10 +262,10 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                       >
                         <div className="flex items-center gap-1.5 font-semibold text-xs text-amber-300">
                           <AlertCircle className={`w-3.5 h-3.5 ${applicationMode === 'replace' ? 'text-amber-400' : 'text-slate-500'}`} />
-                          Fresh Setup (Replace)
+                          {tr('Fresh Setup (Replace)')}
                         </div>
                         <p className="text-[10px] text-slate-400 mt-1 leading-normal">
-                          Replaces current CoA with fresh {selectedPreset.accounts.length} industry accounts. (Balances reset to template standards).
+                          {tr('Replaces current CoA with fresh')} {selectedPreset.accounts.length} {tr('industry accounts. (Balances reset to template standards).')}
                         </p>
                       </button>
                     </div>
@@ -272,7 +274,7 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
 
                 {/* Account Category Filter Tabs */}
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold text-slate-300">Accounts in Template ({selectedPreset.accounts.length}):</span>
+                  <span className="text-xs font-bold text-slate-300">{tr('Accounts in Template')} ({selectedPreset.accounts.length}):</span>
                   <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 text-[10px] font-semibold">
                     {(['ALL', 'ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'] as const).map((tab) => (
                       <button
@@ -284,7 +286,7 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                             : 'text-slate-400 hover:text-slate-200'
                         }`}
                       >
-                        {tab}
+                        {tr(tab)}
                       </button>
                     ))}
                   </div>
@@ -296,11 +298,11 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                     <table className="w-full text-left text-xs text-slate-300">
                       <thead className="bg-slate-950 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800 sticky top-0">
                         <tr>
-                          <th className="p-2.5">Code</th>
-                          <th className="p-2.5">Account Name</th>
-                          <th className="p-2.5">Type</th>
-                          <th className="p-2.5">Group / Sub-Category</th>
-                          <th className="p-2.5 text-center">Normal</th>
+                          <th className="p-2.5">{tr('Code')}</th>
+                          <th className="p-2.5">{tr('Account Name')}</th>
+                          <th className="p-2.5">{tr('Type')}</th>
+                          <th className="p-2.5">{tr('Group / Sub-Category')}</th>
+                          <th className="p-2.5 text-center">{tr('Normal')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/50 font-mono text-[11px]">
@@ -312,11 +314,11 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                                 {acc.code}
                                 {alreadyExists && applicationMode === 'merge' && (
                                   <span className="text-[9px] px-1 bg-slate-800 text-slate-400 rounded">
-                                    Current
+                                    {tr('Current')}
                                   </span>
                                 )}
                               </td>
-                              <td className="p-2.5 font-sans font-medium text-slate-200">{acc.name}</td>
+                              <td className="p-2.5 font-sans font-medium text-slate-200">{tr(acc.name)}</td>
                               <td className="p-2.5">
                                 <span
                                   className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
@@ -331,17 +333,17 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                                       : 'bg-rose-500/20 text-rose-300'
                                   }`}
                                 >
-                                  {acc.type}
+                                  {tr(acc.type)}
                                 </span>
                               </td>
-                              <td className="p-2.5 font-sans text-slate-400">{acc.subCategory}</td>
+                              <td className="p-2.5 font-sans text-slate-400">{tr(acc.subCategory || '')}</td>
                               <td className="p-2.5 text-center font-bold text-[10px]">
                                 <span
                                   className={
                                     acc.normalBalance === 'DEBIT' ? 'text-cyan-400' : 'text-amber-400'
                                   }
                                 >
-                                  {acc.normalBalance}
+                                  {tr(acc.normalBalance)}
                                 </span>
                               </td>
                             </tr>
@@ -355,13 +357,13 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
                 <div className="p-3 bg-indigo-950/20 border border-indigo-500/20 rounded-xl flex items-start gap-2 text-xs text-indigo-300">
                   <Info className="w-4 h-4 shrink-0 mt-0.5 text-indigo-400" />
                   <p className="text-[11px] leading-relaxed">
-                    Once applied, you can <strong>modify names, add custom codes, adjust categories</strong>, or archive any accounts directly from the Chart of Accounts manager table.
+                    {tr('Once applied, you can')} <strong>{tr('modify names, add custom codes, adjust categories')}</strong>{tr(', or archive any accounts directly from the Chart of Accounts manager table.')}
                   </p>
                 </div>
               </>
             ) : (
               <div className="h-full flex items-center justify-center text-slate-500 text-xs">
-                Select an industry preset from the left to view details.
+                {tr('Select an industry preset from the left to view details.')}
               </div>
             )}
           </div>
@@ -377,7 +379,7 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
             )}
             {!errorMsg && selectedPreset && (
               <span>
-                Ready to configure <strong>{selectedPreset.name}</strong> for {activeTenant.name} ({applicationMode === 'merge' ? `+${newAccountsCount} new accounts` : `${selectedPreset.accounts.length} total accounts`}).
+                {tr('Ready to configure')} <strong>{tr(selectedPreset.name)}</strong> {tr('for')} {activeTenant.name} ({applicationMode === 'merge' ? `+${newAccountsCount} ${tr('new accounts')}` : `${selectedPreset.accounts.length} ${tr('total accounts')}`}).
               </span>
             )}
           </div>
@@ -388,7 +390,7 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer"
             >
-              Cancel
+              {tr('Cancel')}
             </button>
             <button
               type="button"
@@ -397,7 +399,7 @@ export const IndustryCoaPresetModal: React.FC<IndustryCoaPresetModalProps> = ({
               className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2 cursor-pointer"
             >
               <Sparkles className="w-4 h-4" />
-              <span>{applicationMode === 'replace' ? 'Apply & Overwrite COA' : 'Apply & Merge Accounts'}</span>
+              <span>{applicationMode === 'replace' ? tr('Apply & Overwrite COA') : tr('Apply & Merge Accounts')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

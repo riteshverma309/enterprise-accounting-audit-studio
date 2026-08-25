@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useFontSize } from '../context/FontSizeContext';
 import {
   ALargeSmall,
@@ -20,10 +21,10 @@ interface FontSizeControlProps {
   showLabel?: boolean;
 }
 
-export const FontSizeControl: React.FC<FontSizeControlProps> = ({
-  variant = 'header_button',
+export const FontSizeControl: React.FC<FontSizeControlProps> = ({ variant = 'header_button',
   showLabel = true,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     fontSize,
     preset,
@@ -65,7 +66,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
               <ALargeSmall className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white tracking-tight">Display & Font Sizing Preferences</h3>
+              <h3 className="text-base font-bold text-white tracking-tight">{tr('Display & Font Sizing Preferences')}</h3>
               <p className="text-xs text-slate-400">
                 Adjust the base font scaling across all ledger tables, forms, and analytical dashboards.
               </p>
@@ -79,7 +80,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-300 rounded-lg text-xs font-medium border border-slate-700 transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset Default (100%)</span>
+              <span>{tr('Reset Default (100%)')}</span>
             </button>
           </div>
         </div>
@@ -129,7 +130,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Sliders className="w-4 h-4 text-indigo-400" />
-              <span className="text-xs font-semibold text-slate-200">Fine Scale Calibration</span>
+              <span className="text-xs font-semibold text-slate-200">{tr('Fine Scale Calibration')}</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-mono font-bold text-indigo-300 bg-indigo-500/10 px-2.5 py-1 rounded-lg border border-indigo-500/20">
@@ -142,7 +143,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
             <button
               onClick={decreaseFontSize}
               disabled={fontSize <= 80}
-              title="Decrease Font Size (5%)"
+              title={tr('Decrease Font Size (5%)')}
               className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 rounded-lg border border-slate-700 transition cursor-pointer"
             >
               <Minus className="w-4 h-4" />
@@ -163,7 +164,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
             <button
               onClick={increaseFontSize}
               disabled={fontSize >= 140}
-              title="Increase Font Size (5%)"
+              title={tr('Increase Font Size (5%)')}
               className="p-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 rounded-lg border border-slate-700 transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
@@ -171,10 +172,10 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
           </div>
 
           <div className="flex justify-between text-[10px] text-slate-500 font-mono px-1">
-            <span>80% (Compact 12.8px)</span>
-            <span>100% (Standard 16px)</span>
-            <span>125% (Large 20px)</span>
-            <span>140% (Max 22.4px)</span>
+            <span>{tr('80% (Compact 12.8px)')}</span>
+            <span>{tr('100% (Standard 16px)')}</span>
+            <span>{tr('125% (Large 20px)')}</span>
+            <span>{tr('140% (Max 22.4px)')}</span>
           </div>
         </div>
 
@@ -183,24 +184,24 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-1.5 text-xs text-slate-400">
               <Eye className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Live Render Preview (Real-time Scale Test)</span>
+              <span>{tr('Live Render Preview (Real-time Scale Test)')}</span>
             </div>
-            <span className="text-[10px] text-emerald-400 font-mono">Real-time Root CSS Synchronized</span>
+            <span className="text-[10px] text-emerald-400 font-mono">{tr('Real-time Root CSS Synchronized')}</span>
           </div>
 
           <div className="p-3 bg-slate-900 rounded-lg border border-slate-800 space-y-2">
             <div className="flex items-center justify-between text-xs pb-1 border-b border-slate-800 text-slate-400 font-medium">
-              <span>Account & Transaction</span>
-              <span>Reference</span>
-              <span>Debit Amount</span>
-              <span>Status</span>
+              <span>{tr('Account & Transaction')}</span>
+              <span>{tr('Reference')}</span>
+              <span>{tr('Debit Amount')}</span>
+              <span>{tr('Status')}</span>
             </div>
             <div className="flex items-center justify-between text-xs text-slate-200">
               <div className="flex items-center gap-2">
                 <span className="font-mono text-indigo-400 font-bold">1010</span>
-                <span>Operating Cash & Treasury Account</span>
+                <span>{tr('Operating Cash & Treasury Account')}</span>
               </div>
-              <span className="font-mono text-slate-400">JE-2026-8902</span>
+              <span className="font-mono text-slate-400">{tr('JE-2026-8902')}</span>
               <span className="font-mono font-bold text-white">$142,500.00</span>
               <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 POSTED
@@ -246,8 +247,8 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
                 <ALargeSmall className="w-4 h-4" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white tracking-tight">Display Font Size</h4>
-                <p className="text-[10px] text-slate-400">Scale entire UI & ledger density</p>
+                <h4 className="text-xs font-bold text-white tracking-tight">{tr('Display Font Size')}</h4>
+                <p className="text-[10px] text-slate-400">{tr('Scale entire UI & ledger density')}</p>
               </div>
             </div>
 
@@ -264,7 +265,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
             <button
               onClick={decreaseFontSize}
               disabled={fontSize <= 80}
-              title="Decrease Font Size (-5%)"
+              title={tr('Decrease Font Size (-5%)')}
               className="p-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 rounded-lg border border-slate-700 transition cursor-pointer flex items-center gap-1 text-xs font-medium px-2"
             >
               <Minus className="w-3.5 h-3.5 text-indigo-400" />
@@ -283,7 +284,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
             <button
               onClick={increaseFontSize}
               disabled={fontSize >= 140}
-              title="Increase Font Size (+5%)"
+              title={tr('Increase Font Size (+5%)')}
               className="p-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 rounded-lg border border-slate-700 transition cursor-pointer flex items-center gap-1 text-xs font-medium px-2"
             >
               <span className="text-[11px]">A⁺</span>
@@ -293,7 +294,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
             <button
               onClick={resetFontSize}
               disabled={fontSize === 100}
-              title="Reset to standard 100%"
+              title={tr('Reset to standard 100%')}
               className="p-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-300 rounded-lg border border-slate-700 transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5" />
@@ -337,7 +338,7 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
           {/* Slider */}
           <div className="space-y-1.5 pt-1">
             <div className="flex items-center justify-between text-[10px] text-slate-400">
-              <span>Slider Adjustment</span>
+              <span>{tr('Slider Adjustment')}</span>
               <span className="font-mono">{fontSize}%</span>
             </div>
             <input
@@ -356,12 +357,12 @@ export const FontSizeControl: React.FC<FontSizeControlProps> = ({
             <div className="flex items-center justify-between text-slate-400 text-[10px]">
               <span className="flex items-center gap-1">
                 <Eye className="w-3 h-3 text-indigo-400" />
-                <span>Preview Scale</span>
+                <span>{tr('Preview Scale')}</span>
               </span>
-              <span className="text-emerald-400 font-mono text-[9px]">Saved to Browser</span>
+              <span className="text-emerald-400 font-mono text-[9px]">{tr('Saved to Browser')}</span>
             </div>
             <div className="flex items-center justify-between font-mono pt-1 text-slate-200">
-              <span className="truncate max-w-[140px]">Cash & Equiv.</span>
+              <span className="truncate max-w-[140px]">{tr('Cash & Equiv.')}</span>
               <span className="text-white font-bold">$24,500.00</span>
               <span className="text-[9px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-semibold">
                 ACTIVE

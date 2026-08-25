@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import { InventoryStockItem, InventoryAdjustmentRecord } from '../types';
 import {
@@ -24,6 +25,7 @@ import {
 } from 'lucide-react';
 
 export const InventoryManagementView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     inventoryItems,
@@ -204,18 +206,12 @@ export const InventoryManagementView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider">
-              Asset & Stock Control
-            </span>
-            <span className="text-xs text-slate-400">FIFO / Weighted Average Perpetual Inventory</span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 uppercase tracking-wider">{tr('Asset & Stock Control')}</span>
+            <span className="text-xs text-slate-400">{tr('FIFO / Weighted Average Perpetual Inventory')}</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2.5">
-            <Boxes className="w-6 h-6 text-amber-400" />
-            Inventory Tracking & Stock Movements
-          </h1>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Track merchandise stock levels, reorder thresholds, automated valuation balances, and perpetual General Ledger COGS postings.
-          </p>
+            <Boxes className="w-6 h-6 text-amber-400" />{tr('Inventory Tracking & Stock Movements')}</h1>
+          <p className="text-sm text-slate-400 mt-0.5">{tr('Track merchandise stock levels, reorder thresholds, automated valuation balances, and perpetual General Ledger COGS postings.')}</p>
         </div>
 
         <button
@@ -225,9 +221,7 @@ export const InventoryManagementView: React.FC = () => {
           }}
           className="flex items-center gap-2 px-4 py-2.5 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-amber-600/20 transition-all cursor-pointer"
         >
-          <PackagePlus className="w-4 h-4" />
-          Add New Stock Item
-        </button>
+          <PackagePlus className="w-4 h-4" />{tr('Add New Stock Item')}</button>
       </div>
 
       {notification && (
@@ -241,52 +235,44 @@ export const InventoryManagementView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Total Inventory Asset Value</span>
+            <span className="text-xs font-medium">{tr('Total Inventory Asset Value')}</span>
             <DollarSign className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold text-amber-400 font-mono">
             ${totalValuation.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            General Ledger Asset Balance (Acc 1500)
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('General Ledger Asset Balance (Acc 1500)')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Total Catalog SKUs</span>
+            <span className="text-xs font-medium">{tr('Total Catalog SKUs')}</span>
             <Layers className="w-4 h-4 text-slate-300" />
           </div>
           <div className="text-2xl font-bold text-slate-100 font-mono">
             {inventoryItems.filter((i) => i.tenantId === activeTenant.id).length}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Active tracked product lines
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Active tracked product lines')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Low Stock Alerts</span>
+            <span className="text-xs font-medium">{tr('Low Stock Alerts')}</span>
             <AlertTriangle className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold text-amber-400 font-mono">{lowStockCount}</div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Units below safety reorder threshold
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Units below safety reorder threshold')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Stock Adjustments Logged</span>
+            <span className="text-xs font-medium">{tr('Stock Adjustments Logged')}</span>
             <History className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="text-2xl font-bold text-cyan-400 font-mono">
             {inventoryAdjustments.filter((a) => a.tenantId === activeTenant.id).length}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Perpetual audit movement records
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Perpetual audit movement records')}</div>
         </div>
       </div>
 
@@ -322,7 +308,7 @@ export const InventoryManagementView: React.FC = () => {
             <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search SKU, item name, location..."
+              placeholder={tr('Search SKU, item name, location...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 pr-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-500 w-52 sm:w-64"
@@ -336,10 +322,10 @@ export const InventoryManagementView: React.FC = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-amber-500"
               >
-                <option value="ALL">All Stock Levels</option>
-                <option value="IN_STOCK">In Stock</option>
-                <option value="LOW_STOCK">Low Stock Alert</option>
-                <option value="OUT_OF_STOCK">Out of Stock</option>
+                <option value="ALL">{tr('All Stock Levels')}</option>
+                <option value="IN_STOCK">{tr('In Stock')}</option>
+                <option value="LOW_STOCK">{tr('Low Stock Alert')}</option>
+                <option value="OUT_OF_STOCK">{tr('Out of Stock')}</option>
               </select>
 
               <select
@@ -347,7 +333,7 @@ export const InventoryManagementView: React.FC = () => {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-amber-500"
               >
-                <option value="ALL">All Categories</option>
+                <option value="ALL">{tr('All Categories')}</option>
                 {categories.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -366,15 +352,15 @@ export const InventoryManagementView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">SKU / Code</th>
-                  <th className="px-4 py-3 font-semibold">Product Name</th>
-                  <th className="px-4 py-3 font-semibold">Category</th>
-                  <th className="px-4 py-3 font-semibold">Location</th>
-                  <th className="px-4 py-3 font-semibold text-center">On Hand</th>
-                  <th className="px-4 py-3 font-semibold text-right">Unit Cost</th>
-                  <th className="px-4 py-3 font-semibold text-right">Total Valuation</th>
-                  <th className="px-4 py-3 font-semibold text-center">Status</th>
-                  <th className="px-4 py-3 font-semibold text-center">Actions</th>
+                  <th className="px-4 py-3 font-semibold">{tr('SKU / Code')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Product Name')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Category')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Location')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('On Hand')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Unit Cost')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Total Valuation')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Status')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -413,16 +399,14 @@ export const InventoryManagementView: React.FC = () => {
                         <td className="px-4 py-3 text-center font-sans">
                           {isOut ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
-                              <XCircle className="w-3 h-3" /> Out of Stock
-                            </span>
+                              <XCircle className="w-3 h-3" />{tr('Out of Stock')}</span>
                           ) : isLow ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
                               <AlertTriangle className="w-3 h-3" /> Low Stock ({item.quantityOnHand}/{item.reorderThreshold})
                             </span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                              <CheckCircle2 className="w-3 h-3" /> In Stock
-                            </span>
+                              <CheckCircle2 className="w-3 h-3" />{tr('In Stock')}</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-center font-sans">
@@ -430,15 +414,13 @@ export const InventoryManagementView: React.FC = () => {
                             <button
                               onClick={() => handleOpenAdjustModal(item)}
                               className="flex items-center gap-1 px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600 text-amber-300 hover:text-white rounded text-[11px] font-medium border border-amber-500/30 transition-all cursor-pointer"
-                              title="Adjust Stock Quantity"
+                              title={tr('Adjust Stock Quantity')}
                             >
-                              <ArrowUpDown className="w-3 h-3" />
-                              Adjust
-                            </button>
+                              <ArrowUpDown className="w-3 h-3" />{tr('Adjust')}</button>
                             <button
                               onClick={() => deleteInventoryItem(item.id)}
                               className="p-1.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded transition-colors"
-                              title="Delete Item"
+                              title={tr('Delete Item')}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -458,22 +440,20 @@ export const InventoryManagementView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Date</th>
-                  <th className="px-4 py-3 font-semibold">SKU & Product</th>
-                  <th className="px-4 py-3 font-semibold">Movement Type</th>
-                  <th className="px-4 py-3 font-semibold text-center">Change</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Date')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('SKU & Product')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Movement Type')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Change')}</th>
                   <th className="px-4 py-3 font-semibold text-center">Before → After</th>
-                  <th className="px-4 py-3 font-semibold text-right">Cost Impact</th>
-                  <th className="px-4 py-3 font-semibold">Reason / Audit Trail</th>
-                  <th className="px-4 py-3 font-semibold">Logged By</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Cost Impact')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Reason / Audit Trail')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Logged By')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
                 {filteredAdjustments.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-8 text-center text-slate-500 font-sans">
-                      No stock movement audit records yet.
-                    </td>
+                    <td colSpan={8} className="px-4 py-8 text-center text-slate-500 font-sans">{tr('No stock movement audit records yet.')}</td>
                   </tr>
                 ) : (
                   filteredAdjustments.map((adj) => {
@@ -523,12 +503,8 @@ export const InventoryManagementView: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <PackagePlus className="w-5 h-5 text-amber-400" />
-                  Add New Stock Inventory Item
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Define SKU code, purchase unit cost, safety reorder thresholds, and warehouse location.
-                </p>
+                  <PackagePlus className="w-5 h-5 text-amber-400" />{tr('Add New Stock Inventory Item')}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{tr('Define SKU code, purchase unit cost, safety reorder thresholds, and warehouse location.')}</p>
               </div>
               <button
                 onClick={() => setIsAddItemModalOpen(false)}
@@ -545,7 +521,7 @@ export const InventoryManagementView: React.FC = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. SRV-RACK-01"
+                    placeholder={tr('e.g. SRV-RACK-01')}
                     value={sku}
                     onChange={(e) => setSku(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-amber-500 font-mono uppercase"
@@ -557,7 +533,7 @@ export const InventoryManagementView: React.FC = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 42U Server Rack Enclosure"
+                    placeholder={tr('e.g. 42U Server Rack Enclosure')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-amber-500"
@@ -580,21 +556,21 @@ export const InventoryManagementView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Unit of Measure</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Unit of Measure')}</label>
                   <select
                     value={unitOfMeasure}
                     onChange={(e) => setUnitOfMeasure(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-amber-500"
                   >
-                    <option value="UNITS">Units (Each)</option>
-                    <option value="BOXES">Boxes</option>
-                    <option value="METERS">Meters</option>
-                    <option value="KILOGRAMS">Kilograms</option>
+                    <option value="UNITS">{tr('Units (Each)')}</option>
+                    <option value="BOXES">{tr('Boxes')}</option>
+                    <option value="METERS">{tr('Meters')}</option>
+                    <option value="KILOGRAMS">{tr('Kilograms')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Initial Quantity On Hand</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Initial Quantity On Hand')}</label>
                   <input
                     type="number"
                     min={0}
@@ -605,7 +581,7 @@ export const InventoryManagementView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Safety Reorder Alert Level</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Safety Reorder Alert Level')}</label>
                   <input
                     type="number"
                     min={1}
@@ -641,43 +617,43 @@ export const InventoryManagementView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Valuation Method</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Valuation Method')}</label>
                   <select
                     value={valuationMethod}
                     onChange={(e) => setValuationMethod(e.target.value as any)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-amber-500"
                   >
-                    <option value="FIFO">FIFO (First-In, First-Out)</option>
-                    <option value="WEIGHTED_AVERAGE">Weighted Average Cost</option>
+                    <option value="FIFO">{tr('FIFO (First-In, First-Out)')}</option>
+                    <option value="WEIGHTED_AVERAGE">{tr('Weighted Average Cost')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Warehouse Bay / Shelf</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Warehouse Bay / Shelf')}</label>
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. Warehouse Bay 4A"
+                    placeholder={tr('e.g. Warehouse Bay 4A')}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Primary Supplier Name</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Primary Supplier Name')}</label>
                 <input
                   type="text"
                   value={supplierName}
                   onChange={(e) => setSupplierName(e.target.value)}
-                  placeholder="e.g. Dell Enterprise Hardware OEM"
+                  placeholder={tr('e.g. Dell Enterprise Hardware OEM')}
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-amber-500"
                 />
               </div>
 
               {/* Total Initial Valuation Box */}
               <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center justify-between font-mono">
-                <span className="text-xs text-slate-400 font-sans">Initial Stock Asset Valuation:</span>
+                <span className="text-xs text-slate-400 font-sans">{tr("Initial Stock Asset Valuation:")}</span>
                 <span className="text-base font-bold text-amber-400">
                   ${(Number(quantityOnHand) * Number(unitCost)).toFixed(2)} {activeTenant.currency}
                 </span>
@@ -688,15 +664,11 @@ export const InventoryManagementView: React.FC = () => {
                   type="button"
                   onClick={() => setIsAddItemModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-amber-600/20 transition-all cursor-pointer"
-                >
-                  Save Stock Item
-                </button>
+                >{tr('Save Stock Item')}</button>
               </div>
             </form>
           </div>
@@ -729,10 +701,10 @@ export const InventoryManagementView: React.FC = () => {
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-amber-500"
                 >
                   <option value="PURCHASE_RECEIPT">Purchase Receipt (+ Stock)</option>
-                  <option value="PHYSICAL_COUNT">Physical Inventory Count Reconciliation</option>
-                  <option value="DAMAGE_SHRINKAGE">Damage / Shrinkage (- Stock)</option>
-                  <option value="SALES_DELIVERY">Manual Sales Dispatch (- Stock)</option>
-                  <option value="SUPPLIER_RETURN">Supplier Return / RMA (- Stock)</option>
+                  <option value="PHYSICAL_COUNT">{tr('Physical Inventory Count Reconciliation')}</option>
+                  <option value="DAMAGE_SHRINKAGE">{tr('Damage / Shrinkage (- Stock)')}</option>
+                  <option value="SALES_DELIVERY">{tr('Manual Sales Dispatch (- Stock)')}</option>
+                  <option value="SUPPLIER_RETURN">{tr('Supplier Return / RMA (- Stock)')}</option>
                 </select>
               </div>
 
@@ -767,18 +739,16 @@ export const InventoryManagementView: React.FC = () => {
                   onChange={(e) => setPostToGl(e.target.checked)}
                   className="rounded bg-slate-950 border-slate-800 text-amber-600 focus:ring-0 cursor-pointer"
                 />
-                <label htmlFor="postToGl" className="text-xs text-slate-300 cursor-pointer">
-                  Post Double-Entry to General Ledger (Acc 1500 Inventory & Acc 5010 COGS)
-                </label>
+                <label htmlFor="postToGl" className="text-xs text-slate-300 cursor-pointer">{tr('Post Double-Entry to General Ledger (Acc 1500 Inventory & Acc 5010 COGS)')}</label>
               </div>
 
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs font-mono space-y-1">
                 <div className="flex justify-between text-slate-400">
-                  <span>Current Qty:</span>
+                  <span>{tr("Current Qty:")}</span>
                   <span>{selectedItemForAdjust.quantityOnHand} units</span>
                 </div>
                 <div className="flex justify-between text-slate-400">
-                  <span>New Qty After Adjustment:</span>
+                  <span>{tr("New Qty After Adjustment:")}</span>
                   <span className="font-bold text-slate-100">
                     {adjustType === 'DAMAGE_SHRINKAGE' || adjustType === 'SALES_DELIVERY' || adjustType === 'SUPPLIER_RETURN'
                       ? Math.max(0, selectedItemForAdjust.quantityOnHand - quantityDelta)
@@ -787,7 +757,7 @@ export const InventoryManagementView: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex justify-between text-amber-400 font-bold pt-1 border-t border-slate-800">
-                  <span>Valuation Impact:</span>
+                  <span>{tr("Valuation Impact:")}</span>
                   <span>${(quantityDelta * selectedItemForAdjust.unitCost).toFixed(2)}</span>
                 </div>
               </div>
@@ -797,15 +767,11 @@ export const InventoryManagementView: React.FC = () => {
                   type="button"
                   onClick={() => setIsAdjustModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-amber-600/20 transition-all cursor-pointer"
-                >
-                  Apply Stock Adjustment
-                </button>
+                >{tr('Apply Stock Adjustment')}</button>
               </div>
             </form>
           </div>

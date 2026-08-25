@@ -1,3 +1,4 @@
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
 import { RecurringInvoiceSchedule, RecurrenceFrequency } from '../types';
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 
 export const RecurringBillingView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     recurringSchedules,
@@ -194,18 +196,12 @@ export const RecurringBillingView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">
-              Automated Invoicing Engine
-            </span>
-            <span className="text-xs text-slate-400">Recurring Billing & Retainers</span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 uppercase tracking-wider">{tr('Automated Invoicing Engine')}</span>
+            <span className="text-xs text-slate-400">{tr('Recurring Billing & Retainers')}</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2.5">
-            <Repeat className="w-6 h-6 text-indigo-400" />
-            Recurring Billing & Subscriptions
-          </h1>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Automate routine client invoices, SaaS retainers, and SLA service agreements with automated double-entry General Ledger syncing.
-          </p>
+            <Repeat className="w-6 h-6 text-indigo-400" />{tr('Recurring Billing & Subscriptions')}</h1>
+          <p className="text-sm text-slate-400 mt-0.5">{tr('Automate routine client invoices, SaaS retainers, and SLA service agreements with automated double-entry General Ledger syncing.')}</p>
         </div>
 
         <button
@@ -215,9 +211,7 @@ export const RecurringBillingView: React.FC = () => {
           }}
           className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
         >
-          <Plus className="w-4 h-4" />
-          Create Recurring Schedule
-        </button>
+          <Plus className="w-4 h-4" />{tr('Create Recurring Schedule')}</button>
       </div>
 
       {successBanner && (
@@ -231,44 +225,38 @@ export const RecurringBillingView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Monthly Recurring (MRR)</span>
+            <span className="text-xs font-medium">{tr('Monthly Recurring (MRR)')}</span>
             <TrendingUp className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold text-indigo-400 font-mono">
             ${monthlyRecurringRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Normalized monthly recurring contract volume
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Normalized monthly recurring contract volume')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Active Subscriptions</span>
+            <span className="text-xs font-medium">{tr('Active Subscriptions')}</span>
             <Repeat className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-slate-100 font-mono">
             {recurringSchedules.filter((s) => s.tenantId === activeTenant.id && s.status === 'ACTIVE').length}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Active auto-billing customer profiles
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Active auto-billing customer profiles')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Total Invoices Generated</span>
+            <span className="text-xs font-medium">{tr('Total Invoices Generated')}</span>
             <FileText className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="text-2xl font-bold text-cyan-400 font-mono">{totalGeneratedInvoices}</div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Invoices automatically issued to AR
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Invoices automatically issued to AR')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Active Fiscal Tenant</span>
+            <span className="text-xs font-medium">{tr('Active Fiscal Tenant')}</span>
             <Building className="w-4 h-4 text-slate-400" />
           </div>
           <div className="text-sm font-bold text-slate-200 truncate">{activeTenant.name}</div>
@@ -285,7 +273,7 @@ export const RecurringBillingView: React.FC = () => {
             <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search schedule name, customer..."
+              placeholder={tr('Search schedule name, customer...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-8 pr-3 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 w-52 sm:w-64"
@@ -297,12 +285,12 @@ export const RecurringBillingView: React.FC = () => {
             onChange={(e) => setFrequencyFilter(e.target.value)}
             className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
           >
-            <option value="ALL">All Frequencies</option>
-            <option value="WEEKLY">Weekly</option>
-            <option value="MONTHLY">Monthly</option>
-            <option value="QUARTERLY">Quarterly</option>
-            <option value="SEMI_ANNUAL">Semi-Annual</option>
-            <option value="ANNUAL">Annual</option>
+            <option value="ALL">{tr('All Frequencies')}</option>
+            <option value="WEEKLY">{tr('Weekly')}</option>
+            <option value="MONTHLY">{tr('Monthly')}</option>
+            <option value="QUARTERLY">{tr('Quarterly')}</option>
+            <option value="SEMI_ANNUAL">{tr('Semi-Annual')}</option>
+            <option value="ANNUAL">{tr('Annual')}</option>
           </select>
 
           <select
@@ -310,10 +298,10 @@ export const RecurringBillingView: React.FC = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
           >
-            <option value="ALL">All Statuses</option>
-            <option value="ACTIVE">Active</option>
-            <option value="PAUSED">Paused</option>
-            <option value="CANCELLED">Cancelled</option>
+            <option value="ALL">{tr('All Statuses')}</option>
+            <option value="ACTIVE">{tr('Active')}</option>
+            <option value="PAUSED">{tr('Paused')}</option>
+            <option value="CANCELLED">{tr('Cancelled')}</option>
           </select>
         </div>
       </div>
@@ -324,15 +312,15 @@ export const RecurringBillingView: React.FC = () => {
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
               <tr>
-                <th className="px-4 py-3 font-semibold">Schedule Profile</th>
-                <th className="px-4 py-3 font-semibold">Customer / Client</th>
-                <th className="px-4 py-3 font-semibold">Cadence</th>
-                <th className="px-4 py-3 font-semibold">Next Run Date</th>
-                <th className="px-4 py-3 font-semibold">Auto-Email</th>
-                <th className="px-4 py-3 font-semibold text-right">Amount / Cycle</th>
-                <th className="px-4 py-3 font-semibold text-center">Invoices Run</th>
-                <th className="px-4 py-3 font-semibold text-center">Status</th>
-                <th className="px-4 py-3 font-semibold text-center">Actions</th>
+                <th className="px-4 py-3 font-semibold">{tr('Schedule Profile')}</th>
+                <th className="px-4 py-3 font-semibold">{tr('Customer / Client')}</th>
+                <th className="px-4 py-3 font-semibold">{tr('Cadence')}</th>
+                <th className="px-4 py-3 font-semibold">{tr('Next Run Date')}</th>
+                <th className="px-4 py-3 font-semibold">{tr('Auto-Email')}</th>
+                <th className="px-4 py-3 font-semibold text-right">{tr('Amount / Cycle')}</th>
+                <th className="px-4 py-3 font-semibold text-center">{tr('Invoices Run')}</th>
+                <th className="px-4 py-3 font-semibold text-center">{tr('Status')}</th>
+                <th className="px-4 py-3 font-semibold text-center">{tr('Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -380,10 +368,9 @@ export const RecurringBillingView: React.FC = () => {
                       <td className="px-4 py-3 font-sans">
                         {sch.autoSendEmail ? (
                           <span className="text-[10px] text-emerald-400 flex items-center gap-1">
-                            <Check className="w-3 h-3" /> Enabled
-                          </span>
+                            <Check className="w-3 h-3" />{tr('Enabled')}</span>
                         ) : (
-                          <span className="text-[10px] text-slate-500">Draft Only</span>
+                          <span className="text-[10px] text-slate-500">{tr('Draft Only')}</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-right font-bold text-slate-100">
@@ -397,24 +384,20 @@ export const RecurringBillingView: React.FC = () => {
                       <td className="px-4 py-3 text-center font-sans">
                         {isActive ? (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                            <CheckCircle2 className="w-3 h-3" /> Active
-                          </span>
+                            <CheckCircle2 className="w-3 h-3" />{tr('Active')}</span>
                         ) : (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                            <Pause className="w-3 h-3" /> Paused
-                          </span>
+                            <Pause className="w-3 h-3" />{tr('Paused')}</span>
                         )}
                       </td>
                       <td className="px-4 py-3 text-center font-sans">
                         <div className="flex items-center justify-center gap-1.5">
                           <button
                             onClick={() => handleRunNow(sch.id, sch.profileName)}
-                            title="Generate and post invoice right now"
+                            title={tr('Generate and post invoice right now')}
                             className="flex items-center gap-1 px-2 py-1 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded text-[11px] font-medium border border-indigo-500/30 transition-all cursor-pointer"
                           >
-                            <Play className="w-3 h-3" />
-                            Run Now
-                          </button>
+                            <Play className="w-3 h-3" />{tr('Run Now')}</button>
                           <button
                             onClick={() =>
                               updateRecurringSchedule(sch.id, {
@@ -429,7 +412,7 @@ export const RecurringBillingView: React.FC = () => {
                           <button
                             onClick={() => deleteRecurringSchedule(sch.id)}
                             className="p-1.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded transition-colors"
-                            title="Delete Schedule"
+                            title={tr('Delete Schedule')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -451,12 +434,8 @@ export const RecurringBillingView: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <Repeat className="w-5 h-5 text-indigo-400" />
-                  Create Recurring Billing Schedule
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Set up automated subscription cadence, product line items, and revenue recognition rules.
-                </p>
+                  <Repeat className="w-5 h-5 text-indigo-400" />{tr('Create Recurring Billing Schedule')}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{tr('Set up automated subscription cadence, product line items, and revenue recognition rules.')}</p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -473,7 +452,7 @@ export const RecurringBillingView: React.FC = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Monthly Enterprise Cloud Retainer"
+                    placeholder={tr('e.g. Monthly Enterprise Cloud Retainer')}
                     value={profileName}
                     onChange={(e) => setProfileName(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -488,7 +467,7 @@ export const RecurringBillingView: React.FC = () => {
                     onChange={(e) => setCustomerId(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="">Select customer contact...</option>
+                    <option value="">{tr('Select customer contact...')}</option>
                     {customers.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name} ({c.code})
@@ -504,11 +483,11 @@ export const RecurringBillingView: React.FC = () => {
                     onChange={(e) => setFrequency(e.target.value as RecurrenceFrequency)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="WEEKLY">Weekly</option>
-                    <option value="MONTHLY">Monthly</option>
-                    <option value="QUARTERLY">Quarterly</option>
-                    <option value="SEMI_ANNUAL">Semi-Annual</option>
-                    <option value="ANNUAL">Annual</option>
+                    <option value="WEEKLY">{tr('Weekly')}</option>
+                    <option value="MONTHLY">{tr('Monthly')}</option>
+                    <option value="QUARTERLY">{tr('Quarterly')}</option>
+                    <option value="SEMI_ANNUAL">{tr('Semi-Annual')}</option>
+                    <option value="ANNUAL">{tr('Annual')}</option>
                   </select>
                 </div>
 
@@ -526,7 +505,7 @@ export const RecurringBillingView: React.FC = () => {
 
               {/* Line Items Builder */}
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
-                <div className="text-xs font-semibold text-slate-200">Subscription Line Items</div>
+                <div className="text-xs font-semibold text-slate-200">{tr('Subscription Line Items')}</div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
                   <div className="sm:col-span-4">
@@ -535,7 +514,7 @@ export const RecurringBillingView: React.FC = () => {
                       onChange={(e) => handleProductSelect(e.target.value)}
                       className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-indigo-500"
                     >
-                      <option value="">Choose item catalog...</option>
+                      <option value="">{tr('Choose item catalog...')}</option>
                       {productsServices.map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.name} (${p.unitPrice})
@@ -546,7 +525,7 @@ export const RecurringBillingView: React.FC = () => {
                   <div className="sm:col-span-4">
                     <input
                       type="text"
-                      placeholder="Item description"
+                      placeholder={tr('Item description')}
                       value={itemDescription}
                       onChange={(e) => setItemDescription(e.target.value)}
                       className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -556,7 +535,7 @@ export const RecurringBillingView: React.FC = () => {
                     <input
                       type="number"
                       min={1}
-                      placeholder="Qty"
+                      placeholder={tr('Qty')}
                       value={itemQuantity}
                       onChange={(e) => setItemQuantity(parseInt(e.target.value) || 1)}
                       className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500 font-mono"
@@ -566,7 +545,7 @@ export const RecurringBillingView: React.FC = () => {
                     <input
                       type="number"
                       step="0.01"
-                      placeholder="Price"
+                      placeholder={tr('Price')}
                       value={itemUnitPrice || ''}
                       onChange={(e) => setItemUnitPrice(parseFloat(e.target.value) || 0)}
                       className="w-full px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500 font-mono"
@@ -580,18 +559,17 @@ export const RecurringBillingView: React.FC = () => {
                     onClick={handleAddItem}
                     className="flex items-center gap-1 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-semibold"
                   >
-                    <Plus className="w-3.5 h-3.5" /> Add Line Item
-                  </button>
+                    <Plus className="w-3.5 h-3.5" />{tr('Add Line Item')}</button>
                 </div>
 
                 {items.length > 0 && (
                   <table className="w-full text-left text-xs text-slate-300 font-mono mt-2">
                     <thead>
                       <tr className="text-[10px] text-slate-500 border-b border-slate-800">
-                        <th className="py-1">Description</th>
-                        <th className="py-1 text-center">Qty</th>
-                        <th className="py-1 text-right">Unit Price</th>
-                        <th className="py-1 text-right">Amount</th>
+                        <th className="py-1">{tr('Description')}</th>
+                        <th className="py-1 text-center">{tr("Qty")}</th>
+                        <th className="py-1 text-right">{tr('Unit Price')}</th>
+                        <th className="py-1 text-right">{tr('Amount')}</th>
                         <th className="py-1 text-center"></th>
                       </tr>
                     </thead>
@@ -626,9 +604,7 @@ export const RecurringBillingView: React.FC = () => {
                   onChange={(e) => setAutoSendEmail(e.target.checked)}
                   className="rounded bg-slate-950 border-slate-800 text-indigo-600 focus:ring-0 cursor-pointer"
                 />
-                <label htmlFor="autoSendEmail" className="text-xs text-slate-300 cursor-pointer">
-                  Automatically dispatch branded PDF invoice via email upon schedule trigger
-                </label>
+                <label htmlFor="autoSendEmail" className="text-xs text-slate-300 cursor-pointer">{tr('Automatically dispatch branded PDF invoice via email upon schedule trigger')}</label>
               </div>
 
               {/* Total Summary Box */}
@@ -644,16 +620,12 @@ export const RecurringBillingView: React.FC = () => {
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   disabled={items.length === 0}
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer disabled:opacity-50"
-                >
-                  Save Recurring Schedule
-                </button>
+                >{tr('Save Recurring Schedule')}</button>
               </div>
             </form>
           </div>

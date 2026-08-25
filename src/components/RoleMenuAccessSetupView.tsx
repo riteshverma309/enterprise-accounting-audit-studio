@@ -1,3 +1,4 @@
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
 import { Role, TabType, MenuCategory, Tenant } from '../types';
@@ -55,6 +56,7 @@ interface RoleMenuAccessSetupViewProps {
 }
 
 export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = ({ onSimulateRole }) => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     tenants,
     activeTenant,
@@ -519,7 +521,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-xl">
               <Building2 className="w-4 h-4 text-indigo-400 shrink-0" />
-              <div className="text-[10px] text-slate-400 uppercase font-mono">Entity Scope:</div>
+              <div className="text-[10px] text-slate-400 uppercase font-mono">{tr("Entity Scope:")}</div>
               <select
                 value={selectedTenantId}
                 onChange={(e) => setSelectedTenantId(e.target.value)}
@@ -539,7 +541,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
               className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-1.5 transition cursor-pointer"
             >
               <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-              <span>Reset All Roles</span>
+              <span>{tr("Reset All Roles")}</span>
             </button>
           </div>
         </div>
@@ -650,7 +652,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
                     </div>
                   </div>
                   <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
-                    <span className="text-slate-400">Allowed:</span>
+                    <span className="text-slate-400">{tr("Allowed:")}</span>
                     <span
                       className={`font-mono font-bold ${
                         allowedCount === 31
@@ -770,7 +772,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
               <div className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center gap-3 text-amber-300">
                 <Lock className="w-5 h-5 text-amber-400 shrink-0" />
                 <div>
-                  <div className="font-bold text-xs text-amber-200">Super Admin Menu Access is Protected & Immutable</div>
+                  <div className="font-bold text-xs text-amber-200">{tr("Super Admin Menu Access is Protected & Immutable")}</div>
                   <div className="text-[11px] text-amber-300/80 leading-relaxed">
                     Under SOX 404 ITGC standards, Super Administrator menu permissions are immutable and managed strictly by Super Users. Entity Administrators cannot alter Super Admin menu visibility.
                   </div>
@@ -1034,8 +1036,8 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
             <table className="w-full text-left text-xs text-slate-300">
               <thead>
                 <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider font-mono bg-slate-950/40">
-                  <th className="py-3 px-4 min-w-[280px]">Application Menu / Functional Module</th>
-                  <th className="py-3 px-2 text-center min-w-[70px]">Category</th>
+                  <th className="py-3 px-4 min-w-[280px]">{tr("Application Menu / Functional Module")}</th>
+                  <th className="py-3 px-2 text-center min-w-[70px]">{tr("Category")}</th>
                   {allRolesList.map((r) => {
                     const isSuperLockedCol = r.code === 'super_user' && !isSuperUser;
                     return (
@@ -1134,7 +1136,7 @@ export const RoleMenuAccessSetupView: React.FC<RoleMenuAccessSetupViewProps> = (
             </p>
 
             <div className="space-y-2">
-              <label className="text-xs font-bold text-slate-300">Select Source Role to Copy From:</label>
+              <label className="text-xs font-bold text-slate-300">{tr("Select Source Role to Copy From:")}</label>
               <select
                 value={cloneSourceRole}
                 onChange={(e) => setCloneSourceRole(e.target.value)}

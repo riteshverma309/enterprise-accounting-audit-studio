@@ -14,6 +14,7 @@ import { InvoicingArView } from './components/InvoicingArView';
 import { PayablesApView } from './components/PayablesApView';
 import { ExpenseTrackingView } from './components/ExpenseTrackingView';
 import { RecurringBillingView } from './components/RecurringBillingView';
+import { PurchaseOrderView } from './components/PurchaseOrderView';
 import { InventoryManagementView } from './components/InventoryManagementView';
 import { PayrollView } from './components/PayrollView';
 import { EmployeeDirectoryView } from './components/EmployeeDirectoryView';
@@ -151,6 +152,8 @@ function MainLayout() {
               )}
 
               {activeTab === 'recurring_billing' && <RecurringBillingView />}
+
+              {activeTab === 'purchase_orders' && <PurchaseOrderView />}
 
               {activeTab === 'payables_ap' && (
                 <PayablesApView preSelectedVendor={selectedVendorForBill} />

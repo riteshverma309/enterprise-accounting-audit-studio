@@ -1,8 +1,10 @@
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import React, { useState } from 'react';
 import { useAccounting } from '../context/AccountingContext';
 import { Landmark, ArrowUpRight, ArrowDownLeft, ShieldCheck, Sparkles, RefreshCw, Send, DollarSign, Wallet, TrendingUp } from 'lucide-react';
 
 export const TreasuryView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const { treasuryAccounts, executeSweepTransfer, activeTenant, invoices, vendorBills } = useAccounting();
 
   const [fromAccountId, setFromAccountId] = useState(treasuryAccounts[0]?.id || '');
@@ -55,21 +57,17 @@ export const TreasuryView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-white tracking-tight">Treasury Management & Cash Forecasting</h1>
-            <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-full text-xs font-semibold">
-              IAS 7 Cash Rules
-            </span>
+            <h1 className="text-xl font-black text-white tracking-tight">{tr('Treasury Management & Cash Forecasting')}</h1>
+            <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-full text-xs font-semibold">{tr('IAS 7 Cash Rules')}</span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Real-time multi-bank liquidity, automated treasury sweep transfers & 30-60-90 day predictive cash forecasting.
-          </p>
+          <p className="text-xs text-slate-400 mt-1">{tr('Real-time multi-bank liquidity, automated treasury sweep transfers & 30-60-90 day predictive cash forecasting.')}</p>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="px-4 py-2 bg-slate-900 border border-slate-800 rounded-xl flex items-center gap-3">
             <Wallet className="w-5 h-5 text-emerald-400" />
             <div>
-              <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Liquidity Reserve</div>
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">{tr('Total Liquidity Reserve')}</div>
               <div className="text-lg font-black text-white font-mono">{currencySymbol}{totalLiquidAssets.toLocaleString()}</div>
             </div>
           </div>
@@ -98,8 +96,7 @@ export const TreasuryView: React.FC = () => {
             <h2 className="text-base font-bold text-white">30-60-90 Day Predictive Cash Flow Forecast</h2>
           </div>
           <span className="text-xs text-slate-400 flex items-center gap-1 font-mono">
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" /> Algorithmic AR/AP Run-rate Projection
-          </span>
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />{tr('Algorithmic AR/AP Run-rate Projection')}</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -186,9 +183,8 @@ export const TreasuryView: React.FC = () => {
         <div className="lg:col-span-2 bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Landmark className="w-5 h-5 text-indigo-400" /> Multi-Bank Treasury Accounts
-            </h2>
-            <span className="text-xs text-slate-400">Active Liquidity Vaults</span>
+              <Landmark className="w-5 h-5 text-indigo-400" />{tr('Multi-Bank Treasury Accounts')}</h2>
+            <span className="text-xs text-slate-400">{tr('Active Liquidity Vaults')}</span>
           </div>
 
           <div className="space-y-3">
@@ -212,7 +208,7 @@ export const TreasuryView: React.FC = () => {
                 </div>
 
                 <div className="text-right font-mono">
-                  <div className="text-xs text-slate-400 uppercase tracking-wider">Available Balance</div>
+                  <div className="text-xs text-slate-400 uppercase tracking-wider">{tr('Available Balance')}</div>
                   <div className="text-lg font-bold text-emerald-400">
                     {acc.currency === 'EUR' ? '€' : acc.currency === 'INR' ? '₹' : '$'}
                     {acc.balance.toLocaleString()}
@@ -227,14 +223,13 @@ export const TreasuryView: React.FC = () => {
         <div className="bg-slate-900 rounded-2xl border border-slate-800 p-6 space-y-4">
           <div className="pb-3 border-b border-slate-800">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <Send className="w-5 h-5 text-indigo-400" /> Execute Sweep Transfer
-            </h2>
-            <p className="text-xs text-slate-400 mt-0.5">Automated inter-account transfer with GL posting</p>
+              <Send className="w-5 h-5 text-indigo-400" />{tr('Execute Sweep Transfer')}</h2>
+            <p className="text-xs text-slate-400 mt-0.5">{tr('Automated inter-account transfer with GL posting')}</p>
           </div>
 
           <form onSubmit={handleSweepSubmit} className="space-y-4 text-xs">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">From Source Vault</label>
+              <label className="block text-slate-300 font-semibold mb-1">{tr('From Source Vault')}</label>
               <select
                 value={fromAccountId}
                 onChange={(e) => setFromAccountId(e.target.value)}
@@ -249,7 +244,7 @@ export const TreasuryView: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-slate-300 font-semibold mb-1">To Destination Vault</label>
+              <label className="block text-slate-300 font-semibold mb-1">{tr('To Destination Vault')}</label>
               <select
                 value={toAccountId}
                 onChange={(e) => setToAccountId(e.target.value)}
@@ -279,8 +274,7 @@ export const TreasuryView: React.FC = () => {
               type="submit"
               className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
             >
-              <RefreshCw className="w-4 h-4" /> Execute & Post GL Journal Entry
-            </button>
+              <RefreshCw className="w-4 h-4" />{tr('Execute & Post GL Journal Entry')}</button>
           </form>
         </div>
       </div>

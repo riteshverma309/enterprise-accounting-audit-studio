@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { Account, AccountType } from '../types';
 import {
   X,
   PlusCircle,
   Edit3,
-  HelpCircle,
-  CheckCircle2,
-  AlertTriangle,
   BookOpen,
-  ArrowRight,
   ShieldAlert,
 } from 'lucide-react';
 
@@ -69,12 +66,12 @@ const DEFAULT_SUB_CATEGORIES: Record<AccountType, string[]> = {
   ],
 };
 
-export const EditAccountModal: React.FC<EditAccountModalProps> = ({
-  isOpen,
+export const EditAccountModal: React.FC<EditAccountModalProps> = ({ isOpen,
   onClose,
   accountToEdit,
   onSuccess,
 }) => {
+  const { tr, t } = useLanguage();
   const { activeTenant, createAccount, updateAccount } = useAccounting();
 
   const isEditMode = Boolean(accountToEdit);
@@ -147,11 +144,11 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
     const resolvedSubCategory = isCustomSubCategory ? customSubCategory.trim() : subCategory.trim();
 
     if (!trimmedCode) {
-      setErrorMsg('Please enter an account code.');
+      setErrorMsg(tr('Please enter an account code.'));
       return;
     }
     if (!trimmedName) {
-      setErrorMsg('Please enter an account name.');
+      setErrorMsg(tr('Please enter an account name.'));
       return;
     }
 
@@ -186,7 +183,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           }
           onClose();
         } else {
-          setErrorMsg(res.error || 'Failed to update account.');
+          setErrorMsg(res.error || tr('Failed to update account.'));
         }
       } else {
         // Create mode
@@ -222,11 +219,11 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           }
           onClose();
         } else {
-          setErrorMsg(res.error || 'Failed to create account.');
+          setErrorMsg(res.error || tr('Failed to create account.'));
         }
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'An unexpected error occurred.');
+      setErrorMsg(err.message || tr('An unexpected error occurred.'));
     } finally {
       setIsSaving(false);
     }
@@ -234,8 +231,8 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
 
   const financialStatementMapping =
     type === 'ASSET' || type === 'LIABILITY' || type === 'EQUITY'
-      ? 'Balance Sheet (Permanent Account)'
-      : 'Income Statement / P&L (Nominal Account)';
+      ? `${tr('Balance Sheet')} (${tr('Permanent Account')})`
+      : `${tr('Income Statement')} (${tr('Nominal Account')})`;
 
   const availableSubCategories = DEFAULT_SUB_CATEGORIES[type] || [];
 
@@ -256,12 +253,12 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold text-white">
-                {isEditMode ? `Modify Account [${accountToEdit?.code}]` : 'Create New Chart of Account'}
+                {isEditMode ? `${tr('Edit Account Master')} [${accountToEdit?.code}]` : tr('Create New Chart of Account')}
               </h2>
               <p className="text-xs text-slate-400 mt-0.5">
                 {isEditMode
-                  ? `Update configuration, classification, and metadata for this ledger account.`
-                  : `Add a custom account to ${activeTenant.name}'s General Ledger.`}
+                  ? tr('Update configuration, classification, and metadata for this ledger account.')
+                  : tr(`Add a custom account to ${activeTenant.name}'s General Ledger.`)}
               </p>
             </div>
           </div>
@@ -286,7 +283,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           {/* Account Type Selection */}
           <div className="space-y-2">
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-              Account Classification / Major Type <span className="text-rose-400">*</span>
+              {tr('Account Classification / Major Type')} <span className="text-rose-400">*</span>
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
               {(['ASSET', 'LIABILITY', 'EQUITY', 'REVENUE', 'EXPENSE'] as const).map((t) => (
@@ -308,7 +305,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
                       : 'bg-slate-950/80 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  {t}
+                  {tr(t)}
                 </button>
               ))}
             </div>
@@ -318,7 +315,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="space-y-1.5 sm:col-span-1">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-                Account Code <span className="text-rose-400">*</span>
+                {tr('Account Code')} <span className="text-rose-400">*</span>
               </label>
               <input
                 type="text"
@@ -328,22 +325,22 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
                 className="w-full bg-slate-950 text-white font-mono text-sm px-3 py-2.5 rounded-xl border border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
                 required
               />
-              <p className="text-[10px] text-slate-500">Unique alphanumeric code.</p>
+              <p className="text-[10px] text-slate-500">{tr('Unique alphanumeric code.')}</p>
             </div>
 
             <div className="space-y-1.5 sm:col-span-2">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-                Account Name / Title <span className="text-rose-400">*</span>
+                {tr('Account Name / Title')} <span className="text-rose-400">*</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. SaaS Subscription Revenue"
+                placeholder={tr('e.g. SaaS Subscription Revenue')}
                 className="w-full bg-slate-950 text-white text-sm px-3 py-2.5 rounded-xl border border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
                 required
               />
-              <p className="text-[10px] text-slate-500">Official general ledger descriptor.</p>
+              <p className="text-[10px] text-slate-500">{tr('Official general ledger descriptor.')}</p>
             </div>
           </div>
 
@@ -351,14 +348,14 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-                Sub-Category / Reporting Group
+                {tr('Sub-Category / Reporting Group')}
               </label>
               <button
                 type="button"
                 onClick={() => setIsCustomSubCategory(!isCustomSubCategory)}
                 className="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
               >
-                {isCustomSubCategory ? '← Choose standard preset group' : '+ Enter custom group'}
+                {isCustomSubCategory ? `← ${tr('Choose standard preset group')}` : `+ ${tr('Enter custom group')}`}
               </button>
             </div>
 
@@ -367,7 +364,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
                 type="text"
                 value={customSubCategory}
                 onChange={(e) => setCustomSubCategory(e.target.value)}
-                placeholder="e.g. R&D Cloud Compute Infrastructure"
+                placeholder={tr('e.g. R&D Cloud Compute Infrastructure')}
                 className="w-full bg-slate-950 text-white text-xs px-3 py-2.5 rounded-xl border border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none"
               />
             ) : (
@@ -384,10 +381,10 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
               >
                 {availableSubCategories.map((sc) => (
                   <option key={sc} value={sc}>
-                    {sc}
+                    {tr(sc)}
                   </option>
                 ))}
-                <option value="OTHER">+ Other / Custom Group...</option>
+                <option value="OTHER">+ {tr('Other / Custom Group...')}</option>
               </select>
             )}
           </div>
@@ -396,7 +393,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-                Normal Balance Convention
+                {tr('Normal Balance Convention')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -408,7 +405,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  DEBIT (DR)
+                  {tr('DEBIT')} (DR)
                 </button>
                 <button
                   type="button"
@@ -419,14 +416,14 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  CREDIT (CR)
+                  {tr('CREDIT')} (CR)
                 </button>
               </div>
             </div>
 
             <div className="space-y-1.5">
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-                Account Status
+                {tr('Account Status')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -438,7 +435,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  Active
+                  {tr('Active')}
                 </button>
                 <button
                   type="button"
@@ -449,7 +446,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
                       : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
-                  Archived / Inactive
+                  {tr('Archived')}
                 </button>
               </div>
             </div>
@@ -458,13 +455,13 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           {/* Description / Notes */}
           <div className="space-y-1.5">
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-              Accounting Notes & Usage Description (Optional)
+              {tr('Accounting Notes & Usage Description (Optional)')}
             </label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
-              placeholder="e.g. Used for monthly and annual SaaS ARR subscription billings recognized under ASC 606 / IFRS 15."
+              placeholder={tr('e.g. Used for monthly and annual SaaS ARR subscription billings recognized under ASC 606 / IFRS 15.')}
               className="w-full bg-slate-950 text-slate-300 text-xs p-3 rounded-xl border border-slate-800 focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed"
             />
           </div>
@@ -473,12 +470,12 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
           <div className="p-3.5 bg-slate-950/70 border border-slate-800/80 rounded-2xl space-y-1.5 text-xs text-slate-400">
             <div className="flex items-center gap-2 text-indigo-300 font-semibold">
               <BookOpen className="w-4 h-4 text-indigo-400" />
-              <span>Reporting & Ledger Behavior:</span>
+              <span>{tr('Reporting & Ledger Behavior:')}</span>
             </div>
             <p className="text-[11px] text-slate-400 leading-normal">
               • Maps to: <strong className="text-slate-200">{financialStatementMapping}</strong>
               <br />
-              • Debits <strong className="text-slate-200">{type === 'ASSET' || type === 'EXPENSE' ? 'increase' : 'decrease'}</strong> the account balance; Credits <strong className="text-slate-200">{type === 'LIABILITY' || type === 'EQUITY' || type === 'REVENUE' ? 'increase' : 'decrease'}</strong> the account balance.
+              • Debits <strong className="text-slate-200">{type === 'ASSET' || type === 'EXPENSE' ? tr('increase') : tr('decrease')}</strong> {tr('the account balance;')}; Credits <strong className="text-slate-200">{type === 'LIABILITY' || type === 'EQUITY' || type === 'REVENUE' ? tr('increase') : tr('decrease')}</strong> {tr('the account balance.')}
             </p>
           </div>
 
@@ -489,7 +486,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
               onClick={onClose}
               className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer"
             >
-              Cancel
+              {tr('Cancel')}
             </button>
             <button
               type="submit"
@@ -497,7 +494,7 @@ export const EditAccountModal: React.FC<EditAccountModalProps> = ({
               className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2 cursor-pointer"
             >
               {isEditMode ? <Edit3 className="w-4 h-4" /> : <PlusCircle className="w-4 h-4" />}
-              <span>{isEditMode ? 'Save Account Changes' : 'Create Account'}</span>
+              <span>{isEditMode ? tr('Save Changes') : tr('Create Account')}</span>
             </button>
           </div>
         </form>

@@ -73,6 +73,11 @@ import {
   TabType,
   RoleMenuPermissionsMap,
   TenantRoleMenuConfig,
+  PurchaseOrder,
+  PurchaseOrderStatus,
+  PoApprovalTierConfig,
+  PurchaseOrderLineItem,
+  PurchaseOrderApprovalStep,
 } from '../types';
 import {
   DEFAULT_ROLE_MENU_PERMISSIONS,
@@ -113,6 +118,8 @@ import {
   INITIAL_INTEGRATION_CONNECTORS,
   INITIAL_TENANT_AI_CONFIGS,
   INITIAL_AI_USAGE_LOGS,
+  INITIAL_PO_APPROVAL_TIERS,
+  INITIAL_PURCHASE_ORDERS,
   FX_RATES,
   mockCustomAttributeDefinitions,
   mockCustomerContacts,
@@ -245,6 +252,20 @@ interface AccountingContextType {
   receiveInvoicePayment: (invoiceId: string, paymentAmount: number, bankAccountId: string) => { success: boolean; error?: string };
   createVendorBill: (billData: Omit<VendorBill, 'id' | 'billNumber' | 'amountPaid' | 'status'>) => { success: boolean; error?: string };
   payVendorBill: (billId: string, paymentAmount: number, bankAccountId: string) => { success: boolean; error?: string };
+
+  // Purchase Order & Configurable Approval Workflow Engine
+  purchaseOrders: PurchaseOrder[];
+  poApprovalTiers: PoApprovalTierConfig[];
+  createPurchaseOrder: (poData: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt' | 'approvalAuditTrail' | 'currentApprovalLevel' | 'requiredApprovalLevels' | 'status'> & { status?: PurchaseOrderStatus }) => { success: boolean; po?: PurchaseOrder; error?: string };
+  updatePurchaseOrder: (id: string, updates: Partial<PurchaseOrder>) => { success: boolean; error?: string };
+  deletePurchaseOrder: (id: string) => { success: boolean; error?: string };
+  submitPurchaseOrderForApproval: (id: string) => { success: boolean; message: string; error?: string };
+  approvePurchaseOrder: (id: string, comments?: string) => { success: boolean; message: string; isFinalApproval?: boolean; error?: string };
+  rejectPurchaseOrder: (id: string, rejectionReason: string) => { success: boolean; message: string; error?: string };
+  receiveGoodsForPurchaseOrder: (poId: string, receivedItems: { lineItemId: string; quantityToReceive: number; batchOrSerialNo?: string; conditionNotes?: string }[]) => { success: boolean; message: string; error?: string };
+  convertPurchaseOrderToVendorBill: (poId: string, glExpenseAccountId?: string) => { success: boolean; billId?: string; billNumber?: string; error?: string };
+  updatePoApprovalTiers: (tiers: PoApprovalTierConfig[]) => { success: boolean; error?: string };
+  resetPoApprovalTiersToDefault: (tenantId?: string) => { success: boolean; error?: string };
 
   // Advanced Customer AR, Payment Receipts & Opening Balances Engine
   paymentReceipts: CustomerPaymentReceipt[];
@@ -466,6 +487,10 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [integrationConnectors, setIntegrationConnectors] = useState<IntegrationConnector[]>(INITIAL_INTEGRATION_CONNECTORS);
   const [tenantAiConfigs, setTenantAiConfigs] = useState<Record<string, EntityAiConfig>>(INITIAL_TENANT_AI_CONFIGS);
   const [aiUsageLogs, setAiUsageLogs] = useState<AiTokenUsageLog[]>(INITIAL_AI_USAGE_LOGS);
+
+  // Purchase Order & Multi-Tier Approval Workflow State
+  const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(INITIAL_PURCHASE_ORDERS);
+  const [poApprovalTiers, setPoApprovalTiers] = useState<PoApprovalTierConfig[]>(INITIAL_PO_APPROVAL_TIERS);
 
   // Role-to-Menu Access Permissions State (per-tenant map)
   const [roleMenuPermissions, setRoleMenuPermissions] = useState<Record<string, RoleMenuPermissionsMap>>(() => {
@@ -2444,6 +2469,724 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
       details: `Disbursed ${paymentAmount} ${activeTenant.currency} for Vendor Bill #${bill.billNumber}`,
       status: 'SUCCESS',
       payloadSummary: `New Status: ${newStatus}`,
+    });
+
+    return { success: true };
+  };
+
+  // Helper: Get applicable approval tiers for a given PO amount
+  const getApplicableApprovalTiersForPo = (totalAmount: number, tenantId: string): PoApprovalTierConfig[] => {
+    const tenantTiers = poApprovalTiers.filter(
+      (t) => (t.tenantId === tenantId || (!t.tenantId && tenantId === 't-acme-us')) && t.isEnabled
+    );
+    const applicable = tenantTiers.filter((t) => totalAmount >= t.minAmount);
+    return applicable.sort((a, b) => a.level - b.level);
+  };
+
+  // Purchase Orders & Configurable Approval Engine
+  const createPurchaseOrder = (
+    poData: Omit<PurchaseOrder, 'id' | 'createdAt' | 'updatedAt' | 'approvalAuditTrail' | 'currentApprovalLevel' | 'requiredApprovalLevels' | 'status'> & { status?: PurchaseOrderStatus }
+  ) => {
+    const poId = `po-${Date.now()}`;
+    const nextSeq = purchaseOrders.filter((p) => (p.tenantId || activeTenant.id) === activeTenant.id).length + 1;
+    const poNumber = poData.poNumber || `PO-${new Date().getFullYear()}-${String(nextSeq).padStart(3, '0')}`;
+    const targetTenantId = poData.tenantId || activeTenant.id;
+    const nowIso = new Date().toISOString();
+
+    const applicableTiers = getApplicableApprovalTiersForPo(poData.totalAmount, targetTenantId);
+    const requiresApproval = applicableTiers.length > 0;
+
+    let initialStatus: PurchaseOrderStatus = poData.status || (requiresApproval ? 'PENDING_APPROVAL' : 'APPROVED');
+    let currentLevel = 0;
+    let requiredLevels = applicableTiers.length;
+
+    const auditTrail: PurchaseOrderApprovalStep[] = applicableTiers.map((tier, idx) => ({
+      stepId: `step-${tier.tierId}-${Date.now()}-${idx}`,
+      tierId: tier.tierId,
+      tierName: tier.tierName,
+      level: tier.level,
+      requiredRole: tier.requiredRole,
+      status: initialStatus === 'DRAFT' ? 'NOT_STARTED' : idx === 0 ? 'PENDING' : 'NOT_STARTED',
+      enforceMakerChecker: tier.enforceMakerChecker,
+    }));
+
+    if (initialStatus === 'PENDING_APPROVAL') {
+      currentLevel = 1;
+    } else if (initialStatus === 'APPROVED') {
+      currentLevel = requiredLevels;
+    }
+
+    const newPo: PurchaseOrder = {
+      ...poData,
+      id: poId,
+      poNumber,
+      tenantId: targetTenantId,
+      createdAt: nowIso,
+      updatedAt: nowIso,
+      createdBy: poData.createdBy || userEmail,
+      creatorRole: poData.creatorRole || activeRole,
+      status: initialStatus,
+      currentApprovalLevel: currentLevel,
+      requiredApprovalLevels: requiredLevels,
+      approvalAuditTrail: auditTrail,
+      currency: poData.currency || activeTenant.currency,
+      deliveryStatus: poData.deliveryStatus || 'PENDING',
+      isFullyBilled: false,
+    };
+
+    setPurchaseOrders((prev) => [newPo, ...prev]);
+
+    // Also queue into general approvalItems if pending approval
+    if (initialStatus === 'PENDING_APPROVAL' && applicableTiers.length > 0) {
+      const firstTier = applicableTiers[0];
+      const newApprovalItem: ApprovalItem = {
+        id: `app-po-${newPo.id}`,
+        tenantId: targetTenantId,
+        entityType: 'PURCHASE_ORDER',
+        entityId: newPo.id,
+        referenceNumber: newPo.poNumber,
+        amount: newPo.totalAmount,
+        currency: newPo.currency,
+        requestedBy: newPo.createdBy,
+        requestedDate: nowIso.split('T')[0],
+        requestedRole: newPo.creatorRole,
+        requiredRole: firstTier.requiredRole,
+        thresholdRuleId: firstTier.tierId,
+        status: 'PENDING',
+        comments: `Purchase order #${newPo.poNumber} for ${newPo.vendorName} pending Tier ${firstTier.level} (${firstTier.tierName}) approval.`,
+      };
+      setApprovalItems((prev) => [newApprovalItem, ...prev]);
+    }
+
+    addAuditLog({
+      action: 'PO_CREATE',
+      tenantId: targetTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Created Purchase Order #${poNumber} for ${poData.vendorName} (${poData.totalAmount} ${newPo.currency}) - Status: ${initialStatus}`,
+      status: 'SUCCESS',
+      payloadSummary: `PO ID: ${poId} | Required Approval Levels: ${requiredLevels} | Tiers: ${applicableTiers.map((t) => t.tierName).join(' -> ') || 'Auto-Approved'}`,
+    });
+
+    return { success: true, po: newPo };
+  };
+
+  const updatePurchaseOrder = (id: string, updates: Partial<PurchaseOrder>) => {
+    const existing = purchaseOrders.find((p) => p.id === id);
+    if (!existing) return { success: false, error: 'Purchase Order not found.' };
+
+    const targetTenantId = existing.tenantId || activeTenant.id;
+    let updatedTrail = updates.approvalAuditTrail || existing.approvalAuditTrail;
+    let updatedRequiredLevels = updates.requiredApprovalLevels ?? existing.requiredApprovalLevels;
+    let updatedCurrentLevel = updates.currentApprovalLevel ?? existing.currentApprovalLevel;
+    let updatedStatus = updates.status || existing.status;
+
+    // If amount changed while in DRAFT or PENDING_APPROVAL, re-evaluate tiers
+    if (updates.totalAmount !== undefined && updates.totalAmount !== existing.totalAmount && (existing.status === 'DRAFT' || existing.status === 'PENDING_APPROVAL')) {
+      const applicableTiers = getApplicableApprovalTiersForPo(updates.totalAmount, targetTenantId);
+      updatedRequiredLevels = applicableTiers.length;
+      updatedTrail = applicableTiers.map((tier, idx) => ({
+        stepId: `step-${tier.tierId}-${Date.now()}-${idx}`,
+        tierId: tier.tierId,
+        tierName: tier.tierName,
+        level: tier.level,
+        requiredRole: tier.requiredRole,
+        status: existing.status === 'DRAFT' ? 'NOT_STARTED' : idx === 0 ? 'PENDING' : 'NOT_STARTED',
+        enforceMakerChecker: tier.enforceMakerChecker,
+      }));
+      if (existing.status === 'PENDING_APPROVAL') {
+        updatedCurrentLevel = 1;
+      }
+    }
+
+    const updatedPo: PurchaseOrder = {
+      ...existing,
+      ...updates,
+      approvalAuditTrail: updatedTrail,
+      requiredApprovalLevels: updatedRequiredLevels,
+      currentApprovalLevel: updatedCurrentLevel,
+      status: updatedStatus,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setPurchaseOrders((prev) => prev.map((p) => (p.id === id ? updatedPo : p)));
+
+    addAuditLog({
+      action: 'PO_UPDATE',
+      tenantId: targetTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated Purchase Order #${existing.poNumber}`,
+      status: 'SUCCESS',
+      payloadSummary: `Updates: ${Object.keys(updates).join(', ')}`,
+    });
+
+    return { success: true };
+  };
+
+  const deletePurchaseOrder = (id: string) => {
+    const existing = purchaseOrders.find((p) => p.id === id);
+    if (!existing) return { success: false, error: 'Purchase Order not found.' };
+
+    if (existing.status === 'APPROVED' || existing.isFullyBilled || existing.deliveryStatus === 'DELIVERED') {
+      return {
+        success: false,
+        error: `Cannot delete Purchase Order #${existing.poNumber} because it is currently in "${existing.status}" status with downstream accounting/receipt linkages. Please cancel or reject it instead.`,
+      };
+    }
+
+    setPurchaseOrders((prev) => prev.filter((p) => p.id !== id));
+    setApprovalItems((prev) => prev.filter((item) => item.entityId !== id));
+
+    addAuditLog({
+      action: 'PO_DELETE',
+      tenantId: existing.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Deleted Purchase Order #${existing.poNumber} (${existing.vendorName})`,
+      status: 'SUCCESS',
+      payloadSummary: `PO ID: ${id} | Deleted by ${userEmail}`,
+    });
+
+    return { success: true };
+  };
+
+  const submitPurchaseOrderForApproval = (id: string) => {
+    const po = purchaseOrders.find((p) => p.id === id);
+    if (!po) return { success: false, message: 'Purchase Order not found.', error: 'Purchase Order not found.' };
+
+    if (po.status !== 'DRAFT' && po.status !== 'REJECTED') {
+      return { success: false, message: `PO is already in ${po.status} status.`, error: `PO is already in ${po.status} status.` };
+    }
+
+    const targetTenantId = po.tenantId || activeTenant.id;
+    const applicableTiers = getApplicableApprovalTiersForPo(po.totalAmount, targetTenantId);
+
+    if (applicableTiers.length === 0) {
+      // Auto-approved
+      const approvedPo: PurchaseOrder = {
+        ...po,
+        status: 'APPROVED',
+        currentApprovalLevel: 0,
+        requiredApprovalLevels: 0,
+        updatedAt: new Date().toISOString(),
+      };
+      setPurchaseOrders((prev) => prev.map((p) => (p.id === id ? approvedPo : p)));
+
+      addAuditLog({
+        action: 'PO_APPROVAL_DECISION',
+        tenantId: targetTenantId,
+        userRole: activeRole,
+        userEmail,
+        details: `Purchase Order #${po.poNumber} auto-approved (amount below minimum configured approval tier threshold).`,
+        status: 'SUCCESS',
+        payloadSummary: `Amount: ${po.totalAmount} ${po.currency}`,
+      });
+
+      return { success: true, message: `PO #${po.poNumber} amount is below threshold and has been auto-approved.` };
+    }
+
+    const trail: PurchaseOrderApprovalStep[] = applicableTiers.map((tier, idx) => ({
+      stepId: `step-${tier.tierId}-${Date.now()}-${idx}`,
+      tierId: tier.tierId,
+      tierName: tier.tierName,
+      level: tier.level,
+      requiredRole: tier.requiredRole,
+      status: idx === 0 ? 'PENDING' : 'NOT_STARTED',
+      enforceMakerChecker: tier.enforceMakerChecker,
+    }));
+
+    const submittedPo: PurchaseOrder = {
+      ...po,
+      status: 'PENDING_APPROVAL',
+      currentApprovalLevel: 1,
+      requiredApprovalLevels: applicableTiers.length,
+      approvalAuditTrail: trail,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setPurchaseOrders((prev) => prev.map((p) => (p.id === id ? submittedPo : p)));
+
+    // Queue in approval items
+    const firstTier = applicableTiers[0];
+    const newApprovalItem: ApprovalItem = {
+      id: `app-po-${po.id}`,
+      tenantId: targetTenantId,
+      entityType: 'PURCHASE_ORDER',
+      entityId: po.id,
+      referenceNumber: po.poNumber,
+      amount: po.totalAmount,
+      currency: po.currency,
+      requestedBy: po.createdBy,
+      requestedDate: new Date().toISOString().split('T')[0],
+      requestedRole: po.creatorRole,
+      requiredRole: firstTier.requiredRole,
+      thresholdRuleId: firstTier.tierId,
+      status: 'PENDING',
+      comments: `Purchase order #${po.poNumber} submitted for Tier 1 (${firstTier.tierName}) approval.`,
+    };
+    setApprovalItems((prev) => [newApprovalItem, ...prev.filter((i) => i.entityId !== po.id)]);
+
+    addAuditLog({
+      action: 'PO_SUBMIT_APPROVAL',
+      tenantId: targetTenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Submitted Purchase Order #${po.poNumber} for Tier 1 approval (${firstTier.tierName} - ${firstTier.requiredRole})`,
+      status: 'SUCCESS',
+      payloadSummary: `Total Levels: ${applicableTiers.length} | Amount: ${po.totalAmount} ${po.currency}`,
+    });
+
+    return {
+      success: true,
+      message: `Purchase Order #${po.poNumber} submitted successfully. Tier 1 (${firstTier.tierName}) approval is now pending.`,
+    };
+  };
+
+  const approvePurchaseOrder = (id: string, comments?: string) => {
+    const po = purchaseOrders.find((p) => p.id === id);
+    if (!po) return { success: false, message: 'Purchase Order not found.', error: 'Purchase Order not found.' };
+
+    if (po.status !== 'PENDING_APPROVAL') {
+      return {
+        success: false,
+        message: `Cannot approve PO #${po.poNumber} because it is in "${po.status}" status.`,
+        error: `Cannot approve PO in "${po.status}" status.`,
+      };
+    }
+
+    const currentStepIndex = po.approvalAuditTrail.findIndex(
+      (step) => step.level === po.currentApprovalLevel && step.status === 'PENDING'
+    );
+
+    if (currentStepIndex === -1) {
+      return { success: false, message: 'No active pending approval step found for this PO.', error: 'No active step found.' };
+    }
+
+    const currentStep = po.approvalAuditTrail[currentStepIndex];
+
+    // SOX 404 Maker-Checker Control Verification
+    const isMakerCheckerEnforced = currentStep.enforceMakerChecker ?? true;
+    if (isMakerCheckerEnforced && po.createdBy.toLowerCase() === userEmail.toLowerCase() && activeRole !== 'super_user') {
+      return {
+        success: false,
+        message: 'SOX 404 Compliance Violation: The creator of the Purchase Order cannot approve their own request. An independent authorized approver must approve.',
+        error: 'Creator cannot approve their own Purchase Order (Maker-Checker violation).',
+      };
+    }
+
+    // Role verification
+    const requiredRole = currentStep.requiredRole;
+    const isAuthorizedRole =
+      activeRole === 'super_user' ||
+      activeRole === 'cfo' ||
+      activeRole === requiredRole ||
+      (requiredRole === 'manager' && (activeRole === 'accountant' || activeRole === 'admin')) ||
+      (requiredRole === 'controller' && (activeRole === 'admin' || activeRole === 'cfo'));
+
+    if (!isAuthorizedRole && !hasPermission('po:approve_l1', po.tenantId) && !hasPermission('governance:approve', po.tenantId)) {
+      return {
+        success: false,
+        message: `Access Denied: Tier ${currentStep.level} (${currentStep.tierName}) requires role "${requiredRole}". Your active role is "${activeRole}".`,
+        error: `Insufficient approval authority for tier ${currentStep.level}. Required: ${requiredRole}`,
+      };
+    }
+
+    const nowIso = new Date().toISOString();
+    const today = nowIso.split('T')[0];
+
+    // Update current step to APPROVED
+    const updatedTrail = [...po.approvalAuditTrail];
+    updatedTrail[currentStepIndex] = {
+      ...currentStep,
+      status: 'APPROVED',
+      actionBy: userEmail,
+      actionRole: activeRole,
+      actionDate: today,
+      comments: comments || `Approved by ${userName} (${activeRole})`,
+    };
+
+    const hasNextStep = currentStepIndex + 1 < updatedTrail.length;
+    let nextStatus: PurchaseOrderStatus = po.status;
+    let nextLevel = po.currentApprovalLevel;
+    let isFinal = false;
+
+    if (hasNextStep) {
+      // Advance to next tier
+      nextLevel = po.currentApprovalLevel + 1;
+      updatedTrail[currentStepIndex + 1] = {
+        ...updatedTrail[currentStepIndex + 1],
+        status: 'PENDING',
+      };
+      nextStatus = 'PENDING_APPROVAL';
+
+      // Update approvalItems queue to point to next tier approvers
+      const nextStep = updatedTrail[currentStepIndex + 1];
+      setApprovalItems((prev) =>
+        prev.map((item) =>
+          item.entityId === po.id
+            ? {
+                ...item,
+                requiredRole: nextStep.requiredRole,
+                comments: `PO #${po.poNumber} advanced to Tier ${nextStep.level} (${nextStep.tierName}) approval.`,
+              }
+            : item
+        )
+      );
+    } else {
+      // Final approval achieved
+      nextStatus = 'APPROVED';
+      isFinal = true;
+
+      // Mark approvalItem as APPROVED
+      setApprovalItems((prev) =>
+        prev.map((item) =>
+          item.entityId === po.id
+            ? {
+                ...item,
+                status: 'APPROVED',
+                decisionDate: today,
+                decisionBy: userEmail,
+                comments: comments || 'Final Purchase Order approval granted.',
+              }
+            : item
+        )
+      );
+    }
+
+    const updatedPo: PurchaseOrder = {
+      ...po,
+      status: nextStatus,
+      currentApprovalLevel: nextLevel,
+      approvalAuditTrail: updatedTrail,
+      updatedAt: nowIso,
+    };
+
+    setPurchaseOrders((prev) => prev.map((p) => (p.id === id ? updatedPo : p)));
+
+    addAuditLog({
+      action: 'PO_APPROVAL_DECISION',
+      tenantId: po.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Approved Purchase Order #${po.poNumber} at Tier ${currentStep.level} (${currentStep.tierName})${isFinal ? ' - FINAL APPROVAL GRANTED' : ` - Advanced to Tier ${nextLevel}`}`,
+      status: 'SUCCESS',
+      payloadSummary: `Approver: ${userEmail} (${activeRole}) | Notes: ${comments || 'None'} | New PO Status: ${nextStatus}`,
+    });
+
+    return {
+      success: true,
+      message: isFinal
+        ? `Purchase Order #${po.poNumber} has received final approval and is now ready for goods receipt and vendor billing.`
+        : `Tier ${currentStep.level} approval recorded. PO #${po.poNumber} advanced to Tier ${nextLevel} (${updatedTrail[currentStepIndex + 1]?.tierName || ''}) for next sign-off.`,
+      isFinalApproval: isFinal,
+    };
+  };
+
+  const rejectPurchaseOrder = (id: string, rejectionReason: string) => {
+    const po = purchaseOrders.find((p) => p.id === id);
+    if (!po) return { success: false, message: 'Purchase Order not found.', error: 'Purchase Order not found.' };
+
+    if (po.status !== 'PENDING_APPROVAL') {
+      return {
+        success: false,
+        message: `Cannot reject PO #${po.poNumber} because it is in "${po.status}" status.`,
+        error: `Cannot reject PO in "${po.status}" status.`,
+      };
+    }
+
+    const currentStepIndex = po.approvalAuditTrail.findIndex(
+      (step) => step.level === po.currentApprovalLevel && step.status === 'PENDING'
+    );
+
+    const nowIso = new Date().toISOString();
+    const today = nowIso.split('T')[0];
+
+    const updatedTrail = [...po.approvalAuditTrail];
+    if (currentStepIndex !== -1) {
+      updatedTrail[currentStepIndex] = {
+        ...updatedTrail[currentStepIndex],
+        status: 'REJECTED',
+        actionBy: userEmail,
+        actionRole: activeRole,
+        actionDate: today,
+        comments: rejectionReason,
+      };
+    }
+
+    const updatedPo: PurchaseOrder = {
+      ...po,
+      status: 'REJECTED',
+      rejectionReason,
+      approvalAuditTrail: updatedTrail,
+      updatedAt: nowIso,
+    };
+
+    setPurchaseOrders((prev) => prev.map((p) => (p.id === id ? updatedPo : p)));
+
+    setApprovalItems((prev) =>
+      prev.map((item) =>
+        item.entityId === po.id
+          ? {
+              ...item,
+              status: 'REJECTED',
+              decisionDate: today,
+              decisionBy: userEmail,
+              comments: `Rejected: ${rejectionReason}`,
+            }
+          : item
+      )
+    );
+
+    addAuditLog({
+      action: 'PO_APPROVAL_DECISION',
+      tenantId: po.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `REJECTED Purchase Order #${po.poNumber} by ${userEmail} (${activeRole}). Reason: "${rejectionReason}"`,
+      status: 'SUCCESS',
+      payloadSummary: `PO ID: ${po.id} | Rejection Reason: ${rejectionReason}`,
+    });
+
+    return {
+      success: true,
+      message: `Purchase Order #${po.poNumber} was rejected. Reason logged in audit trail.`,
+    };
+  };
+
+  const receiveGoodsForPurchaseOrder = (
+    poId: string,
+    receivedItems: { lineItemId: string; quantityToReceive: number; batchOrSerialNo?: string; conditionNotes?: string }[]
+  ) => {
+    const po = purchaseOrders.find((p) => p.id === poId);
+    if (!po) return { success: false, message: 'Purchase Order not found.', error: 'Purchase Order not found.' };
+
+    if (po.status !== 'APPROVED' && po.status !== 'PARTIALLY_RECEIVED' && po.status !== 'RECEIVED') {
+      return {
+        success: false,
+        message: `Cannot receive goods for PO #${po.poNumber} because its status is "${po.status}". The PO must be APPROVED first.`,
+        error: `PO status must be APPROVED to receive goods.`,
+      };
+    }
+
+    const updatedLineItems = po.items.map((item) => {
+      const match = receivedItems.find((r) => r.lineItemId === item.id);
+      if (match && match.quantityToReceive > 0) {
+        const newReceived = (item.receivedQuantity || 0) + match.quantityToReceive;
+        return {
+          ...item,
+          receivedQuantity: Math.min(item.quantity, newReceived),
+        };
+      }
+      return item;
+    });
+
+    const allFullyReceived = updatedLineItems.every((item) => (item.receivedQuantity || 0) >= item.quantity);
+    const anyReceived = updatedLineItems.some((item) => (item.receivedQuantity || 0) > 0);
+
+    const newDeliveryStatus = allFullyReceived ? 'DELIVERED' : anyReceived ? 'PARTIAL' : 'PENDING';
+    const newStatus: PurchaseOrderStatus = allFullyReceived ? 'RECEIVED' : anyReceived ? 'PARTIALLY_RECEIVED' : po.status;
+
+    const updatedPo: PurchaseOrder = {
+      ...po,
+      items: updatedLineItems,
+      deliveryStatus: newDeliveryStatus,
+      status: newStatus,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setPurchaseOrders((prev) => prev.map((p) => (p.id === poId ? updatedPo : p)));
+
+    // If inventory item matched, update inventory stock automatically
+    let totalItemsReceived = 0;
+    receivedItems.forEach((r) => {
+      const matchedItem = po.items.find((i) => i.id === r.lineItemId);
+      if (matchedItem && r.quantityToReceive > 0) {
+        totalItemsReceived += r.quantityToReceive;
+        // Check if item corresponds to an inventory stock item
+        const inventoryItem = inventoryItems.find(
+          (inv) => (inv.sku && matchedItem.sku && inv.sku.toLowerCase() === matchedItem.sku.toLowerCase()) || inv.name.toLowerCase() === matchedItem.itemName.toLowerCase()
+        );
+        if (inventoryItem) {
+          adjustInventoryStock({
+            itemId: inventoryItem.id,
+            type: 'RECEIPT_PURCHASE',
+            quantityDelta: r.quantityToReceive,
+            reason: `Goods receipt from Purchase Order #${po.poNumber}`,
+          });
+        }
+      }
+    });
+
+    addAuditLog({
+      action: 'PO_GOODS_RECEIPT',
+      tenantId: po.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Processed Goods Receipt (GRN) for Purchase Order #${po.poNumber}. Total items received: ${totalItemsReceived}. New Delivery Status: ${newDeliveryStatus}`,
+      status: 'SUCCESS',
+      payloadSummary: `PO Status: ${newStatus} | Fully Received: ${allFullyReceived}`,
+    });
+
+    return {
+      success: true,
+      message: allFullyReceived
+        ? `All items for Purchase Order #${po.poNumber} are fully received (GRN complete). Ready for vendor bill match.`
+        : `Partial goods receipt recorded for PO #${po.poNumber}. Delivery status updated to PARTIAL.`,
+    };
+  };
+
+  const convertPurchaseOrderToVendorBill = (poId: string, glExpenseAccountId?: string) => {
+    const po = purchaseOrders.find((p) => p.id === poId);
+    if (!po) return { success: false, error: 'Purchase Order not found.' };
+
+    if (po.status !== 'APPROVED' && po.status !== 'PARTIALLY_RECEIVED' && po.status !== 'RECEIVED') {
+      return {
+        success: false,
+        error: `Cannot convert Purchase Order #${po.poNumber} to a Vendor Bill because it has not been approved (Current Status: "${po.status}").`,
+      };
+    }
+
+    if (po.isFullyBilled) {
+      return {
+        success: false,
+        error: `Purchase Order #${po.poNumber} is already fully billed (Linked Bill: ${po.vendorBillNumber || po.vendorBillId}).`,
+      };
+    }
+
+    const billId = `bill-${Date.now()}`;
+    const nextBillSeq = vendorBills.length + 1;
+    const billNumber = `BILL-${new Date().getFullYear()}-${String(nextBillSeq).padStart(3, '0')}`;
+    const today = new Date().toISOString().split('T')[0];
+    const dueDate = po.expectedDeliveryDate || new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+
+    const currentAccs = accountsMap[activeTenant.id] || [];
+    const fallbackExpAcc = currentAccs.find((a) => (glExpenseAccountId && a.id === glExpenseAccountId) || a.code === '5010') || currentAccs.find((a) => a.type === 'EXPENSE');
+
+    const billItems = po.items.map((item, idx) => ({
+      id: `bi-${Date.now()}-${idx}`,
+      description: `[PO #${po.poNumber}] ${item.itemName} - ${item.description || ''}`,
+      amount: item.totalAmount,
+      expenseAccountCode: item.expenseAccountCode || fallbackExpAcc?.code || '5010',
+    }));
+
+    const newBill: VendorBill = {
+      id: billId,
+      tenantId: po.tenantId || activeTenant.id,
+      vendorId: po.vendorId,
+      vendorName: po.vendorName,
+      billNumber,
+      billDate: today,
+      dueDate,
+      items: billItems,
+      totalAmount: po.totalAmount,
+      amountPaid: 0,
+      currency: po.currency,
+      status: 'APPROVED',
+      notes: `Generated via 3-Way Match from Purchase Order #${po.poNumber}. Terms: ${po.paymentTerms || 'Net 30'}.`,
+      purchaseOrderId: po.id,
+      purchaseOrderNumber: po.poNumber,
+    };
+
+    setVendorBills((prev) => [newBill, ...prev]);
+
+    // Double-entry GL posting: Debit Expense / Credit AP
+    const apAcc = currentAccs.find((a) => a.code === '2010') || currentAccs.find((a) => a.type === 'LIABILITY');
+
+    if (apAcc && billItems.length > 0) {
+      const glLines: JournalLine[] = billItems.map((item, idx) => {
+        const expAcc = currentAccs.find((a) => a.code === item.expenseAccountCode) || currentAccs.find((a) => a.type === 'EXPENSE');
+        return {
+          id: `jl-pobill-exp-${Date.now()}-${idx}`,
+          accountId: expAcc ? expAcc.id : 'acc-5001',
+          accountCode: expAcc ? expAcc.code : '5010',
+          accountName: expAcc ? expAcc.name : 'Operating Expenses',
+          debit: item.amount,
+          credit: 0,
+          memo: item.description,
+        };
+      });
+
+      glLines.push({
+        id: `jl-pobill-ap-${Date.now()}`,
+        accountId: apAcc.id,
+        accountCode: apAcc.code,
+        accountName: apAcc.name,
+        debit: 0,
+        credit: po.totalAmount,
+        memo: `Vendor Bill #${billNumber} for PO #${po.poNumber}`,
+      });
+
+      postJournalEntry({
+        tenantId: po.tenantId || activeTenant.id,
+        organizationId: activeOrganization?.id,
+        branchId: activeBranch?.id,
+        date: today,
+        description: `Vendor Bill #${billNumber} converted from Purchase Order #${po.poNumber} (${po.vendorName})`,
+        reference: billNumber,
+        pluginId: activePlugin,
+        lines: glLines,
+      });
+    }
+
+    // Mark PO as billed
+    const updatedPo: PurchaseOrder = {
+      ...po,
+      isFullyBilled: true,
+      vendorBillId: billId,
+      vendorBillNumber: billNumber,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setPurchaseOrders((prev) => prev.map((p) => (p.id === poId ? updatedPo : p)));
+
+    addAuditLog({
+      action: 'PO_CONVERT_BILL',
+      tenantId: po.tenantId || activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Converted Purchase Order #${po.poNumber} to Accounts Payable Vendor Bill #${billNumber} (${po.totalAmount} ${po.currency})`,
+      status: 'SUCCESS',
+      payloadSummary: `PO: ${po.poNumber} -> Bill: ${billNumber} | GL Posting Reference: ${billNumber}`,
+    });
+
+    return { success: true, billId, billNumber };
+  };
+
+  const updatePoApprovalTiers = (tiers: PoApprovalTierConfig[]) => {
+    setPoApprovalTiers(tiers);
+
+    addAuditLog({
+      action: 'PO_CONFIG_TIERS',
+      tenantId: activeTenant.id,
+      userRole: activeRole,
+      userEmail,
+      details: `Updated Purchase Order Approval Matrix configuration (${tiers.length} active tiers configured)`,
+      status: 'SUCCESS',
+      payloadSummary: `Configured Tiers: ${tiers.map((t) => `${t.tierName} (L${t.level}: >= ${t.minAmount})`).join(', ')}`,
+    });
+
+    return { success: true };
+  };
+
+  const resetPoApprovalTiersToDefault = (targetTenantId?: string) => {
+    const tenantId = targetTenantId || activeTenant.id;
+    const defaultTiers = INITIAL_PO_APPROVAL_TIERS.filter(
+      (t) => t.tenantId === tenantId || (!t.tenantId && tenantId === 't-acme-us')
+    );
+
+    setPoApprovalTiers((prev) => {
+      const otherTenantTiers = prev.filter((t) => t.tenantId && t.tenantId !== tenantId);
+      return [...otherTenantTiers, ...defaultTiers];
+    });
+
+    addAuditLog({
+      action: 'PO_CONFIG_TIERS',
+      tenantId,
+      userRole: activeRole,
+      userEmail,
+      details: `Reset Purchase Order Approval Tiers to standard regulatory default matrix for tenant [${tenantId}]`,
+      status: 'SUCCESS',
     });
 
     return { success: true };
@@ -5985,6 +6728,21 @@ export const AccountingProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         receiveInvoicePayment,
         createVendorBill,
         payVendorBill,
+
+        // Purchase Orders & Configurable Approval Engine
+        purchaseOrders,
+        poApprovalTiers,
+        createPurchaseOrder,
+        updatePurchaseOrder,
+        deletePurchaseOrder,
+        submitPurchaseOrderForApproval,
+        approvePurchaseOrder,
+        rejectPurchaseOrder,
+        receiveGoodsForPurchaseOrder,
+        convertPurchaseOrderToVendorBill,
+        updatePoApprovalTiers,
+        resetPoApprovalTiersToDefault,
+
         toggleFiscalPeriodStatus,
         executeYearEndClose,
         executeSweepTransfer,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   Users,
@@ -38,6 +39,7 @@ import { Role, EnterpriseUser, TenantAccessScope, PermissionKey, CustomRoleDefin
 import { RoleMenuAccessSetupView } from './RoleMenuAccessSetupView';
 
 export const UserManagementView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     enterpriseUsers,
     customRoles,
@@ -577,10 +579,8 @@ export const UserManagementView: React.FC = () => {
           <ShieldAlert className="w-8 h-8" />
         </div>
         <div className="space-y-1 max-w-md">
-          <h2 className="text-lg font-bold text-white">Restricted Access · Admin Privilege Required</h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
-            User Provisioning & RBAC management is strictly restricted to <strong>Admin</strong> and <strong>Super Admin</strong> roles under SOX 404 access control guidelines.
-          </p>
+          <h2 className="text-lg font-bold text-white">{tr('Restricted Access · Admin Privilege Required')}</h2>
+          <p className="text-xs text-slate-400 leading-relaxed">{tr('User Provisioning & RBAC management is strictly restricted to')}<strong>{tr('Admin')}</strong> {tr('and')} <strong>{tr('Super Admin')}</strong>{tr('roles under SOX 404 access control guidelines.')}</p>
         </div>
         <div className="px-3 py-1 bg-slate-900 border border-slate-800 rounded-lg text-[11px] font-mono text-slate-400">
           Active Role: <span className="text-amber-400 font-bold">{activeRole}</span>
@@ -595,14 +595,10 @@ export const UserManagementView: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-800">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-black text-white tracking-tight">Enterprise Access & Granular RBAC Engine</h1>
-            <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-full text-xs font-semibold">
-              SOX 404 Access Control
-            </span>
+            <h1 className="text-xl font-black text-white tracking-tight">{tr('Enterprise Access & Granular RBAC Engine')}</h1>
+            <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-full text-xs font-semibold">{tr('SOX 404 Access Control')}</span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Provision identities, define granular custom roles, assign multi-tenant entity access scopes, and enforce Segregation of Duties (SoD).
-          </p>
+          <p className="text-xs text-slate-400 mt-1">{tr('Provision identities, define granular custom roles, assign multi-tenant entity access scopes, and enforce Segregation of Duties (SoD).')}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -628,8 +624,7 @@ export const UserManagementView: React.FC = () => {
               }`}
             >
               <span className="flex items-center gap-1.5">
-                <Shield className="w-3.5 h-3.5" /> Permission Matrix
-              </span>
+                <Shield className="w-3.5 h-3.5" />{tr('Permission Matrix')}</span>
             </button>
             <button
               onClick={() => setActiveTab('ROLES')}
@@ -652,8 +647,7 @@ export const UserManagementView: React.FC = () => {
               }`}
             >
               <span className="flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Role-Menu Setup
-              </span>
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />{tr('Role-Menu Setup')}</span>
             </button>
             <button
               onClick={() => setActiveTab('AI_CONFIG')}
@@ -664,8 +658,7 @@ export const UserManagementView: React.FC = () => {
               }`}
             >
               <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-indigo-400" /> AI Entity Keys & Quotas
-              </span>
+                <Sparkles className="w-3.5 h-3.5 text-indigo-400" />{tr('AI Entity Keys & Quotas')}</span>
             </button>
           </div>
 
@@ -673,8 +666,7 @@ export const UserManagementView: React.FC = () => {
             onClick={handleOpenProvisionModal}
             className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
           >
-            <UserPlus className="w-4 h-4" /> Provision User
-          </button>
+            <UserPlus className="w-4 h-4" />{tr('Provision User')}</button>
         </div>
       </div>
 
@@ -703,7 +695,7 @@ export const UserManagementView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Total Enterprise Users</span>
+            <span>{tr('Total Enterprise Users')}</span>
             <Users className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-black text-white font-mono">{totalUsersCount}</div>
@@ -712,7 +704,7 @@ export const UserManagementView: React.FC = () => {
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>MFA Security Posture</span>
+            <span>{tr('MFA Security Posture')}</span>
             <Smartphone className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-black text-emerald-400 font-mono">{mfaPercent}%</div>
@@ -721,7 +713,7 @@ export const UserManagementView: React.FC = () => {
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Configured Roles</span>
+            <span>{tr('Configured Roles')}</span>
             <ShieldCheck className="w-4 h-4 text-purple-400" />
           </div>
           <div className="text-2xl font-black text-white font-mono">{customRoles.length}</div>
@@ -730,7 +722,7 @@ export const UserManagementView: React.FC = () => {
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-1">
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Active Session Role</span>
+            <span>{tr('Active Session Role')}</span>
             <Key className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-lg font-black text-amber-400 font-mono uppercase truncate">{activeRole}</div>
@@ -749,7 +741,7 @@ export const UserManagementView: React.FC = () => {
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search user name, email, or title..."
+                  placeholder={tr('Search user name, email, or title...')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -759,10 +751,10 @@ export const UserManagementView: React.FC = () => {
                 onChange={(e) => setStatusFilter(e.target.value as any)}
                 className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 font-mono"
               >
-                <option value="ALL">Status: All</option>
-                <option value="ACTIVE">Active</option>
-                <option value="SUSPENDED">Suspended</option>
-                <option value="INVITED">Invited</option>
+                <option value="ALL">{tr('Status: All')}</option>
+                <option value="ACTIVE">{tr('Active')}</option>
+                <option value="SUSPENDED">{tr('Suspended')}</option>
+                <option value="INVITED">{tr('Invited')}</option>
               </select>
 
               <select
@@ -770,7 +762,7 @@ export const UserManagementView: React.FC = () => {
                 onChange={(e) => setRoleFilter(e.target.value)}
                 className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-indigo-500 font-mono"
               >
-                <option value="ALL">Role: All</option>
+                <option value="ALL">{tr('Role: All')}</option>
                 {customRoles.map((r) => (
                   <option key={r.id} value={r.code}>{r.name}</option>
                 ))}
@@ -782,7 +774,7 @@ export const UserManagementView: React.FC = () => {
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-md shadow-indigo-600/20 transition cursor-pointer shrink-0"
             >
               <UserPlus className="w-4 h-4" />
-              <span>Provision User</span>
+              <span>{tr('Provision User')}</span>
             </button>
           </div>
 
@@ -790,13 +782,13 @@ export const UserManagementView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead>
                 <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider font-mono">
-                  <th className="py-3 px-4">User Details & Identity</th>
-                  <th className="py-3 px-4">Department & Title</th>
-                  <th className="py-3 px-4">Primary Role</th>
-                  <th className="py-3 px-4">Entity Access Scopes</th>
-                  <th className="py-3 px-4 text-center">MFA</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4">{tr('User Details & Identity')}</th>
+                  <th className="py-3 px-4">{tr('Department & Title')}</th>
+                  <th className="py-3 px-4">{tr('Primary Role')}</th>
+                  <th className="py-3 px-4">{tr('Entity Access Scopes')}</th>
+                  <th className="py-3 px-4 text-center">{tr('MFA')}</th>
+                  <th className="py-3 px-4 text-center">{tr('Status')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -827,7 +819,7 @@ export const UserManagementView: React.FC = () => {
 
                           if (!visibleScopes || visibleScopes.length === 0) {
                             return (
-                              <span className="text-[10px] text-slate-500 italic">No assigned scopes in your entity</span>
+                              <span className="text-[10px] text-slate-500 italic">{tr('No assigned scopes in your entity')}</span>
                             );
                           }
 
@@ -848,17 +840,15 @@ export const UserManagementView: React.FC = () => {
 
                         {!isSuperUser && (user.defaultRole === 'super_user' || (user.tenantScopes || []).some((s) => s.role === 'super_user')) ? (
                           <span className="px-1.5 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded text-[9px] font-semibold flex items-center gap-0.5">
-                            <Lock className="w-2.5 h-2.5" /> Super Admin
-                          </span>
+                            <Lock className="w-2.5 h-2.5" />{tr('Super Admin')}</span>
                         ) : (
                           <button
                             type="button"
                             onClick={() => handleStartEditScopes(user)}
                             className="px-1.5 py-0.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 hover:text-indigo-300 border border-indigo-500/30 rounded text-[10px] font-semibold flex items-center gap-1 cursor-pointer transition"
-                            title="Modify Entity Access Scopes"
+                            title={tr('Modify Entity Access Scopes')}
                           >
-                            <Plus className="w-2.5 h-2.5" /> Scopes
-                          </button>
+                            <Plus className="w-2.5 h-2.5" />{tr('Scopes')}</button>
                         )}
                       </div>
                     </td>
@@ -866,12 +856,10 @@ export const UserManagementView: React.FC = () => {
                     <td className="py-3.5 px-4 text-center">
                       {user.mfaEnabled ? (
                         <span className="inline-flex items-center gap-1 text-emerald-400 text-[10px] font-bold">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Enforced
-                        </span>
+                          <CheckCircle2 className="w-3.5 h-3.5" />{tr('Enforced')}</span>
                       ) : (
                         <span className="inline-flex items-center gap-1 text-slate-500 text-[10px]">
-                          <XCircle className="w-3.5 h-3.5" /> Disabled
-                        </span>
+                          <XCircle className="w-3.5 h-3.5" />{tr('Disabled')}</span>
                       )}
                     </td>
 
@@ -894,16 +882,15 @@ export const UserManagementView: React.FC = () => {
                         <div className="flex items-center justify-end">
                           <span
                             className="px-2.5 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg text-[10px] font-bold flex items-center gap-1"
-                            title="Super Admin user accounts are protected and can only be managed by Super Administrators under SOX 404 ITGC controls"
+                            title={tr('Super Admin user accounts are protected and can only be managed by Super Administrators under SOX 404 ITGC controls')}
                           >
-                            <Lock className="w-3 h-3 text-amber-400" /> Protected
-                          </span>
+                            <Lock className="w-3 h-3 text-amber-400" />{tr('Protected')}</span>
                         </div>
                       ) : (
                         <div className="flex items-center justify-end gap-1.5">
                           <button
                             onClick={() => handleStartEditScopes(user)}
-                            title="Edit Roles & Tenant Scopes"
+                            title={tr('Edit Roles & Tenant Scopes')}
                             className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition cursor-pointer"
                           >
                             <Edit3 className="w-3.5 h-3.5 text-indigo-400" />
@@ -911,7 +898,7 @@ export const UserManagementView: React.FC = () => {
 
                           <button
                             onClick={() => toggleUserMfa(user.id)}
-                            title="Toggle MFA Enforcement"
+                            title={tr('Toggle MFA Enforcement')}
                             className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 transition cursor-pointer"
                           >
                             <Smartphone className={`w-3.5 h-3.5 ${user.mfaEnabled ? 'text-emerald-400' : 'text-slate-500'}`} />
@@ -933,7 +920,7 @@ export const UserManagementView: React.FC = () => {
 
                           <button
                             onClick={() => deleteEnterpriseUser(user.id)}
-                            title="Delete User Identity"
+                            title={tr('Delete User Identity')}
                             className="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-lg border border-rose-500/30 transition cursor-pointer"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -955,11 +942,8 @@ export const UserManagementView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-indigo-400" /> Granular Access Control & Permission Matrix
-              </h2>
-              <p className="text-xs text-slate-400">
-                Segregation of duties (SoD) mapping permissions across defined corporate user roles.
-              </p>
+                <ShieldCheck className="w-5 h-5 text-indigo-400" />{tr('Granular Access Control & Permission Matrix')}</h2>
+              <p className="text-xs text-slate-400">{tr('Segregation of duties (SoD) mapping permissions across defined corporate user roles.')}</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -981,7 +965,7 @@ export const UserManagementView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead>
                 <tr className="border-b border-slate-800 text-[10px] text-slate-400 uppercase tracking-wider font-mono">
-                  <th className="py-3 px-4 min-w-[260px]">System Operation / Scope Key</th>
+                  <th className="py-3 px-4 min-w-[260px]">{tr('System Operation / Scope Key')}</th>
                   {customRoles.map((roleDef) => (
                     <th key={roleDef.id} className="py-3 px-3 text-center min-w-[110px]">
                       <div className="font-bold text-slate-200 truncate">{roleDef.name}</div>
@@ -1035,19 +1019,15 @@ export const UserManagementView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
             <div>
               <h2 className="text-base font-bold text-white flex items-center gap-2">
-                <Sliders className="w-5 h-5 text-indigo-400" /> Custom Role Definitions & Permissions
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Create tailored organizational roles with specific security permissions and scopes.
-              </p>
+                <Sliders className="w-5 h-5 text-indigo-400" />{tr('Custom Role Definitions & Permissions')}</h2>
+              <p className="text-xs text-slate-400 mt-0.5">{tr('Create tailored organizational roles with specific security permissions and scopes.')}</p>
             </div>
 
             <button
               onClick={handleOpenCreateRole}
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition cursor-pointer"
             >
-              <Plus className="w-4 h-4" /> Create Custom Role
-            </button>
+              <Plus className="w-4 h-4" />{tr('Create Custom Role')}</button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1064,9 +1044,7 @@ export const UserManagementView: React.FC = () => {
                         {roleDef.code}
                       </span>
                       {roleDef.isSystemRole && (
-                        <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[10px]">
-                          System Role
-                        </span>
+                        <span className="px-2 py-0.5 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded text-[10px]">{tr('System Role')}</span>
                       )}
                     </div>
                     <p className="text-xs text-slate-400 mt-1">{roleDef.description}</p>
@@ -1075,14 +1053,14 @@ export const UserManagementView: React.FC = () => {
                   <div className="flex items-center gap-1.5">
                     <button
                       onClick={() => handleOpenEditRole(roleDef)}
-                      title="Configure Permissions"
+                      title={tr('Configure Permissions')}
                       className="p-1.5 bg-slate-900 hover:bg-slate-800 text-indigo-400 border border-slate-800 rounded-lg transition"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => cloneCustomRole(roleDef.id, `${roleDef.name} Copy`, `${roleDef.code}_copy`)}
-                      title="Clone Role"
+                      title={tr('Clone Role')}
                       className="p-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg transition"
                     >
                       <Copy className="w-3.5 h-3.5" />
@@ -1090,7 +1068,7 @@ export const UserManagementView: React.FC = () => {
                     {!roleDef.isSystemRole && (
                       <button
                         onClick={() => deleteCustomRole(roleDef.id)}
-                        title="Delete Role"
+                        title={tr('Delete Role')}
                         className="p-1.5 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 rounded-lg transition"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -1101,7 +1079,7 @@ export const UserManagementView: React.FC = () => {
 
                 <div className="space-y-1.5 pt-2 border-t border-slate-900">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-400 font-mono">Assigned Permissions:</span>
+                    <span className="text-slate-400 font-mono">{tr('Assigned Permissions:')}</span>
                     <span className="font-bold text-white font-mono">{roleDef.permissions.length}</span>
                   </div>
                   <div className="flex flex-wrap gap-1">
@@ -1135,16 +1113,12 @@ export const UserManagementView: React.FC = () => {
             <div>
               <h2 className="text-sm font-bold text-white flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-indigo-400" />
-                <span>Entity-Scoped AI API Keys & Monthly Token Quotas</span>
+                <span>{tr('Entity-Scoped AI API Keys & Monthly Token Quotas')}</span>
               </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Each entity administrator can configure their own Google Gemini AI key, isolated strictly to their entity, with dedicated token consumption quota caps.
-              </p>
+              <p className="text-xs text-slate-400 mt-0.5">{tr('Each entity administrator can configure their own Google Gemini AI key, isolated strictly to their entity, with dedicated token consumption quota caps.')}</p>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg font-mono">
-                SOX 404 & GDPR Tenant Isolation Active
-              </span>
+              <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg font-mono">{tr('SOX 404 & GDPR Tenant Isolation Active')}</span>
             </div>
           </div>
 
@@ -1267,7 +1241,7 @@ export const UserManagementView: React.FC = () => {
                     {/* Directives Preview */}
                     {aiConfig.customAuditInstructions && (
                       <div className="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/80 text-[11px] text-slate-400 line-clamp-2">
-                        <span className="text-indigo-400 font-semibold">Audit Directives: </span>
+                        <span className="text-indigo-400 font-semibold">{tr('Audit Directives:')} </span>
                         {aiConfig.customAuditInstructions}
                       </div>
                     )}
@@ -1278,10 +1252,10 @@ export const UserManagementView: React.FC = () => {
                     <button
                       onClick={() => handleResetQuotaForTenant(t.id, t.name)}
                       className="text-slate-400 hover:text-amber-400 text-xs flex items-center gap-1 transition cursor-pointer py-1 px-2 rounded-lg hover:bg-slate-800"
-                      title="Reset token consumption for this billing period"
+                      title={tr('Reset token consumption for this billing period')}
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
-                      <span>Reset Usage</span>
+                      <span>{tr('Reset Usage')}</span>
                     </button>
 
                     <button
@@ -1289,7 +1263,7 @@ export const UserManagementView: React.FC = () => {
                       className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold px-3.5 py-1.5 rounded-xl transition shadow-md shadow-indigo-600/20 flex items-center gap-1.5 cursor-pointer"
                     >
                       <Sliders className="w-3.5 h-3.5" />
-                      <span>Configure Key & Quota</span>
+                      <span>{tr('Configure Key & Quota')}</span>
                     </button>
                   </div>
                 </div>
@@ -1309,7 +1283,7 @@ export const UserManagementView: React.FC = () => {
                   <KeyRound className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Configure Entity AI Key & Token Quota</h3>
+                  <h3 className="text-base font-bold text-white">{tr('Configure Entity AI Key & Token Quota')}</h3>
                   <p className="text-xs text-slate-400">
                     Entity: <strong>{tenants.find((t) => t.id === aiConfigModalTenantId)?.name}</strong> ({tenants.find((t) => t.id === aiConfigModalTenantId)?.code})
                   </p>
@@ -1326,15 +1300,13 @@ export const UserManagementView: React.FC = () => {
             <form onSubmit={handleSaveAiConfig} className="space-y-4 text-xs">
               {/* API Key */}
               <div>
-                <label className="block font-semibold text-slate-200 mb-1">
-                  Entity Gemini API Key
-                </label>
+                <label className="block font-semibold text-slate-200 mb-1">{tr('Entity Gemini API Key')}</label>
                 <div className="relative">
                   <input
                     type={showAiKey ? 'text' : 'password'}
                     value={aiKeyInput}
                     onChange={(e) => setAiKeyInput(e.target.value)}
-                    placeholder="AIzaSy..."
+                    placeholder={tr('AIzaSy...')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-indigo-500 pr-10"
                   />
                   <button
@@ -1345,54 +1317,46 @@ export const UserManagementView: React.FC = () => {
                     {showAiKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-[11px] text-slate-500 mt-1">
-                  Isolated strictly to this entity. Unused by or inaccessible to sibling entities in the group.
-                </p>
+                <p className="text-[11px] text-slate-500 mt-1">{tr('Isolated strictly to this entity. Unused by or inaccessible to sibling entities in the group.')}</p>
               </div>
 
               {/* Model Select */}
               <div>
-                <label className="block font-semibold text-slate-200 mb-1">
-                  Reasoning Model
-                </label>
+                <label className="block font-semibold text-slate-200 mb-1">{tr('Reasoning Model')}</label>
                 <select
                   value={aiModelInput}
                   onChange={(e) => setAiModelInput(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                 >
-                  <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast & Cost Efficient)</option>
-                  <option value="gemini-3.7-flash">Gemini 3.7 Flash (High Performance)</option>
-                  <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Deep Statutory & Tax Logic)</option>
+                  <option value="gemini-2.5-flash">{tr('Gemini 2.5 Flash (Fast & Cost Efficient)')}</option>
+                  <option value="gemini-3.7-flash">{tr('Gemini 3.7 Flash (High Performance)')}</option>
+                  <option value="gemini-3.1-pro-preview">{tr('Gemini 3.1 Pro (Deep Statutory & Tax Logic)')}</option>
                 </select>
               </div>
 
               {/* Monthly Quota & Reset Cycle */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-200 mb-1">
-                    Token Quota Limit
-                  </label>
+                  <label className="block font-semibold text-slate-200 mb-1">{tr('Token Quota Limit')}</label>
                   <input
                     type="number"
                     value={aiQuotaInput}
                     onChange={(e) => setAiQuotaInput(Number(e.target.value))}
-                    placeholder="e.g. 500000 (0 for unlimited)"
+                    placeholder={tr('e.g. 500000 (0 for unlimited)')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-200 mb-1">
-                    Reset Cycle
-                  </label>
+                  <label className="block font-semibold text-slate-200 mb-1">{tr('Reset Cycle')}</label>
                   <select
                     value={aiCycleInput}
                     onChange={(e) => setAiCycleInput(e.target.value as any)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="MONTHLY">Monthly</option>
-                    <option value="DAILY">Daily</option>
-                    <option value="TOTAL">Lifetime</option>
+                    <option value="MONTHLY">{tr('Monthly')}</option>
+                    <option value="DAILY">{tr('Daily')}</option>
+                    <option value="TOTAL">{tr('Lifetime')}</option>
                   </select>
                 </div>
               </div>
@@ -1409,16 +1373,14 @@ export const UserManagementView: React.FC = () => {
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   >
                     <option value={70}>70%</option>
-                    <option value={80}>80% (Recommended)</option>
+                    <option value={80}>{tr('80% (Recommended)')}</option>
                     <option value={90}>90%</option>
                     <option value={95}>95%</option>
                   </select>
                 </div>
 
                 <div className="flex flex-col justify-center">
-                  <label className="block font-semibold text-slate-200 mb-1">
-                    Enforce Hard Block
-                  </label>
+                  <label className="block font-semibold text-slate-200 mb-1">{tr('Enforce Hard Block')}</label>
                   <label className="flex items-center gap-2 cursor-pointer mt-1">
                     <input
                       type="checkbox"
@@ -1426,21 +1388,19 @@ export const UserManagementView: React.FC = () => {
                       onChange={(e) => setAiEnforceInput(e.target.checked)}
                       className="rounded border-slate-700 text-indigo-600 focus:ring-0"
                     />
-                    <span className="text-slate-300 text-xs">Block queries at 100% quota</span>
+                    <span className="text-slate-300 text-xs">{tr('Block queries at 100% quota')}</span>
                   </label>
                 </div>
               </div>
 
               {/* Custom Audit Instructions */}
               <div>
-                <label className="block font-semibold text-slate-200 mb-1">
-                  Custom Forensic Audit Instructions
-                </label>
+                <label className="block font-semibold text-slate-200 mb-1">{tr('Custom Forensic Audit Instructions')}</label>
                 <textarea
                   rows={3}
                   value={aiDirectivesInput}
                   onChange={(e) => setAiDirectivesInput(e.target.value)}
-                  placeholder="e.g. Audit ASC 606 contract revenue milestones, inspect intercompany loans, and verify GST reverse charges."
+                  placeholder={tr('e.g. Audit ASC 606 contract revenue milestones, inspect intercompany loans, and verify GST reverse charges.')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -1462,15 +1422,11 @@ export const UserManagementView: React.FC = () => {
                   type="button"
                   onClick={() => setAiConfigModalTenantId(null)}
                   className="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl hover:bg-slate-700 transition cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/30 transition cursor-pointer"
-                >
-                  Save Entity Configuration
-                </button>
+                >{tr('Save Entity Configuration')}</button>
               </div>
             </form>
           </div>
@@ -1484,7 +1440,7 @@ export const UserManagementView: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-base font-bold text-white">Provision Enterprise User Account</h3>
+                <h3 className="text-base font-bold text-white">{tr('Provision Enterprise User Account')}</h3>
               </div>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-white cursor-pointer">✕</button>
             </div>
@@ -1495,9 +1451,8 @@ export const UserManagementView: React.FC = () => {
                 <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs flex items-start gap-2.5 text-amber-300">
                   <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <p className="font-bold text-white">Entity Admin Scope Constraint Active</p>
-                    <p className="text-[11px] text-amber-200/80 leading-relaxed">
-                      As an <strong>Entity Administrator</strong>, you can provision access exclusively for your authorized entity (
+                    <p className="font-bold text-white">{tr('Entity Admin Scope Constraint Active')}</p>
+                    <p className="text-[11px] text-amber-200/80 leading-relaxed">{tr('As an')}<strong>{tr('Entity Administrator')}</strong>, you can provision access exclusively for your authorized entity (
                       <span className="font-mono font-bold text-amber-300">
                         {authorizedTenants.map((at) => `${at.name} [${at.code}]`).join(', ')}
                       </span>
@@ -1509,35 +1464,33 @@ export const UserManagementView: React.FC = () => {
                 <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs flex items-start gap-2.5 text-emerald-300">
                   <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                   <div className="space-y-0.5">
-                    <p className="font-bold text-white">Global Super Admin Authority</p>
-                    <p className="text-[11px] text-emerald-200/80 leading-relaxed">
-                      You have unrestricted authority to provision user accounts, assign any system role (including Super Admin), and allocate access across all enterprise subsidiary entities.
-                    </p>
+                    <p className="font-bold text-white">{tr('Global Super Admin Authority')}</p>
+                    <p className="text-[11px] text-emerald-200/80 leading-relaxed">{tr('You have unrestricted authority to provision user accounts, assign any system role (including Super Admin), and allocate access across all enterprise subsidiary entities.')}</p>
                   </div>
                 </div>
               ) : null}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Full Name *</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Full Name *')}</label>
                   <input
                     type="text"
                     required
                     value={newUserName}
                     onChange={(e) => setNewUserName(e.target.value)}
-                    placeholder="e.g. Marcus Aurelius"
+                    placeholder={tr('e.g. Marcus Aurelius')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Corporate Email *</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Corporate Email *')}</label>
                   <input
                     type="email"
                     required
                     value={newUserEmail}
                     onChange={(e) => setNewUserEmail(e.target.value)}
-                    placeholder="e.g. marcus@acme.com"
+                    placeholder={tr('e.g. marcus@acme.com')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
@@ -1545,39 +1498,38 @@ export const UserManagementView: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Job Title</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Job Title')}</label>
                   <input
                     type="text"
                     value={newUserTitle}
                     onChange={(e) => setNewUserTitle(e.target.value)}
-                    placeholder="e.g. Senior Treasury Analyst"
+                    placeholder={tr('e.g. Senior Treasury Analyst')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Department</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Department')}</label>
                   <select
                     value={newUserDepartment}
                     onChange={(e) => setNewUserDepartment(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 font-mono"
                   >
-                    <option value="Corporate Accounting">Corporate Accounting</option>
-                    <option value="Finance Operations">Finance Operations</option>
-                    <option value="Treasury & Risk">Treasury & Risk</option>
-                    <option value="Executive Leadership">Executive Leadership</option>
-                    <option value="External Audit">External Audit</option>
+                    <option value="Corporate Accounting">{tr('Corporate Accounting')}</option>
+                    <option value="Finance Operations">{tr('Finance Operations')}</option>
+                    <option value="Treasury & Risk">{tr('Treasury & Risk')}</option>
+                    <option value="Executive Leadership">{tr('Executive Leadership')}</option>
+                    <option value="External Audit">{tr('External Audit')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-300">Primary Default Role</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Primary Default Role')}</label>
                   {!isSuperUser && (
                     <span className="text-[10px] text-slate-400 flex items-center gap-1 font-mono">
-                      <Lock className="w-3 h-3 text-amber-400" /> Super Admin role restricted to Super Admin
-                    </span>
+                      <Lock className="w-3 h-3 text-amber-400" />{tr('Super Admin role restricted to Super Admin')}</span>
                   )}
                 </div>
                 <select
@@ -1608,7 +1560,7 @@ export const UserManagementView: React.FC = () => {
                   <div>
                     <label className="text-xs font-bold text-white flex items-center gap-1.5">
                       <Building2 className="w-4 h-4 text-indigo-400" />
-                      <span>Search & Assign Entity Access Scopes *</span>
+                      <span>{tr('Search & Assign Entity Access Scopes *')}</span>
                     </label>
                     <p className="text-[11px] text-slate-400">
                       Search and select the corporate entities and subsidiaries this user can access:
@@ -1628,17 +1580,13 @@ export const UserManagementView: React.FC = () => {
                         });
                       }}
                       className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
-                    >
-                      Select All Allowed
-                    </button>
+                    >{tr('Select All Allowed')}</button>
                     <span className="text-slate-600">•</span>
                     <button
                       type="button"
                       onClick={() => setSelectedTenantScopes({})}
                       className="text-slate-400 hover:text-slate-300 cursor-pointer"
-                    >
-                      Clear
-                    </button>
+                    >{tr('Clear')}</button>
                     <span className="text-slate-600">•</span>
                     <button
                       type="button"
@@ -1650,9 +1598,7 @@ export const UserManagementView: React.FC = () => {
                         }
                       }}
                       className="text-slate-400 hover:text-slate-300 cursor-pointer"
-                    >
-                      Active Only
-                    </button>
+                    >{tr('Active Only')}</button>
                   </div>
                 </div>
 
@@ -1700,7 +1646,7 @@ export const UserManagementView: React.FC = () => {
                       type="text"
                       value={entitySearchQuery}
                       onChange={(e) => setEntitySearchQuery(e.target.value)}
-                      placeholder="Search entities by name, code, country, or currency (e.g., Acme, US, EUR)..."
+                      placeholder={tr('Search entities by name, code, country, or currency (e.g., Acme, US, EUR)...')}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-sans"
                     />
                     {entitySearchQuery && (
@@ -1779,9 +1725,7 @@ export const UserManagementView: React.FC = () => {
                                   {t.currency} • {t.country}
                                 </span>
                                 {t.isConsolidationEntity && (
-                                  <span className="px-1.5 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[9px] rounded font-semibold">
-                                    Parent Group
-                                  </span>
+                                  <span className="px-1.5 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[9px] rounded font-semibold">{tr('Parent Group')}</span>
                                 )}
                               </div>
 
@@ -1789,16 +1733,12 @@ export const UserManagementView: React.FC = () => {
                                 <span>Framework: {t.pluginId.toUpperCase()}</span>
                                 {!isAllowed ? (
                                   <span className="text-amber-400 font-semibold flex items-center gap-1">
-                                    <Lock className="w-2.5 h-2.5" /> Scope Restricted (Super Admin Only)
-                                  </span>
+                                    <Lock className="w-2.5 h-2.5" />{tr('Scope Restricted (Super Admin Only)')}</span>
                                 ) : isSelected ? (
                                   <span className="text-emerald-400 font-semibold flex items-center gap-0.5">
-                                    <Check className="w-2.5 h-2.5" /> In User Scope
-                                  </span>
+                                    <Check className="w-2.5 h-2.5" />{tr('In User Scope')}</span>
                                 ) : (
-                                  <span className="text-slate-500 flex items-center gap-0.5">
-                                    Not assigned
-                                  </span>
+                                  <span className="text-slate-500 flex items-center gap-0.5">{tr('Not assigned')}</span>
                                 )}
                               </div>
                             </div>
@@ -1832,7 +1772,7 @@ export const UserManagementView: React.FC = () => {
                                     });
                                   }}
                                   className="px-2 py-1 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 rounded-lg text-xs font-semibold transition cursor-pointer border border-slate-700 hover:border-rose-500/30"
-                                  title="Remove from Scope"
+                                  title={tr('Remove from Scope')}
                                 >
                                   ✕ Remove
                                 </button>
@@ -1851,7 +1791,7 @@ export const UserManagementView: React.FC = () => {
                                 + Add to Scope
                               </button>
                             ) : (
-                              <span className="text-[11px] text-slate-500 font-mono italic">Locked</span>
+                              <span className="text-[11px] text-slate-500 font-mono italic">{tr('Locked')}</span>
                             )}
                           </div>
                         </div>
@@ -1873,9 +1813,7 @@ export const UserManagementView: React.FC = () => {
                       t.pluginId.toLowerCase().includes(q)
                     );
                   }).length === 0 && (
-                    <div className="p-4 text-center text-xs text-slate-500 font-mono">
-                      No entities matched the selected filters.
-                    </div>
+                    <div className="p-4 text-center text-xs text-slate-500 font-mono">{tr('No entities matched the selected filters.')}</div>
                   )}
                 </div>
 
@@ -1886,7 +1824,7 @@ export const UserManagementView: React.FC = () => {
                       Provisioned Scope Summary ({Object.keys(selectedTenantScopes).length} entities selected):
                     </span>
                     {Object.keys(selectedTenantScopes).length === 0 && (
-                      <span className="text-rose-400 font-semibold">* At least 1 entity required</span>
+                      <span className="text-rose-400 font-semibold">{tr('* At least 1 entity required')}</span>
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -1920,7 +1858,7 @@ export const UserManagementView: React.FC = () => {
                       );
                     })}
                     {Object.keys(selectedTenantScopes).length === 0 && (
-                      <div className="text-xs text-slate-500 italic">No entities selected yet. Please check required entities above.</div>
+                      <div className="text-xs text-slate-500 italic">{tr('No entities selected yet. Please check required entities above.')}</div>
                     )}
                   </div>
                 </div>
@@ -1934,9 +1872,7 @@ export const UserManagementView: React.FC = () => {
                   onChange={(e) => setNewUserMfa(e.target.checked)}
                   className="rounded border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer"
                 />
-                <label htmlFor="mfaCheck" className="text-xs text-slate-300 font-semibold cursor-pointer">
-                  Enforce Hardware MFA / TOTP for this corporate account
-                </label>
+                <label htmlFor="mfaCheck" className="text-xs text-slate-300 font-semibold cursor-pointer">{tr('Enforce Hardware MFA / TOTP for this corporate account')}</label>
               </div>
 
               <div className="flex justify-end gap-3 pt-4 border-t border-slate-800 shrink-0">
@@ -1944,16 +1880,12 @@ export const UserManagementView: React.FC = () => {
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   disabled={Object.keys(selectedTenantScopes).length === 0}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/30 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Provision User Account
-                </button>
+                >{tr('Provision User Account')}</button>
               </div>
             </form>
           </div>
@@ -1967,7 +1899,7 @@ export const UserManagementView: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Edit3 className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-base font-bold text-white">Modify Tenant Access Scopes & Role</h3>
+                <h3 className="text-base font-bold text-white">{tr('Modify Tenant Access Scopes & Role')}</h3>
               </div>
               <button onClick={() => setEditingUserId(null)} className="text-slate-400 hover:text-white cursor-pointer">✕</button>
             </div>
@@ -1984,8 +1916,8 @@ export const UserManagementView: React.FC = () => {
                       <div className="text-[11px] text-slate-400 font-mono">{targetUser.email}</div>
                     </div>
                     <div className="text-right font-mono text-[11px] text-slate-400">
-                      <div>Title: <span className="text-slate-200">{targetUser.title}</span></div>
-                      <div>Dept: <span className="text-slate-200">{targetUser.department}</span></div>
+                      <div>{tr('Title:')} <span className="text-slate-200">{targetUser.title}</span></div>
+                      <div>{tr('Dept:')} <span className="text-slate-200">{targetUser.department}</span></div>
                     </div>
                   </div>
                 );
@@ -1995,8 +1927,7 @@ export const UserManagementView: React.FC = () => {
               {isEntityAdmin ? (
                 <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-xs flex items-start gap-2.5 text-amber-300">
                   <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <p className="text-[11px] text-amber-200/80 leading-relaxed">
-                    As an <strong>Entity Administrator</strong>, you can assign roles exclusively for your authorized entity (
+                  <p className="text-[11px] text-amber-200/80 leading-relaxed">{tr('As an')}<strong>{tr('Entity Administrator')}</strong>, you can assign roles exclusively for your authorized entity (
                     <span className="font-mono font-bold text-amber-300">
                       {authorizedTenants.map((at) => at.name).join(', ')}
                     </span>
@@ -2007,11 +1938,10 @@ export const UserManagementView: React.FC = () => {
 
               <div className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-300">Default Primary System Role</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Default Primary System Role')}</label>
                   {!isSuperUser && (
                     <span className="text-[10px] text-slate-400 flex items-center gap-1 font-mono">
-                      <Lock className="w-3 h-3 text-amber-400" /> Super Admin role restricted to Super Admin
-                    </span>
+                      <Lock className="w-3 h-3 text-amber-400" />{tr('Super Admin role restricted to Super Admin')}</span>
                   )}
                 </div>
                 <select
@@ -2031,7 +1961,7 @@ export const UserManagementView: React.FC = () => {
                   <div>
                     <label className="text-xs font-bold text-white flex items-center gap-1.5">
                       <Building2 className="w-4 h-4 text-indigo-400" />
-                      <span>Search & Configure Entity Access Scopes</span>
+                      <span>{tr('Search & Configure Entity Access Scopes')}</span>
                     </label>
                     <p className="text-[11px] text-slate-400">
                       Search, add, remove, or modify entity-specific roles for this user:
@@ -2051,9 +1981,7 @@ export const UserManagementView: React.FC = () => {
                         });
                       }}
                       className="text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
-                    >
-                      Select All Allowed
-                    </button>
+                    >{tr('Select All Allowed')}</button>
                     <span className="text-slate-600">•</span>
                     <button
                       type="button"
@@ -2067,9 +1995,7 @@ export const UserManagementView: React.FC = () => {
                         });
                       }}
                       className="text-slate-400 hover:text-slate-300 cursor-pointer"
-                    >
-                      Clear
-                    </button>
+                    >{tr('Clear')}</button>
                   </div>
                 </div>
 
@@ -2117,7 +2043,7 @@ export const UserManagementView: React.FC = () => {
                       type="text"
                       value={editEntitySearchQuery}
                       onChange={(e) => setEditEntitySearchQuery(e.target.value)}
-                      placeholder="Search entities by name, code, country, or currency..."
+                      placeholder={tr('Search entities by name, code, country, or currency...')}
                       className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-8 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-sans"
                     />
                     {editEntitySearchQuery && (
@@ -2196,9 +2122,7 @@ export const UserManagementView: React.FC = () => {
                                   {t.currency} • {t.country}
                                 </span>
                                 {t.isConsolidationEntity && (
-                                  <span className="px-1.5 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[9px] rounded font-semibold">
-                                    Parent Group
-                                  </span>
+                                  <span className="px-1.5 py-0.5 bg-purple-500/10 text-purple-300 border border-purple-500/20 text-[9px] rounded font-semibold">{tr('Parent Group')}</span>
                                 )}
                               </div>
 
@@ -2206,16 +2130,12 @@ export const UserManagementView: React.FC = () => {
                                 <span>Framework: {t.pluginId.toUpperCase()}</span>
                                 {!isAllowed ? (
                                   <span className="text-amber-400 font-semibold flex items-center gap-1">
-                                    <Lock className="w-2.5 h-2.5" /> Scope Restricted (Super Admin Only)
-                                  </span>
+                                    <Lock className="w-2.5 h-2.5" />{tr('Scope Restricted (Super Admin Only)')}</span>
                                 ) : isSelected ? (
                                   <span className="text-emerald-400 font-semibold flex items-center gap-0.5">
-                                    <Check className="w-2.5 h-2.5" /> In User Scope
-                                  </span>
+                                    <Check className="w-2.5 h-2.5" />{tr('In User Scope')}</span>
                                 ) : (
-                                  <span className="text-slate-500 flex items-center gap-0.5">
-                                    Not assigned
-                                  </span>
+                                  <span className="text-slate-500 flex items-center gap-0.5">{tr('Not assigned')}</span>
                                 )}
                               </div>
                             </div>
@@ -2249,7 +2169,7 @@ export const UserManagementView: React.FC = () => {
                                     });
                                   }}
                                   className="px-2 py-1 bg-slate-800 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 rounded-lg text-xs font-semibold transition cursor-pointer border border-slate-700 hover:border-rose-500/30"
-                                  title="Remove from Scope"
+                                  title={tr('Remove from Scope')}
                                 >
                                   ✕ Remove
                                 </button>
@@ -2268,7 +2188,7 @@ export const UserManagementView: React.FC = () => {
                                 + Add to Scope
                               </button>
                             ) : (
-                              <span className="text-[11px] text-slate-500 font-mono italic">Locked</span>
+                              <span className="text-[11px] text-slate-500 font-mono italic">{tr('Locked')}</span>
                             )}
                           </div>
                         </div>
@@ -2290,9 +2210,7 @@ export const UserManagementView: React.FC = () => {
                       t.pluginId.toLowerCase().includes(q)
                     );
                   }).length === 0 && (
-                    <div className="p-4 text-center text-xs text-slate-500 font-mono">
-                      No entities matched the selected filters.
-                    </div>
+                    <div className="p-4 text-center text-xs text-slate-500 font-mono">{tr('No entities matched the selected filters.')}</div>
                   )}
                 </div>
 
@@ -2303,7 +2221,7 @@ export const UserManagementView: React.FC = () => {
                       Configured Entity Scopes ({Object.keys(editScopes).length} selected):
                     </span>
                     {Object.keys(editScopes).length === 0 && (
-                      <span className="text-rose-400 font-semibold">* At least 1 entity required</span>
+                      <span className="text-rose-400 font-semibold">{tr('* At least 1 entity required')}</span>
                     )}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -2345,17 +2263,13 @@ export const UserManagementView: React.FC = () => {
                   type="button"
                   onClick={() => setEditingUserId(null)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="button"
                   disabled={Object.keys(editScopes).length === 0}
                   onClick={handleSaveEditScopes}
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-md shadow-indigo-600/30 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Save Access Configuration
-                </button>
+                >{tr('Save Access Configuration')}</button>
               </div>
             </div>
           </div>
@@ -2376,38 +2290,38 @@ export const UserManagementView: React.FC = () => {
             <form onSubmit={handleSaveRole} className="space-y-4 flex-1 overflow-y-auto pr-1">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Role Name *</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Role Name *')}</label>
                   <input
                     type="text"
                     required
                     value={roleName}
                     onChange={(e) => setRoleName(e.target.value)}
-                    placeholder="e.g. AP Specialist Lead"
+                    placeholder={tr('e.g. AP Specialist Lead')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-300">Role Code Identifier *</label>
+                  <label className="text-xs font-semibold text-slate-300">{tr('Role Code Identifier *')}</label>
                   <input
                     type="text"
                     required
                     disabled={!!editingRoleId}
                     value={roleCode}
                     onChange={(e) => setRoleCode(e.target.value)}
-                    placeholder="e.g. ap_specialist_lead"
+                    placeholder={tr('e.g. ap_specialist_lead')}
                     className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-indigo-500 disabled:opacity-50"
                   />
                 </div>
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-300">Description</label>
+                <label className="text-xs font-semibold text-slate-300">{tr('Description')}</label>
                 <textarea
                   rows={2}
                   value={roleDesc}
                   onChange={(e) => setRoleDesc(e.target.value)}
-                  placeholder="Responsibilities and functional scope..."
+                  placeholder={tr('Responsibilities and functional scope...')}
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500"
                 />
               </div>
@@ -2420,17 +2334,13 @@ export const UserManagementView: React.FC = () => {
                       type="button"
                       onClick={() => setRolePermissions(permissionsList.map((p) => p.key))}
                       className="text-indigo-400 hover:underline"
-                    >
-                      Select All
-                    </button>
+                    >{tr('Select All')}</button>
                     <span>•</span>
                     <button
                       type="button"
                       onClick={() => setRolePermissions([])}
                       className="text-slate-400 hover:underline"
-                    >
-                      Clear
-                    </button>
+                    >{tr('Clear')}</button>
                   </div>
                 </div>
 
@@ -2480,15 +2390,11 @@ export const UserManagementView: React.FC = () => {
                   type="button"
                   onClick={() => setIsRoleModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 text-slate-300 text-xs font-bold rounded-xl"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-xl shadow-md"
-                >
-                  Save Role Configuration
-                </button>
+                >{tr('Save Role Configuration')}</button>
               </div>
             </form>
           </div>

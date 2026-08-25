@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import { Lock, Unlock, CheckCircle, ShieldAlert, Calendar, RefreshCw, AlertOctagon } from 'lucide-react';
 
 export const FiscalCloseView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const { activeTenant, fiscalPeriods, toggleFiscalPeriodStatus, executeYearEndClose, incomeStatement } = useAccounting();
   const [closingYear, setClosingYear] = useState('2026');
   const [closeResult, setCloseResult] = useState<{ success: boolean; msg: string } | null>(null);
@@ -29,9 +31,7 @@ export const FiscalCloseView: React.FC = () => {
       {/* Header */}
       <div>
         <h1 className="text-xl font-bold text-slate-100 flex items-center gap-2">
-          <Lock className="w-6 h-6 text-amber-400" />
-          Fiscal Period Governance & Year-End Close
-        </h1>
+          <Lock className="w-6 h-6 text-amber-400" />{tr('Fiscal Period Governance & Year-End Close')}</h1>
         <p className="text-xs text-slate-400">
           Enforce accounting lock dates to prevent backdated postings, manage monthly/quarterly fiscal periods, and execute automated retained earnings closing journals for {activeTenant.name}.
         </p>
@@ -41,29 +41,25 @@ export const FiscalCloseView: React.FC = () => {
       <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
         <div className="p-4 border-b border-slate-800 flex items-center justify-between">
           <h2 className="text-sm font-semibold text-slate-200 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-indigo-400" />
-            Fiscal Accounting Calendar & Lock Controls
-          </h2>
-          <span className="text-xs text-slate-400 font-mono">Double-Entry Engine Enforcement Active</span>
+            <Calendar className="w-4 h-4 text-indigo-400" />{tr('Fiscal Accounting Calendar & Lock Controls')}</h2>
+          <span className="text-xs text-slate-400 font-mono">{tr('Double-Entry Engine Enforcement Active')}</span>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-300">
             <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] tracking-wider">
               <tr>
-                <th className="p-3">Fiscal Period Name</th>
-                <th className="p-3">Start Date</th>
-                <th className="p-3">End Date</th>
-                <th className="p-3 text-center">Governance Status</th>
-                <th className="p-3 text-right">Lock / Unlock Actions</th>
+                <th className="p-3">{tr('Fiscal Period Name')}</th>
+                <th className="p-3">{tr('Start Date')}</th>
+                <th className="p-3">{tr('End Date')}</th>
+                <th className="p-3 text-center">{tr('Governance Status')}</th>
+                <th className="p-3 text-right">{tr('Lock / Unlock Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800 font-mono">
               {tenantPeriods.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="p-6 text-center text-slate-500 font-sans">
-                    No custom fiscal periods defined. All transactions defaulting to open status.
-                  </td>
+                  <td colSpan={5} className="p-6 text-center text-slate-500 font-sans">{tr('No custom fiscal periods defined. All transactions defaulting to open status.')}</td>
                 </tr>
               ) : (
                 tenantPeriods.map((p) => (
@@ -95,25 +91,19 @@ export const FiscalCloseView: React.FC = () => {
                           <button
                             onClick={() => toggleFiscalPeriodStatus(p.id, 'OPEN')}
                             className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded text-[11px] font-medium transition"
-                          >
-                            Open Period
-                          </button>
+                          >{tr('Open Period')}</button>
                         )}
                         {p.status !== 'LOCKED' && (
                           <button
                             onClick={() => toggleFiscalPeriodStatus(p.id, 'LOCKED')}
                             className="px-2.5 py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 rounded text-[11px] font-medium transition"
-                          >
-                            Soft Lock
-                          </button>
+                          >{tr('Soft Lock')}</button>
                         )}
                         {p.status !== 'CLOSED' && (
                           <button
                             onClick={() => toggleFiscalPeriodStatus(p.id, 'CLOSED')}
                             className="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded text-[11px] font-semibold transition"
-                          >
-                            Hard Close
-                          </button>
+                          >{tr('Hard Close')}</button>
                         )}
                       </div>
                     </td>
@@ -130,15 +120,11 @@ export const FiscalCloseView: React.FC = () => {
         <div className="flex items-center justify-between border-b border-slate-800 pb-3">
           <div>
             <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-              <RefreshCw className="w-4 h-4 text-emerald-400" />
-              Automated Year-End Financial Closing Engine
-            </h2>
-            <p className="text-xs text-slate-400">
-              Zeroes out nominal Revenue and Expense balances into Equity Retained Earnings (Account 3200) via a balanced Year-End Closing Journal.
-            </p>
+              <RefreshCw className="w-4 h-4 text-emerald-400" />{tr('Automated Year-End Financial Closing Engine')}</h2>
+            <p className="text-xs text-slate-400">{tr('Zeroes out nominal Revenue and Expense balances into Equity Retained Earnings (Account 3200) via a balanced Year-End Closing Journal.')}</p>
           </div>
           <div className="text-right">
-            <span className="text-xs text-slate-400">Current P&L Net Income:</span>
+            <span className="text-xs text-slate-400">{tr('Current P&L Net Income:')}</span>
             <div className="text-lg font-bold text-emerald-400 font-mono">
               {activeTenant.currency} {incomeStatement.netIncome.toLocaleString()}
             </div>
@@ -147,14 +133,14 @@ export const FiscalCloseView: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-950 p-4 rounded-xl border border-slate-800">
           <div className="space-y-1">
-            <label className="block text-xs font-semibold text-slate-300">Target Fiscal Close Year</label>
+            <label className="block text-xs font-semibold text-slate-300">{tr('Target Fiscal Close Year')}</label>
             <select
               value={closingYear}
               onChange={(e) => setClosingYear(e.target.value)}
               className="bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
             >
-              <option value="2026">2026 Fiscal Year</option>
-              <option value="2025">2025 Fiscal Year</option>
+              <option value="2026">{tr('2026 Fiscal Year')}</option>
+              <option value="2025">{tr('2025 Fiscal Year')}</option>
             </select>
           </div>
 

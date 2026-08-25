@@ -1,3 +1,4 @@
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
 import { PayrollEmployee, PayrollRun, PayrollRunEmployeeLine } from '../types';
@@ -28,6 +29,7 @@ interface PayrollViewProps {
 }
 
 export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees }) => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     payrollEmployees,
@@ -165,18 +167,12 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">
-              Human Capital & Payroll Engine
-            </span>
-            <span className="text-xs text-slate-400">IRS Form 941 & Automated Double-Entry GL</span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">{tr('Human Capital & Payroll Engine')}</span>
+            <span className="text-xs text-slate-400">{tr('IRS Form 941 & Automated Double-Entry GL')}</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2.5">
-            <Users className="w-6 h-6 text-emerald-400" />
-            Payroll Management & Tax Withholdings
-          </h1>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Process compensation runs, compute Federal/State FICA withholdings, and automate balanced General Ledger disbursements with zero manual reconciliation.
-          </p>
+            <Users className="w-6 h-6 text-emerald-400" />{tr('Payroll Management & Tax Withholdings')}</h1>
+          <p className="text-sm text-slate-400 mt-0.5">{tr('Process compensation runs, compute Federal/State FICA withholdings, and automate balanced General Ledger disbursements with zero manual reconciliation.')}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -193,9 +189,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             onClick={() => setActiveTab('wizard')}
             className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
           >
-            <Play className="w-4 h-4" />
-            Run Payroll Wizard
-          </button>
+            <Play className="w-4 h-4" />{tr('Run Payroll Wizard')}</button>
           <button
             onClick={() => {
               if (onNavigateToEmployees) {
@@ -207,9 +201,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             }}
             className="flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold border border-slate-700 transition-all cursor-pointer"
           >
-            <Plus className="w-4 h-4" />
-            Add Employee
-          </button>
+            <Plus className="w-4 h-4" />{tr('Add Employee')}</button>
         </div>
       </div>
 
@@ -224,11 +216,11 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Active Staff Headcount</span>
+            <span className="text-xs font-medium">{tr('Active Staff Headcount')}</span>
             <Users className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-slate-100 font-mono">
-            {activeEmployees.filter((e) => e.status === 'ACTIVE').length} <span className="text-xs text-slate-400 font-normal">employees</span>
+            {activeEmployees.filter((e) => e.status === 'ACTIVE').length} <span className="text-xs text-slate-400 font-normal">{tr('employees')}</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">
             Across {departments.length} corporate cost centers
@@ -237,20 +229,18 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Annualized Payroll Base</span>
+            <span className="text-xs font-medium">{tr('Annualized Payroll Base')}</span>
             <DollarSign className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold text-indigo-400 font-mono">
             ${totalAnnualPayroll.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Total active annual salary commitments
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Total active annual salary commitments')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Direct Deposit YTD</span>
+            <span className="text-xs font-medium">{tr('Direct Deposit YTD')}</span>
             <CreditCard className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="text-2xl font-bold text-cyan-400 font-mono">
@@ -263,7 +253,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Tax Compliance Status</span>
+            <span className="text-xs font-medium">{tr('Tax Compliance Status')}</span>
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-sm font-bold text-emerald-400">100% Balanced GL</div>
@@ -294,9 +284,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
           }`}
         >
-          <Play className="w-4 h-4" />
-          Live Pay Run Wizard & Calculations
-        </button>
+          <Play className="w-4 h-4" />{tr('Live Pay Run Wizard & Calculations')}</button>
         <button
           onClick={() => setActiveTab('payruns')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
@@ -317,14 +305,14 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Employee Name</th>
-                  <th className="px-4 py-3 font-semibold">Job Title & Role</th>
-                  <th className="px-4 py-3 font-semibold">Department</th>
-                  <th className="px-4 py-3 font-semibold text-right">Annual Salary</th>
-                  <th className="px-4 py-3 font-semibold">Filing Status</th>
-                  <th className="px-4 py-3 font-semibold">Direct Deposit Account</th>
-                  <th className="px-4 py-3 font-semibold text-center">Status</th>
-                  <th className="px-4 py-3 font-semibold text-center">Actions</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Employee Name')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Job Title & Role')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Department')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Annual Salary')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Filing Status')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Direct Deposit Account')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Status')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -365,8 +353,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                       </td>
                       <td className="px-4 py-3 text-center font-sans">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          <CheckCircle2 className="w-3 h-3" /> Active
-                        </span>
+                          <CheckCircle2 className="w-3 h-3" />{tr('Active')}</span>
                       </td>
                       <td className="px-4 py-3 text-center font-sans">
                         <div className="flex items-center justify-center gap-1.5">
@@ -374,7 +361,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                             <button
                               onClick={onNavigateToEmployees}
                               className="px-2 py-1 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-300 rounded text-[11px] font-semibold transition"
-                              title="Open Employee 360° Profile & Linked Records"
+                              title={tr('Open Employee 360° Profile & Linked Records')}
                             >
                               360° Profile
                             </button>
@@ -382,7 +369,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                           <button
                             onClick={() => deletePayrollEmployee(emp.id)}
                             className="p-1.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded transition-colors"
-                            title="Remove Employee"
+                            title={tr('Remove Employee')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -404,17 +391,13 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                  <Play className="w-4 h-4 text-emerald-400" />
-                  Live Pay Run Calculation & Double-Entry Preview
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Select pay period dates to calculate real-time Gross Wages, Federal/State Taxes, FICA matching, and Net Direct Deposits.
-                </p>
+                  <Play className="w-4 h-4 text-emerald-400" />{tr('Live Pay Run Calculation & Double-Entry Preview')}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{tr('Select pay period dates to calculate real-time Gross Wages, Federal/State Taxes, FICA matching, and Net Direct Deposits.')}</p>
               </div>
 
               <div className="flex items-center gap-3">
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Period Start</label>
+                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">{tr('Period Start')}</label>
                   <input
                     type="date"
                     value={payPeriodStart}
@@ -423,7 +406,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Period End</label>
+                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">{tr('Period End')}</label>
                   <input
                     type="date"
                     value={payPeriodEnd}
@@ -432,7 +415,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">Pay Date</label>
+                  <label className="block text-[10px] uppercase font-bold text-slate-400 mb-1">{tr('Pay Date')}</label>
                   <input
                     type="date"
                     value={payDate}
@@ -448,17 +431,17 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
               <table className="w-full text-left text-xs text-slate-300 font-mono">
                 <thead className="bg-slate-950/80 text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                   <tr>
-                    <th className="px-3 py-2.5">Staff Name</th>
-                    <th className="px-3 py-2.5">Cost Center</th>
-                    <th className="px-3 py-2.5 text-right">Gross Pay</th>
-                    <th className="px-3 py-2.5 text-right">Federal Tax</th>
-                    <th className="px-3 py-2.5 text-right">State Tax</th>
-                    <th className="px-3 py-2.5 text-right">Social Security</th>
-                    <th className="px-3 py-2.5 text-right">Medicare</th>
-                    <th className="px-3 py-2.5 text-right">Benefits (401k)</th>
-                    <th className="px-3 py-2.5 text-right font-bold text-emerald-400">Net Pay</th>
-                    <th className="px-3 py-2.5 text-right text-indigo-400">Employer Cost</th>
-                    <th className="px-3 py-2.5 text-center">Paystub</th>
+                    <th className="px-3 py-2.5">{tr('Staff Name')}</th>
+                    <th className="px-3 py-2.5">{tr('Cost Center')}</th>
+                    <th className="px-3 py-2.5 text-right">{tr('Gross Pay')}</th>
+                    <th className="px-3 py-2.5 text-right">{tr('Federal Tax')}</th>
+                    <th className="px-3 py-2.5 text-right">{tr('State Tax')}</th>
+                    <th className="px-3 py-2.5 text-right">{tr('Social Security')}</th>
+                    <th className="px-3 py-2.5 text-right">{tr('Medicare')}</th>
+                    <th className="px-3 py-2.5 text-right">{tr('Benefits (401k)')}</th>
+                    <th className="px-3 py-2.5 text-right font-bold text-emerald-400">{tr('Net Pay')}</th>
+                    <th className="px-3 py-2.5 text-right text-indigo-400">{tr('Employer Cost')}</th>
+                    <th className="px-3 py-2.5 text-center">{tr('Paystub')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/40">
@@ -478,7 +461,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                         <button
                           onClick={() => setSelectedPaystub(line)}
                           className="p-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-[11px]"
-                          title="View Digital Paystub"
+                          title={tr('View Digital Paystub')}
                         >
                           <Eye className="w-3.5 h-3.5" />
                         </button>
@@ -510,40 +493,38 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             {/* General Ledger Auto-Posting Schema Card */}
             <div className="p-4 bg-slate-950 rounded-xl border border-slate-800">
               <div className="text-xs font-semibold text-slate-200 mb-2 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                Automated Double-Entry General Ledger Post Preview
-              </div>
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />{tr('Automated Double-Entry General Ledger Post Preview')}</div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
                 <div className="p-3 bg-slate-900 rounded-lg border border-slate-800 space-y-1">
-                  <div className="text-emerald-400 font-semibold mb-1">DEBIT (Expenses Incurred)</div>
+                  <div className="text-emerald-400 font-semibold mb-1">{tr('DEBIT (Expenses Incurred)')}</div>
                   <div className="flex justify-between text-slate-300">
-                    <span>Acc 5020 Staff Gross Wages Expense</span>
+                    <span>{tr('Acc 5020 Staff Gross Wages Expense')}</span>
                     <span className="font-bold">${livePreview.totalGrossPay.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-slate-300">
-                    <span>Acc 5020 Employer FICA & FUTA Tax Expense</span>
+                    <span>{tr('Acc 5020 Employer FICA & FUTA Tax Expense')}</span>
                     <span className="font-bold">${livePreview.totalEmployerTaxes.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-emerald-400 font-bold pt-1 border-t border-slate-800">
-                    <span>Total Debits</span>
+                    <span>{tr('Total Debits')}</span>
                     <span>${(livePreview.totalGrossPay + livePreview.totalEmployerTaxes).toFixed(2)}</span>
                   </div>
                 </div>
 
                 <div className="p-3 bg-slate-900 rounded-lg border border-slate-800 space-y-1">
-                  <div className="text-indigo-400 font-semibold mb-1">CREDIT (Liabilities & Disbursements)</div>
+                  <div className="text-indigo-400 font-semibold mb-1">{tr('CREDIT (Liabilities & Disbursements)')}</div>
                   <div className="flex justify-between text-slate-300">
-                    <span>Acc 2200 Payroll Tax & Withholdings Payable</span>
+                    <span>{tr('Acc 2200 Payroll Tax & Withholdings Payable')}</span>
                     <span className="font-bold">
                       ${(livePreview.totalEmployeeTaxWithholdings + livePreview.totalEmployerTaxes).toFixed(2)}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-300">
-                    <span>Acc 1010 Operating Cash (Direct Deposit)</span>
+                    <span>{tr('Acc 1010 Operating Cash (Direct Deposit)')}</span>
                     <span className="font-bold">${livePreview.totalNetPay.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-indigo-400 font-bold pt-1 border-t border-slate-800">
-                    <span>Total Credits</span>
+                    <span>{tr('Total Credits')}</span>
                     <span>${(livePreview.totalGrossPay + livePreview.totalEmployerTaxes).toFixed(2)}</span>
                   </div>
                 </div>
@@ -559,14 +540,10 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
               >
                 {isPayRunExecuting ? (
                   <>
-                    <Clock className="w-4 h-4 animate-spin" />
-                    Executing GL Posting...
-                  </>
+                    <Clock className="w-4 h-4 animate-spin" />{tr('Executing GL Posting...')}</>
                 ) : (
                   <>
-                    <CheckCircle2 className="w-4 h-4" />
-                    Approve & Post Pay Run to General Ledger
-                  </>
+                    <CheckCircle2 className="w-4 h-4" />{tr('Approve & Post Pay Run to General Ledger')}</>
                 )}
               </button>
             </div>
@@ -581,24 +558,22 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Run ID</th>
-                  <th className="px-4 py-3 font-semibold">Pay Period</th>
-                  <th className="px-4 py-3 font-semibold">Disbursement Date</th>
-                  <th className="px-4 py-3 font-semibold text-center">Headcount</th>
-                  <th className="px-4 py-3 font-semibold text-right">Gross Wages</th>
-                  <th className="px-4 py-3 font-semibold text-right">Tax Withholdings</th>
-                  <th className="px-4 py-3 font-semibold text-right">Employer Taxes</th>
-                  <th className="px-4 py-3 font-semibold text-right">Net Cash Disbursed</th>
-                  <th className="px-4 py-3 font-semibold">GL Voucher</th>
-                  <th className="px-4 py-3 font-semibold text-center">Status</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Run ID')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Pay Period')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Disbursement Date')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Headcount')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Gross Wages')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Tax Withholdings')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Employer Taxes')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Net Cash Disbursed')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('GL Voucher')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
                 {activePayRuns.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-4 py-8 text-center text-slate-500 font-sans">
-                      No completed pay runs yet. Use the Live Pay Run Wizard to execute a cycle.
-                    </td>
+                    <td colSpan={10} className="px-4 py-8 text-center text-slate-500 font-sans">{tr('No completed pay runs yet. Use the Live Pay Run Wizard to execute a cycle.')}</td>
                   </tr>
                 ) : (
                   activePayRuns.map((run) => (
@@ -616,8 +591,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                       <td className="px-4 py-3 font-mono text-emerald-400 text-[11px]">{run.journalEntryId || 'N/A'}</td>
                       <td className="px-4 py-3 text-center font-sans">
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                          <CheckCircle2 className="w-3 h-3" /> Balanced GL
-                        </span>
+                          <CheckCircle2 className="w-3 h-3" />{tr('Balanced GL')}</span>
                       </td>
                     </tr>
                   ))
@@ -635,12 +609,8 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <Plus className="w-5 h-5 text-emerald-400" />
-                  Add Staff Employee Profile
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Configure compensation, IRS tax filing status, and direct deposit details.
-                </p>
+                  <Plus className="w-5 h-5 text-emerald-400" />{tr('Add Staff Employee Profile')}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{tr('Configure compensation, IRS tax filing status, and direct deposit details.')}</p>
               </div>
               <button
                 onClick={() => setIsEmployeeModalOpen(false)}
@@ -657,7 +627,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                   <input
                     type="text"
                     required
-                    placeholder="e.g. David Vance"
+                    placeholder={tr('e.g. David Vance')}
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
@@ -669,7 +639,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                   <input
                     type="email"
                     required
-                    placeholder="e.g. david.vance@acme.com"
+                    placeholder={tr('e.g. david.vance@acme.com')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
@@ -681,7 +651,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Senior Security Architect"
+                    placeholder={tr('e.g. Senior Security Architect')}
                     value={role}
                     onChange={(e) => setRole(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
@@ -716,21 +686,21 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">IRS W-4 Filing Status</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('IRS W-4 Filing Status')}</label>
                   <select
                     value={taxFilingStatus}
                     onChange={(e) => setTaxFilingStatus(e.target.value as any)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                   >
-                    <option value="SINGLE">Single</option>
-                    <option value="MARRIED_JOINT">Married Filing Jointly</option>
-                    <option value="HEAD_OF_HOUSEHOLD">Head of Household</option>
+                    <option value="SINGLE">{tr('Single')}</option>
+                    <option value="MARRIED_JOINT">{tr('Married Filing Jointly')}</option>
+                    <option value="HEAD_OF_HOUSEHOLD">{tr('Head of Household')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Direct Deposit Account</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Direct Deposit Account')}</label>
                 <input
                   type="text"
                   value={bankAccountMasked}
@@ -744,15 +714,11 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                   type="button"
                   onClick={() => setIsEmployeeModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
-                >
-                  Save Employee Profile
-                </button>
+                >{tr('Save Employee Profile')}</button>
               </div>
             </form>
           </div>
@@ -766,9 +732,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             <div className="flex items-center justify-between pb-3 border-b border-slate-800 mb-4">
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-emerald-400" />
-                  Official Earnings Statement / Paystub
-                </h3>
+                  <CreditCard className="w-5 h-5 text-emerald-400" />{tr('Official Earnings Statement / Paystub')}</h3>
                 <div className="text-xs text-slate-400">{activeTenant.name} • Period: {payPeriodStart} to {payPeriodEnd}</div>
               </div>
               <button
@@ -782,12 +746,12 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
             <div className="space-y-3 text-xs">
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex justify-between items-center">
                 <div>
-                  <div className="text-slate-400 text-[11px]">Employee Name:</div>
+                  <div className="text-slate-400 text-[11px]">{tr("Employee Name:")}</div>
                   <div className="text-sm font-bold text-slate-100">{selectedPaystub.employeeName}</div>
                   <div className="text-[11px] text-slate-400">Department: {selectedPaystub.department}</div>
                 </div>
                 <div className="text-right">
-                  <div className="text-slate-400 text-[11px]">Net Direct Deposit:</div>
+                  <div className="text-slate-400 text-[11px]">{tr("Net Direct Deposit:")}</div>
                   <div className="text-lg font-bold text-emerald-400 font-mono">${selectedPaystub.netPay.toFixed(2)}</div>
                 </div>
               </div>
@@ -795,7 +759,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
               {/* Earnings breakdown */}
               <div className="space-y-1 font-mono">
                 <div className="flex justify-between text-slate-300 font-sans font-semibold border-b border-slate-800 pb-1">
-                  <span>Gross Earnings:</span>
+                  <span>{tr("Gross Earnings:")}</span>
                   <span className="font-mono text-slate-100 font-bold">${selectedPaystub.grossPay.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-400 pt-1">
@@ -822,7 +786,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
 
               {/* Employer Contributions */}
               <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-[11px] space-y-1 font-mono">
-                <div className="text-indigo-400 font-sans font-semibold mb-1">Employer Paid Contributions & Taxes</div>
+                <div className="text-indigo-400 font-sans font-semibold mb-1">{tr('Employer Paid Contributions & Taxes')}</div>
                 <div className="flex justify-between text-slate-400">
                   <span>Employer FICA Match (7.65%):</span>
                   <span>+${selectedPaystub.employerFicaMatch.toFixed(2)}</span>
@@ -832,7 +796,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
                   <span>+${selectedPaystub.employerFuta.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-200 font-bold pt-1 border-t border-slate-800">
-                  <span>Total Employer Cost:</span>
+                  <span>{tr("Total Employer Cost:")}</span>
                   <span>${selectedPaystub.totalEmployerCost.toFixed(2)}</span>
                 </div>
               </div>
@@ -842,9 +806,7 @@ export const PayrollView: React.FC<PayrollViewProps> = ({ onNavigateToEmployees 
               <button
                 onClick={() => setSelectedPaystub(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-medium"
-              >
-                Close Statement
-              </button>
+              >{tr('Close Statement')}</button>
             </div>
           </div>
         </div>

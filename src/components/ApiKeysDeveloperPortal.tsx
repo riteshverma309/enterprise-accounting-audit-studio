@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   Key,
   Shield,
@@ -30,6 +31,7 @@ import { useAccounting } from '../context/AccountingContext';
 import { ScopedApiKey, ApiKeyPermissionScope, Role } from '../types';
 
 export const ApiKeysDeveloperPortal: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     activeRole,
@@ -400,16 +402,11 @@ func main() {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                <Code2 className="w-3 h-3" /> RESTful Developer API Gateway
-              </span>
-              <span className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">
-                OpenAPI 3.0 / OAuth2 Compatible
-              </span>
+                <Code2 className="w-3 h-3" />{tr('RESTful Developer API Gateway')}</span>
+              <span className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">{tr('OpenAPI 3.0 / OAuth2 Compatible')}</span>
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">API Keys & Developer Portal</h1>
-            <p className="text-sm text-slate-400 max-w-2xl">
-              Generate fine-grained scoped API keys, explore interactive Swagger REST endpoints, and copy ready-made integration code snippets for any programming language.
-            </p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">{tr('API Keys & Developer Portal')}</h1>
+            <p className="text-sm text-slate-400 max-w-2xl">{tr('Generate fine-grained scoped API keys, explore interactive Swagger REST endpoints, and copy ready-made integration code snippets for any programming language.')}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -418,14 +415,14 @@ func main() {
               className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-xl border border-slate-700 font-medium text-xs shadow transition cursor-pointer"
             >
               <Terminal className="w-4 h-4 text-indigo-400" />
-              <span>Interactive Code Snippets</span>
+              <span>{tr('Interactive Code Snippets')}</span>
             </button>
             <button
               onClick={() => setIsCreateModalOpen(true)}
               className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-indigo-600/20 transition cursor-pointer"
             >
               <Plus className="w-4 h-4" />
-              <span>Generate Scoped API Key</span>
+              <span>{tr('Generate Scoped API Key')}</span>
             </button>
           </div>
         </div>
@@ -433,7 +430,7 @@ func main() {
         {/* METRICS ROW */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/80">
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Active API Tokens</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Active API Tokens')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-white">{filteredKeys.filter((k) => k.status === 'ACTIVE').length}</span>
               <span className="text-xs text-slate-500 font-mono">/ {filteredKeys.length} total</span>
@@ -441,23 +438,23 @@ func main() {
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Default Rate Limit</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Default Rate Limit')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-indigo-300 font-mono">1,200</span>
-              <span className="text-xs text-slate-500 font-mono">req / min</span>
+              <span className="text-xs text-slate-500 font-mono">{tr('req / min')}</span>
             </div>
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">RBAC Permission Model</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('RBAC Permission Model')}</span>
             <div className="flex items-baseline gap-2 mt-1">
-              <span className="text-xl font-bold text-emerald-400">Scoped</span>
-              <span className="text-xs text-emerald-500/80 font-mono">Least Privilege</span>
+              <span className="text-xl font-bold text-emerald-400">{tr('Scoped')}</span>
+              <span className="text-xs text-emerald-500/80 font-mono">{tr('Least Privilege')}</span>
             </div>
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Active Entity Scope</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Active Entity Scope')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-purple-300 font-mono">{activeTenant.code}</span>
               <span className="text-xs text-slate-500 font-mono truncate">{activeTenant.currency}</span>
@@ -485,7 +482,7 @@ func main() {
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Interactive Swagger API Docs</span>
+            <span>{tr('Interactive Swagger API Docs')}</span>
           </button>
           <button
             onClick={() => setActiveTab('CODE_GENERATOR')}
@@ -494,7 +491,7 @@ func main() {
             }`}
           >
             <Code2 className="w-3.5 h-3.5" />
-            <span>Code Generator</span>
+            <span>{tr('Code Generator')}</span>
           </button>
           <button
             onClick={() => setActiveTab('OPENAPI_SPEC')}
@@ -503,7 +500,7 @@ func main() {
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>OpenAPI 3.0 Schema</span>
+            <span>{tr('OpenAPI 3.0 Schema')}</span>
           </button>
         </div>
 
@@ -513,7 +510,7 @@ func main() {
               <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search API keys by name or prefix..."
+                placeholder={tr('Search API keys by name or prefix...')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-slate-900 text-slate-200 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none"
@@ -525,7 +522,7 @@ func main() {
               onChange={(e) => setSelectedScopeFilter(e.target.value)}
               className="bg-slate-900 text-slate-300 text-xs px-3 py-2 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none"
             >
-              <option value="ALL">All Permission Scopes</option>
+              <option value="ALL">{tr('All Permission Scopes')}</option>
               {availablePermissionScopes.map((s) => (
                 <option key={s.scope} value={s.scope}>
                   {s.label}
@@ -545,17 +542,15 @@ func main() {
                 <Key className="w-7 h-7" />
               </div>
               <div className="space-y-1 max-w-md mx-auto">
-                <h3 className="text-base font-bold text-white">No API Keys Generated</h3>
-                <p className="text-xs text-slate-400">
-                  Create a scoped secret API token to connect your custom ERP scripts, portals, or Zapier connectors.
-                </p>
+                <h3 className="text-base font-bold text-white">{tr('No API Keys Generated')}</h3>
+                <p className="text-xs text-slate-400">{tr('Create a scoped secret API token to connect your custom ERP scripts, portals, or Zapier connectors.')}</p>
               </div>
               <button
                 onClick={() => setIsCreateModalOpen(true)}
                 className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                <span>Generate First API Key</span>
+                <span>{tr('Generate First API Key')}</span>
               </button>
             </div>
           ) : (
@@ -601,7 +596,7 @@ func main() {
                       {/* KEY DISPLAY STRIP */}
                       <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800/80 space-y-1.5">
                         <div className="flex items-center justify-between text-[11px] text-slate-400">
-                          <span className="font-semibold">Token Secret</span>
+                          <span className="font-semibold">{tr('Token Secret')}</span>
                           <button
                             onClick={() => copyToClipboard(k.fullKey || k.maskedKey, `key-${k.id}`)}
                             className="hover:text-indigo-400 flex items-center gap-1 cursor-pointer"
@@ -635,11 +630,11 @@ func main() {
 
                       <div className="grid grid-cols-2 gap-2 text-[11px] pt-1">
                         <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800/60">
-                          <span className="text-slate-500 block">Rate Limit</span>
+                          <span className="text-slate-500 block">{tr('Rate Limit')}</span>
                           <span className="font-mono text-slate-200 font-bold">{k.rateLimitPerMin} rpm</span>
                         </div>
                         <div className="p-2 bg-slate-950/60 rounded-lg border border-slate-800/60">
-                          <span className="text-slate-500 block">Environment</span>
+                          <span className="text-slate-500 block">{tr('Environment')}</span>
                           <span className="font-mono text-purple-300 font-bold">{k.environment}</span>
                         </div>
                       </div>
@@ -650,7 +645,7 @@ func main() {
                         {k.lastUsedAt ? (
                           <span>Used: {new Date(k.lastUsedAt).toLocaleTimeString()}</span>
                         ) : (
-                          <span>Never used</span>
+                          <span>{tr('Never used')}</span>
                         )}
                       </div>
 
@@ -663,9 +658,7 @@ func main() {
                               }
                             }}
                             className="px-2 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 rounded-lg text-xs font-bold border border-amber-500/20 transition cursor-pointer"
-                          >
-                            Revoke
-                          </button>
+                          >{tr('Revoke')}</button>
                         )}
                         <button
                           onClick={() => {
@@ -674,7 +667,7 @@ func main() {
                             }
                           }}
                           className="p-1.5 hover:bg-rose-500/10 rounded-lg text-slate-500 hover:text-rose-400 transition cursor-pointer"
-                          title="Delete key"
+                          title={tr('Delete key')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -694,14 +687,12 @@ func main() {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
               <div className="space-y-1">
-                <h3 className="text-base font-bold text-white">RESTful API Endpoints & Route Definitions</h3>
-                <p className="text-xs text-slate-400">
-                  Standardized JSON endpoints with tenant isolation headers and double-entry general ledger integrity verification.
-                </p>
+                <h3 className="text-base font-bold text-white">{tr('RESTful API Endpoints & Route Definitions')}</h3>
+                <p className="text-xs text-slate-400">{tr('Standardized JSON endpoints with tenant isolation headers and double-entry general ledger integrity verification.')}</p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs text-slate-400 font-mono">Base URL:</span>
+                <span className="text-xs text-slate-400 font-mono">{tr('Base URL:')}</span>
                 <code className="bg-slate-950 text-indigo-300 px-3 py-1.5 rounded-lg border border-slate-800 font-mono text-xs">
                   {window.location.origin}/api/v1
                 </code>
@@ -747,7 +738,7 @@ func main() {
                             }}
                             className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-xs font-bold cursor-pointer shrink-0 self-start md:self-auto"
                           >
-                            <span>Generate Code</span>
+                            <span>{tr('Generate Code')}</span>
                             <ChevronRight className="w-3.5 h-3.5" />
                           </button>
                         </div>
@@ -768,8 +759,8 @@ func main() {
             <div className="flex items-center gap-2">
               <Code2 className="w-5 h-5 text-indigo-400" />
               <div>
-                <h3 className="text-base font-bold text-white">SDK & cURL Code Generator</h3>
-                <span className="text-xs text-slate-400">Pre-configured with active tenant authorization tokens</span>
+                <h3 className="text-base font-bold text-white">{tr('SDK & cURL Code Generator')}</h3>
+                <span className="text-xs text-slate-400">{tr('Pre-configured with active tenant authorization tokens')}</span>
               </div>
             </div>
 
@@ -802,28 +793,28 @@ func main() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-              <span className="text-slate-400 font-bold block">Selected Endpoint Target:</span>
+              <span className="text-slate-400 font-bold block">{tr('Selected Endpoint Target:')}</span>
               <select
                 value={selectedEndpointForCode}
                 onChange={(e) => setSelectedEndpointForCode(e.target.value)}
                 className="w-full bg-slate-900 text-indigo-300 font-mono p-2 rounded-lg border border-slate-800 outline-none"
               >
-                <option value="POST /api/v1/invoices">POST /api/v1/invoices (Create Invoice)</option>
-                <option value="GET /api/v1/accounts">GET /api/v1/accounts (Query Chart of Accounts)</option>
-                <option value="POST /api/v1/journals">POST /api/v1/journals (Post Journal Voucher)</option>
-                <option value="GET /api/v1/customers">GET /api/v1/customers (List Customers)</option>
+                <option value="POST /api/v1/invoices">{tr('POST /api/v1/invoices (Create Invoice)')}</option>
+                <option value="GET /api/v1/accounts">{tr('GET /api/v1/accounts (Query Chart of Accounts)')}</option>
+                <option value="POST /api/v1/journals">{tr('POST /api/v1/journals (Post Journal Voucher)')}</option>
+                <option value="GET /api/v1/customers">{tr('GET /api/v1/customers (List Customers)')}</option>
               </select>
             </div>
 
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-              <span className="text-slate-400 font-bold block">Active Tenant Context (X-Tenant-ID):</span>
+              <span className="text-slate-400 font-bold block">{tr('Active Tenant Context (X-Tenant-ID):')}</span>
               <div className="font-mono text-purple-300 font-bold p-2 bg-slate-900 rounded-lg">
                 {activeTenant.name} ({activeTenant.id})
               </div>
             </div>
 
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-              <span className="text-slate-400 font-bold block">Authentication Header:</span>
+              <span className="text-slate-400 font-bold block">{tr('Authentication Header:')}</span>
               <div className="font-mono text-amber-300 truncate p-2 bg-slate-900 rounded-lg">
                 Authorization: Bearer sec_live_••••••
               </div>
@@ -842,7 +833,7 @@ func main() {
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-indigo-400" />
-              <h3 className="text-base font-bold text-white">OpenAPI 3.0.3 JSON Specification</h3>
+              <h3 className="text-base font-bold text-white">{tr('OpenAPI 3.0.3 JSON Specification')}</h3>
             </div>
 
             <button
@@ -866,7 +857,7 @@ func main() {
               className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 py-2 rounded-xl transition cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Export OpenAPI JSON</span>
+              <span>{tr('Export OpenAPI JSON')}</span>
             </button>
           </div>
 
@@ -901,7 +892,7 @@ func main() {
                   <Key className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Generate Scoped API Key</h3>
+                  <h3 className="text-base font-bold text-white">{tr('Generate Scoped API Key')}</h3>
                   <span className="text-xs text-slate-400">Scoped to company: {activeTenant.name}</span>
                 </div>
               </div>
@@ -916,11 +907,11 @@ func main() {
 
             <form onSubmit={handleCreateKey} className="space-y-4 text-xs">
               <div className="space-y-1">
-                <label className="block text-slate-300 font-bold">Key Name / Description *</label>
+                <label className="block text-slate-300 font-bold">{tr('Key Name / Description *')}</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Production Shopify Billing Webhook Ingest"
+                  placeholder={tr('e.g. Production Shopify Billing Webhook Ingest')}
                   value={newKeyForm.name}
                   onChange={(e) => setNewKeyForm({ ...newKeyForm, name: e.target.value })}
                   className="w-full bg-slate-950 text-slate-200 p-2.5 rounded-xl border border-slate-800 focus:border-indigo-500 outline-none"
@@ -929,20 +920,20 @@ func main() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="block text-slate-300 font-bold">Environment</label>
+                  <label className="block text-slate-300 font-bold">{tr('Environment')}</label>
                   <select
                     value={newKeyForm.environment}
                     onChange={(e) => setNewKeyForm({ ...newKeyForm, environment: e.target.value as any })}
                     className="w-full bg-slate-950 text-slate-200 p-2.5 rounded-xl border border-slate-800 outline-none"
                   >
-                    <option value="LIVE">Live Production</option>
-                    <option value="TEST">Staging / Test</option>
-                    <option value="SANDBOX">Sandbox Playground</option>
+                    <option value="LIVE">{tr('Live Production')}</option>
+                    <option value="TEST">{tr('Staging / Test')}</option>
+                    <option value="SANDBOX">{tr('Sandbox Playground')}</option>
                   </select>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="block text-slate-300 font-bold">Rate Limit (req/min)</label>
+                  <label className="block text-slate-300 font-bold">{tr('Rate Limit (req/min)')}</label>
                   <input
                     type="number"
                     min="60"
@@ -993,15 +984,11 @@ func main() {
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition cursor-pointer"
-                >
-                  Generate Secret Token
-                </button>
+                >{tr('Generate Secret Token')}</button>
               </div>
             </form>
           </div>
@@ -1017,13 +1004,13 @@ func main() {
                 <Key className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-white">API Key Successfully Generated</h3>
-                <span className="text-xs text-amber-400">Save this secret key now. It will not be shown again!</span>
+                <h3 className="text-base font-bold text-white">{tr('API Key Successfully Generated')}</h3>
+                <span className="text-xs text-amber-400">{tr('Save this secret key now. It will not be shown again!')}</span>
               </div>
             </div>
 
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
-              <span className="text-slate-400 text-xs font-bold block">Bearer Authorization Token:</span>
+              <span className="text-slate-400 text-xs font-bold block">{tr('Bearer Authorization Token:')}</span>
               <div className="flex gap-2">
                 <input
                   type="text"
@@ -1043,18 +1030,14 @@ func main() {
 
             <div className="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-xs text-amber-300 flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 shrink-0 text-amber-400" />
-              <span>
-                For security compliance, this raw secret token is hashed and cannot be retrieved later.
-              </span>
+              <span>{tr('For security compliance, this raw secret token is hashed and cannot be retrieved later.')}</span>
             </div>
 
             <div className="pt-2 flex justify-end">
               <button
                 onClick={() => setJustGeneratedToken(null)}
                 className="px-5 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition cursor-pointer"
-              >
-                I Have Stored the Key Safely
-              </button>
+              >{tr('I Have Stored the Key Safely')}</button>
             </div>
           </div>
         </div>

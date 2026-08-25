@@ -1,3 +1,4 @@
+import { useLanguage } from '../context/LanguageContext';
 import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
 import { InvoiceTemplate, InvoiceTemplateLineItem, ProductServiceItem } from '../types';
@@ -32,6 +33,7 @@ interface InvoiceTemplatesViewProps {
 export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
   onSelectTemplateForInvoice,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     invoiceTemplates,
@@ -295,7 +297,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
     e.preventDefault();
 
     if (!formName.trim()) {
-      showNotification('error', 'Template Name is required.');
+      showNotification('error', `${tr("Template Name")} ${tr("is required")}`);
       return;
     }
 
@@ -395,7 +397,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
             </span>
             <div>
               <h2 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <span>Invoice Templates Master</span>
+                <span>{tr("Invoice Templates Master")}</span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-indigo-950/80 text-indigo-300 border border-indigo-800">
                   {invoiceTemplates.length} configured
                 </span>
@@ -414,7 +416,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
             title="Export templates as JSON"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Export Config</span>
+            <span>{tr("Export Config")}</span>
           </button>
 
           <button
@@ -422,7 +424,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-lg shadow-indigo-600/20 transition cursor-pointer"
           >
             <Plus className="w-4 h-4" />
-            <span>New Invoice Template</span>
+            <span>{tr("New Invoice Template")}</span>
           </button>
         </div>
       </div>
@@ -431,29 +433,29 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-            <span>Total Templates</span>
+            <span>{tr("Total Templates")}</span>
             <Layers className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold text-slate-100 font-mono">{metrics.total}</div>
           <div className="text-[11px] text-slate-400">
-            {metrics.active} active for fast invoicing
+            {metrics.active} {tr("active for fast invoicing")}
           </div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-            <span>Configured Line Items</span>
+            <span>{tr("Configured Line Items")}</span>
             <Package className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-emerald-400 font-mono">{metrics.totalLines}</div>
           <div className="text-[11px] text-slate-400">
-            Across all recurring billing models
+            {tr("Across all recurring billing models")}
           </div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-            <span>Most Active Template</span>
+            <span>{tr("Most Active Template")}</span>
             <Sparkles className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-sm font-bold text-amber-300 truncate">
@@ -466,14 +468,14 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
 
         <div className="bg-slate-900 border border-slate-800 p-4 rounded-xl space-y-1">
           <div className="flex items-center justify-between text-slate-400 text-xs font-semibold">
-            <span>Catalog Sync Status</span>
+            <span>{tr("Catalog Sync Status")}</span>
             <BookOpen className="w-4 h-4 text-sky-400" />
           </div>
           <div className="text-2xl font-bold text-sky-400 font-mono">
             {productsServices.length} Items
           </div>
           <div className="text-[11px] text-slate-400">
-            Available to attach in line items
+            {tr("Available to attach in line items")}
           </div>
         </div>
       </div>
@@ -485,7 +487,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Search by code, template name, category, or line item details..."
+            placeholder={tr("Search by code, template name, category, or line item details...")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500"
@@ -544,7 +546,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
         filteredTemplates.length === 0 ? (
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-12 text-center space-y-3">
             <FileText className="w-10 h-10 text-slate-600 mx-auto" />
-            <h3 className="text-sm font-bold text-slate-300">No Invoice Templates Found</h3>
+            <h3 className="text-sm font-bold text-slate-300">{tr("No Invoice Templates Found")}</h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
               {searchQuery
                 ? `No templates matched "${searchQuery}". Try clearing search filters.`
@@ -555,7 +557,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold inline-flex items-center gap-1.5 cursor-pointer shadow-lg shadow-indigo-600/20"
             >
               <Plus className="w-3.5 h-3.5" />
-              <span>Create First Template</span>
+              <span>{tr("Create First Template")}</span>
             </button>
           </div>
         ) : (
@@ -635,7 +637,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                     <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-800/80 space-y-2">
                       <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
                         <span>Pre-configured Lines ({template.items?.length || 0})</span>
-                        <span className="text-slate-500 font-mono">Tax / Total</span>
+                        <span className="text-slate-500 font-mono">{tr("Tax / Total")}</span>
                       </div>
                       <div className="space-y-1.5 divide-y divide-slate-800/60 max-h-36 overflow-y-auto pr-1">
                         {template.items.map((item, idx) => (
@@ -674,7 +676,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                     <div className="flex items-center justify-between">
                       <div>
                         <span className="text-[10px] uppercase font-bold text-slate-500 block">
-                          Est. Total Value
+                          {tr("Est. Total Value")}
                         </span>
                         <span className="text-base font-bold text-slate-100 font-mono">
                           {activeTenant.currency} {estTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -700,7 +702,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                           className="flex-1 py-2 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-lg shadow-indigo-600/20 transition cursor-pointer"
                         >
                           <FileText className="w-3.5 h-3.5" />
-                          <span>Generate Invoice</span>
+                          <span>{tr("Generate Invoice")}</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       )}
@@ -718,14 +720,14 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950 text-slate-400 uppercase font-mono text-[10px] border-b border-slate-800">
                 <tr>
-                  <th className="p-3.5">Code / Identifier</th>
-                  <th className="p-3.5">Template Name & Category</th>
-                  <th className="p-3.5 text-center">Lines</th>
-                  <th className="p-3.5 text-center">Payment Terms</th>
-                  <th className="p-3.5">GL Account</th>
-                  <th className="p-3.5 text-right">Est. Total Amount</th>
-                  <th className="p-3.5 text-center">Usage</th>
-                  <th className="p-3.5 text-right pr-4">Actions</th>
+                  <th className="p-3.5">{tr("Code / Identifier")}</th>
+                  <th className="p-3.5">{tr("Template Name & Category")}</th>
+                  <th className="p-3.5 text-center">{tr("Lines")}</th>
+                  <th className="p-3.5 text-center">{tr("Payment Terms")}</th>
+                  <th className="p-3.5">{tr("GL Account")}</th>
+                  <th className="p-3.5 text-right">{tr("Est. Total Amount")}</th>
+                  <th className="p-3.5 text-center">{tr("Usage")}</th>
+                  <th className="p-3.5 text-right pr-4">{tr("Actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
@@ -772,28 +774,28 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                             className="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-bold inline-flex items-center gap-1 cursor-pointer transition"
                             title="Generate Invoice with this template"
                           >
-                            <span>Use</span>
+                            <span>{tr("Use")}</span>
                             <ArrowRight className="w-3 h-3" />
                           </button>
                         )}
                         <button
                           onClick={() => handleOpenEditModal(template)}
                           className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-amber-400 transition cursor-pointer"
-                          title="Edit"
+                          title={tr("Edit")}
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDuplicate(template)}
                           className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-indigo-400 transition cursor-pointer"
-                          title="Duplicate"
+                          title={tr("Duplicate")}
                         >
                           <Copy className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => handleDelete(template)}
                           className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-rose-400 transition cursor-pointer"
-                          title="Delete"
+                          title={tr("Delete")}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -816,10 +818,10 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-indigo-400" />
-                  {editingTemplateId ? 'Edit Invoice Template' : 'Create New Invoice Template'}
+                  {editingTemplateId ? tr("Edit Invoice Template") : tr("Create New Invoice Template")}
                 </h3>
                 <p className="text-xs text-slate-400">
-                  Configure reusable line items, default payment schedules, and account links.
+                  {tr("Configure reusable line items, default payment schedules, and account links.")}
                 </p>
               </div>
               <button
@@ -835,7 +837,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Template Code / SKU
+                    {tr("Template Code / SKU")}
                   </label>
                   <input
                     type="text"
@@ -849,7 +851,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
 
                 <div className="sm:col-span-2">
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Template Name
+                    {tr("Template Name")}
                   </label>
                   <input
                     type="text"
@@ -865,43 +867,43 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Business Category
+                    {tr("Business Category")}
                   </label>
                   <select
                     value={formCategory}
                     onChange={(e) => setFormCategory(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="SaaS & Subscriptions">SaaS & Subscriptions</option>
-                    <option value="Professional Services">Professional Services</option>
-                    <option value="Property & Facilities">Property & Facilities (HOA)</option>
-                    <option value="Education">Education & Tuition</option>
-                    <option value="Healthcare">Healthcare & Diagnostics</option>
-                    <option value="Custom">Custom / General</option>
+                    <option value="SaaS & Subscriptions">{tr("SaaS & Subscriptions")}</option>
+                    <option value="Professional Services">{tr("Professional Services")}</option>
+                    <option value="Property & Facilities">{tr("Property & Facilities (HOA)")}</option>
+                    <option value="Education">{tr("Education & Tuition")}</option>
+                    <option value="Healthcare">{tr("Healthcare & Diagnostics")}</option>
+                    <option value="Custom">{tr("Custom / General")}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Payment Terms (Days)
+                    {tr("Payment Terms (Days)")}
                   </label>
                   <select
                     value={formTermsDays}
                     onChange={(e) => setFormTermsDays(Number(e.target.value))}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
                   >
-                    <option value={0}>Due on Receipt (Immediate)</option>
-                    <option value={7}>Net 7 Days</option>
-                    <option value={15}>Net 15 Days</option>
-                    <option value={30}>Net 30 Days</option>
-                    <option value={45}>Net 45 Days</option>
-                    <option value={60}>Net 60 Days</option>
+                    <option value={0}>{tr("Due on Receipt (Immediate)")}</option>
+                    <option value={7}>{tr("Net 7 Days")}</option>
+                    <option value={15}>{tr("Net 15 Days")}</option>
+                    <option value={30}>{tr("Net 30 Days")}</option>
+                    <option value={45}>{tr("Net 45 Days")}</option>
+                    <option value={60}>{tr("Net 60 Days")}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Default Revenue Account
+                    {tr("Default Revenue Account")}
                   </label>
                   <select
                     value={formRevenueAcc}
@@ -917,7 +919,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Optional Default Customer Binding
+                    {tr("Optional Default Customer Binding")}
                   </label>
                   <select
                     value={formCustomerId}
@@ -935,7 +937,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1">
-                    Description / Memo
+                    {tr("Description / Memo")}
                   </label>
                   <input
                     type="text"
@@ -949,7 +951,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Default Payment Notes / Instructions
+                  {tr("Default Payment Notes / Instructions")}
                 </label>
                 <textarea
                   rows={2}
@@ -987,7 +989,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                         className="bg-slate-950 border border-indigo-500/30 text-indigo-300 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-indigo-400 cursor-pointer"
                       >
                         <option value="" disabled>
-                          + Insert From Catalog...
+                          {tr("+ Insert From Catalog...")}
                         </option>
                         {productsServices.map((p) => (
                           <option key={p.id} value={p.id}>
@@ -1003,7 +1005,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                       className="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-bold flex items-center gap-1 cursor-pointer transition"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Custom Line</span>
+                      <span>{tr("Custom Line")}</span>
                     </button>
                   </div>
                 </div>
@@ -1013,12 +1015,12 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                   <table className="w-full text-left text-xs text-slate-300 min-w-[650px]">
                     <thead className="text-[10px] font-mono text-slate-400 uppercase border-b border-slate-800">
                       <tr>
-                        <th className="pb-2 pl-2 w-44">Catalog Item Link</th>
-                        <th className="pb-2">Description / Memo</th>
-                        <th className="pb-2 w-28 text-center">Qty / UoM</th>
-                        <th className="pb-2 w-28 text-right">Unit Price</th>
-                        <th className="pb-2 w-20 text-right">Tax %</th>
-                        <th className="pb-2 w-28 text-right pr-2">Total Amount</th>
+                        <th className="pb-2 pl-2 w-44">{tr("Catalog Item Link")}</th>
+                        <th className="pb-2">{tr("Description / Memo")}</th>
+                        <th className="pb-2 w-28 text-center">{tr("Qty / UoM")}</th>
+                        <th className="pb-2 w-28 text-right">{tr("Unit Price")}</th>
+                        <th className="pb-2 w-20 text-right">{tr("Tax %")}</th>
+                        <th className="pb-2 w-28 text-right pr-2">{tr("Total Amount")}</th>
                         <th className="pb-2 w-10 text-center"></th>
                       </tr>
                     </thead>
@@ -1032,7 +1034,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                               onChange={(e) => handleProductSelectForLine(item.id, e.target.value)}
                               className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-[11px] text-indigo-300 focus:outline-none focus:border-indigo-500 truncate"
                             >
-                              <option value="">-- Custom Line --</option>
+                              <option value="">{tr("-- Custom Line --")}</option>
                               {productsServices.map((p) => (
                                 <option key={p.id} value={p.id}>
                                   {p.name} ({activeTenant.currency} {p.unitPrice})
@@ -1142,19 +1144,19 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                 {/* Template Totals Summary */}
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5 text-xs font-mono">
                   <div className="flex justify-between text-slate-400">
-                    <span>Subtotal:</span>
+                    <span>{tr("Subtotal:")}</span>
                     <span>
                       {activeTenant.currency} {formSubtotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-400">
-                    <span>Estimated Tax Total:</span>
+                    <span>{tr("Estimated Tax Total:")}</span>
                     <span>
                       {activeTenant.currency} {formTaxTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <div className="flex justify-between text-slate-100 font-bold text-sm pt-2 border-t border-slate-800">
-                    <span>Estimated Total Template Amount:</span>
+                    <span>{tr("Estimated Total Template Amount:")}</span>
                     <span className="text-indigo-400">
                       {activeTenant.currency} {formTotalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
@@ -1171,7 +1173,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                     onChange={(e) => setFormIsActive(e.target.checked)}
                     className="rounded border-slate-800 bg-slate-950 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <span>Active Template (Ready for invoice generation)</span>
+                  <span>{tr("Active Template (Ready for invoice generation)")}</span>
                 </label>
 
                 <div className="flex items-center gap-3">
@@ -1180,13 +1182,13 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                     onClick={() => setIsModalOpen(false)}
                     className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer"
                   >
-                    Cancel
+                    {tr("Cancel")}
                   </button>
                   <button
                     type="submit"
                     className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-indigo-600/20 cursor-pointer"
                   >
-                    {editingTemplateId ? 'Save Template Changes' : 'Create Template'}
+                    {editingTemplateId ? tr("Save Template Changes") : tr("Create Template")}
                   </button>
                 </div>
               </div>
@@ -1230,19 +1232,19 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800 font-mono text-slate-300">
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Payment Terms:</span>
+                  <span className="text-slate-500 block text-[10px]">{tr("Payment Terms:")}</span>
                   Net {previewTemplate.defaultPaymentTermsDays || 30} Days
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">GL Revenue Account:</span>
+                  <span className="text-slate-500 block text-[10px]">{tr("GL Revenue Account:")}</span>
                   {previewTemplate.defaultRevenueAccountCode || '4010'}
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Usage Count:</span>
+                  <span className="text-slate-500 block text-[10px]">{tr("Usage Count:")}</span>
                   {previewTemplate.usageCount || 0} invoices created
                 </div>
                 <div>
-                  <span className="text-slate-500 block text-[10px]">Status:</span>
+                  <span className="text-slate-500 block text-[10px]">{tr("Status:")}</span>
                   {previewTemplate.isActive ? 'Active' : 'Inactive'}
                 </div>
               </div>
@@ -1256,11 +1258,11 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                   <table className="w-full text-left text-xs text-slate-300">
                     <thead className="bg-slate-900 text-slate-400 uppercase font-mono text-[10px]">
                       <tr>
-                        <th className="p-2.5">Item Description</th>
-                        <th className="p-2.5 text-center">Qty / UoM</th>
-                        <th className="p-2.5 text-right">Unit Price</th>
-                        <th className="p-2.5 text-right">Tax Rate</th>
-                        <th className="p-2.5 text-right pr-3">Line Amount</th>
+                        <th className="p-2.5">{tr("Item Description")}</th>
+                        <th className="p-2.5 text-center">{tr("Qty / UoM")}</th>
+                        <th className="p-2.5 text-right">{tr("Unit Price")}</th>
+                        <th className="p-2.5 text-right">{tr("Tax Rate")}</th>
+                        <th className="p-2.5 text-right pr-3">{tr("Line Amount")}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800 font-mono text-xs">
@@ -1289,7 +1291,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
 
               {previewTemplate.defaultNotes && (
                 <div className="text-[11px] text-slate-400 bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <span className="font-semibold text-slate-300 block mb-0.5">Default Notes / Wire Instructions:</span>
+                  <span className="font-semibold text-slate-300 block mb-0.5">{tr("Default Notes / Wire Instructions:")}</span>
                   {previewTemplate.defaultNotes}
                 </div>
               )}
@@ -1314,7 +1316,7 @@ export const InvoiceTemplatesView: React.FC<InvoiceTemplatesViewProps> = ({
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-lg shadow-indigo-600/20 cursor-pointer"
                 >
                   <FileText className="w-3.5 h-3.5" />
-                  <span>Use to Generate Invoice</span>
+                  <span>{tr("Use to Generate Invoice")}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}

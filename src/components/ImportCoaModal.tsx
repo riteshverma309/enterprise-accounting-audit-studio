@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import { Account, AccountType } from '../types';
 import { downloadChartOfAccountsCsv, exportChartOfAccountsExcel } from '../utils/excelExport';
@@ -26,6 +27,7 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
   onClose,
   onSuccess,
 }) => {
+  const { tr, t } = useLanguage();
   const { activeTenant, accounts, batchImportAccounts } = useAccounting();
 
   const [dragActive, setDragActive] = useState(false);
@@ -195,9 +197,9 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
               <Upload className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-white">Import Chart of Accounts</h2>
+              <h2 className="text-lg font-bold text-white">{tr('Import Chart of Accounts')}</h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Upload CSV or Excel file to batch import accounts into <strong>{activeTenant.name}</strong>.
+                {tr('Upload CSV or Excel file to batch import accounts into')} <strong>{activeTenant.name}</strong>.
               </p>
             </div>
           </div>
@@ -217,9 +219,9 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
             <div className="flex items-center gap-3">
               <FileSpreadsheet className="w-8 h-8 text-emerald-400 shrink-0" />
               <div>
-                <h4 className="text-xs font-bold text-white">Need an import template format?</h4>
+                <h4 className="text-xs font-bold text-white">{tr('Need an import template format?')}</h4>
                 <p className="text-[11px] text-slate-400">
-                  Download the official Chart of Accounts template with your active organization structure.
+                  {tr('Download the official Chart of Accounts template with your active organization structure.')}
                 </p>
               </div>
             </div>
@@ -231,7 +233,7 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
                 className="flex-1 sm:flex-none px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700 transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5 text-slate-400" />
-                <span>Download CSV Template</span>
+                <span>{tr('Download CSV Template')}</span>
               </button>
               <button
                 type="button"
@@ -239,7 +241,7 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
                 className="flex-1 sm:flex-none px-3 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold rounded-xl border border-emerald-500/30 transition flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
-                <span>Excel (.xlsx) Master</span>
+                <span>{tr('Excel (.xlsx) Master')}</span>
               </button>
             </div>
           </div>
@@ -277,18 +279,18 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
                   <CheckCircle2 className="w-4 h-4" /> {fileName}
                 </span>
               ) : (
-                'Click to upload or drag & drop CSV file'
+                tr('Click to upload or drag & drop CSV file')
               )}
             </p>
             <p className="text-[11px] text-slate-500 mt-1">
-              Supported format: CSV (AccountCode, AccountName, AccountType, SubCategory, NormalBalance, Description)
+              {tr('Supported format: CSV (AccountCode, AccountName, AccountType, SubCategory, NormalBalance, Description)')}
             </p>
           </div>
 
           {/* Import Strategy Selection */}
           <div className="space-y-2">
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400">
-              Import Mode Strategy:
+              {tr('Import Mode Strategy:')}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div
@@ -301,10 +303,10 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
               >
                 <div className="flex items-center gap-2 font-semibold text-xs text-white">
                   <CheckCircle2 className={`w-4 h-4 ${importMode === 'merge' ? 'text-indigo-400' : 'text-slate-500'}`} />
-                  Smart Merge (Safe)
+                  {tr('Smart Merge (Safe)')}
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                  Appends new accounts and updates existing account descriptions/categories without touching historical transactions or balances.
+                  {tr('Appends new accounts and updates existing account descriptions/categories without touching historical transactions or balances.')}
                 </p>
               </div>
 
@@ -318,10 +320,10 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
               >
                 <div className="flex items-center gap-2 font-semibold text-xs text-amber-300">
                   <AlertCircle className={`w-4 h-4 ${importMode === 'replace' ? 'text-amber-400' : 'text-slate-500'}`} />
-                  Overwrite / Replace (Full Reset)
+                  {tr('Overwrite / Replace (Full Reset)')}
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                  Replaces the current tenant Chart of Accounts entirely with the uploaded list.
+                  {tr('Replaces the current tenant Chart of Accounts entirely with the uploaded list.')}
                 </p>
               </div>
             </div>
@@ -332,13 +334,13 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
             <div className="p-3.5 bg-rose-500/15 border border-rose-500/30 rounded-2xl space-y-1.5 text-xs text-rose-300">
               <div className="flex items-center gap-2 font-semibold text-rose-400">
                 <ShieldAlert className="w-4 h-4" />
-                <span>Found {parseErrors.length} Issue(s) in Uploaded Data:</span>
+                <span>{tr('Found Issues in Uploaded Data:')} ({parseErrors.length})</span>
               </div>
               <ul className="list-disc list-inside space-y-0.5 text-[11px] font-mono">
                 {parseErrors.slice(0, 5).map((err, i) => (
-                  <li key={i}>{err}</li>
+                  <li key={i}>{tr(err)}</li>
                 ))}
-                {parseErrors.length > 5 && <li>...and {parseErrors.length - 5} more issues</li>}
+                {parseErrors.length > 5 && <li>...{tr('and')} {parseErrors.length - 5} {tr('more issues')}</li>}
               </ul>
             </div>
           )}
@@ -356,9 +358,9 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="text-xs font-bold text-white flex items-center gap-2">
-                  <span>Parsed Accounts Preview</span>
+                  <span>{tr('Parsed Accounts Preview')}</span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-mono">
-                    {parsedRows.length} Valid Rows
+                    {parsedRows.length} {tr('Valid Rows')}
                   </span>
                 </h4>
               </div>
@@ -367,18 +369,18 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
                 <table className="w-full text-left text-xs text-slate-300">
                   <thead className="bg-slate-900 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800 sticky top-0">
                     <tr>
-                      <th className="p-2.5">Code</th>
-                      <th className="p-2.5">Account Name</th>
-                      <th className="p-2.5">Type</th>
-                      <th className="p-2.5">Sub-Category</th>
-                      <th className="p-2.5 text-center">Normal</th>
+                      <th className="p-2.5">{tr('Code')}</th>
+                      <th className="p-2.5">{tr('Account Name')}</th>
+                      <th className="p-2.5">{tr('Type')}</th>
+                      <th className="p-2.5">{tr('Sub-Category')}</th>
+                      <th className="p-2.5 text-center">{tr('Normal')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
                     {parsedRows.slice(0, 50).map((row, idx) => (
                       <tr key={idx} className="hover:bg-slate-900/60">
                         <td className="p-2.5 font-bold text-indigo-300">{row.code}</td>
-                        <td className="p-2.5 font-sans font-medium text-slate-200">{row.name}</td>
+                        <td className="p-2.5 font-sans font-medium text-slate-200">{tr(row.name || '')}</td>
                         <td className="p-2.5">
                           <span
                             className={`px-1.5 py-0.5 rounded text-[9px] font-bold ${
@@ -393,13 +395,13 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
                                 : 'bg-rose-500/20 text-rose-300'
                             }`}
                           >
-                            {row.type}
+                            {tr(row.type || '')}
                           </span>
                         </td>
-                        <td className="p-2.5 font-sans text-slate-400">{row.subCategory || 'General'}</td>
+                        <td className="p-2.5 font-sans text-slate-400">{tr(row.subCategory || 'General')}</td>
                         <td className="p-2.5 text-center font-bold text-[10px]">
                           <span className={row.normalBalance === 'DEBIT' ? 'text-cyan-400' : 'text-amber-400'}>
-                            {row.normalBalance}
+                            {tr(row.normalBalance || '')}
                           </span>
                         </td>
                       </tr>
@@ -418,7 +420,7 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
             onClick={onClose}
             className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-xl transition cursor-pointer"
           >
-            Cancel
+            {tr('Cancel')}
           </button>
 
           <button
@@ -428,7 +430,7 @@ export const ImportCoaModal: React.FC<ImportCoaModalProps> = ({
             className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center gap-2 cursor-pointer"
           >
             {isProcessing ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            <span>Process & Import ({parsedRows.length} Accounts)</span>
+            <span>{tr('Process & Import')} ({parsedRows.length} {tr('Accounts')})</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>

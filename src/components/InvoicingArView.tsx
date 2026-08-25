@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   Plus,
   Receipt,
@@ -73,6 +73,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
   initialSubTab,
   onNavigateToHelpCenter,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     invoices,
@@ -91,8 +92,6 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
     getCustomerStatementData,
     processOnlineInvoicePayment,
   } = useAccounting();
-
-  const { t, tr } = useLanguage();
 
   // Online Payment Modal state
   const [onlinePayInvoice, setOnlinePayInvoice] = useState<any | null>(null);
@@ -533,7 +532,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
   const totalAr = tenantInvoices.reduce((sum, i) => sum + (i.totalAmount - i.amountPaid), 0);
   const paidAr = tenantInvoices.reduce((sum, i) => sum + i.amountPaid, 0);
   const overdueAr = tenantInvoices
-    .filter((i) => i.status === 'OVERDUE' || (i.status === 'UNPAID' && new Date(i.dueDate) < new Date()))
+    .filter((i) => (i.status === 'OVERDUE' || (i.status === 'UNPAID' && new Date(i.dueDate) < new Date())))
     .reduce((sum, i) => sum + (i.totalAmount - i.amountPaid), 0);
 
   const handleCreateInvoice = (e: React.FormEvent) => {
@@ -967,7 +966,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                           <button
                             onClick={() => setExpandedInvoiceId(isExpanded ? null : inv.id)}
                             className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white cursor-pointer"
-                            title="Toggle itemized line items"
+                            title={tr('Toggle itemized line items')}
                           >
                             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                           </button>
@@ -1095,11 +1094,11 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                                 <thead className="bg-slate-900 text-slate-400 uppercase font-mono text-[9px]">
                                   <tr>
                                     <th className="p-2">#</th>
-                                    <th className="p-2">Item Description</th>
-                                    <th className="p-2 text-right">Qty</th>
-                                    <th className="p-2 text-right">Unit Price</th>
-                                    <th className="p-2 text-right">Tax Rate</th>
-                                    <th className="p-2 text-right">Line Amount</th>
+                                    <th className="p-2">{tr('Item Description')}</th>
+                                    <th className="p-2 text-right">{tr('Qty')}</th>
+                                    <th className="p-2 text-right">{tr('Unit Price')}</th>
+                                    <th className="p-2 text-right">{tr('Tax Rate')}</th>
+                                    <th className="p-2 text-right">{tr('Line Amount')}</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -1116,9 +1115,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                                     ))
                                   ) : (
                                     <tr>
-                                      <td colSpan={6} className="p-2 text-center text-slate-500">
-                                        Single summary item
-                                      </td>
+                                      <td colSpan={6} className="p-2 text-center text-slate-500">{tr('Single summary item')}</td>
                                     </tr>
                                   )}
                                 </tbody>
@@ -1145,12 +1142,8 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                  <Receipt className="w-5 h-5 text-indigo-400" />
-                  Issue New Customer Invoice
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Select from pre-configured Invoice Templates, Customer Master directory, or enter custom details.
-                </p>
+                  <Receipt className="w-5 h-5 text-indigo-400" />{tr('Issue New Customer Invoice')}</h3>
+                <p className="text-xs text-slate-400">{tr('Select from pre-configured Invoice Templates, Customer Master directory, or enter custom details.')}</p>
               </div>
               <button
                 onClick={() => {
@@ -1169,7 +1162,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <label className="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
                     <FileText className="w-4 h-4 text-indigo-400" />
-                    <span>Apply Pre-configured Invoice Template</span>
+                    <span>{tr('Apply Pre-configured Invoice Template')}</span>
                   </label>
                   <span className="text-[11px] text-indigo-300/80 font-mono">
                     {invoiceTemplates.length} templates available
@@ -1185,7 +1178,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                     }}
                     className="flex-1 min-w-[240px] bg-slate-950 border border-indigo-500/40 rounded-lg px-3 py-2 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-400"
                   >
-                    <option value="">-- Choose a Reusable Template --</option>
+                    <option value="">{tr('-- Choose a Reusable Template --')}</option>
                     {invoiceTemplates.map((t) => (
                       <option key={t.id} value={t.id}>
                         [{t.code}] {t.name} ({t.items?.length || 0} lines • {t.category})
@@ -1203,10 +1196,10 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       setShowSaveTemplateModal(true);
                     }}
                     className="px-3 py-2 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
-                    title="Save current line items as a new reusable template"
+                    title={tr('Save current line items as a new reusable template')}
                   >
                     <BookmarkPlus className="w-3.5 h-3.5" />
-                    <span>Save Current as Template</span>
+                    <span>{tr('Save Current as Template')}</span>
                   </button>
                 </div>
 
@@ -1222,9 +1215,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
               <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1.5">
-                    <User className="w-4 h-4" />
-                    Customer Directory Selector
-                  </label>
+                    <User className="w-4 h-4" />{tr('Customer Directory Selector')}</label>
                   <span className="text-[11px] text-slate-400">
                     {availableCustomers.length} master profiles available
                   </span>
@@ -1237,7 +1228,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       onChange={(e) => handleSelectCustomer(e.target.value)}
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 font-semibold focus:outline-none focus:border-indigo-500"
                     >
-                      <option value="">-- Manual / Custom Customer --</option>
+                      <option value="">{tr('-- Manual / Custom Customer --')}</option>
                       {availableCustomers.map((c) => (
                         <option key={c.id} value={c.id}>
                           [{c.code}] {c.name} ({c.category || 'General'})
@@ -1250,7 +1241,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                     <input
                       type="text"
                       required
-                      placeholder="Customer Name"
+                      placeholder={tr('Customer Name')}
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -1261,7 +1252,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                     <input
                       type="email"
                       required
-                      placeholder="Billing Email"
+                      placeholder={tr('Billing Email')}
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -1296,7 +1287,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Payment Due Date</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Payment Due Date')}</label>
                   <input
                     type="date"
                     required
@@ -1307,14 +1298,14 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1">Revenue Account Code</label>
+                  <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Revenue Account Code')}</label>
                   <select
                     value={revenueAccCode}
                     onChange={(e) => setRevenueAccCode(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500 font-mono"
                   >
-                    <option value="4010">4010 - Core Operating Revenue</option>
-                    <option value="4020">4020 - Consulting & Service Revenue</option>
+                    <option value="4010">{tr('4010 - Core Operating Revenue')}</option>
+                    <option value="4020">{tr('4020 - Consulting & Service Revenue')}</option>
                   </select>
                 </div>
               </div>
@@ -1327,7 +1318,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       <Package className="w-3.5 h-3.5 text-indigo-400" />
                       <span>Invoice Line Items & Catalog Products ({lineItems.length})</span>
                     </h4>
-                    <p className="text-[11px] text-slate-400">Select standard products/services from catalog or type custom line items.</p>
+                    <p className="text-[11px] text-slate-400">{tr('Select standard products/services from catalog or type custom line items.')}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     {availableProducts.length > 0 && (
@@ -1342,7 +1333,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                         defaultValue=""
                         className="bg-slate-950 border border-indigo-500/30 text-indigo-300 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-indigo-400 cursor-pointer"
                       >
-                        <option value="" disabled>+ Insert Catalog Item...</option>
+                        <option value="" disabled>{tr('+ Insert Catalog Item...')}</option>
                         {availableProducts.map((p) => (
                           <option key={p.id} value={p.id}>
                             [{p.type}] {p.name} ({activeTenant.currency} {p.unitPrice}/{p.unitOfMeasure || 'unit'})
@@ -1356,7 +1347,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       className="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-lg text-xs font-bold flex items-center gap-1 transition cursor-pointer"
                     >
                       <Plus className="w-3.5 h-3.5" />
-                      <span>Custom Line</span>
+                      <span>{tr('Custom Line')}</span>
                     </button>
                   </div>
                 </div>
@@ -1365,12 +1356,12 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   <table className="w-full text-left text-xs text-slate-300 min-w-[650px]">
                     <thead className="text-[10px] font-mono text-slate-400 uppercase border-b border-slate-800">
                       <tr>
-                        <th className="pb-2 pl-2 w-44">Product / Service</th>
-                        <th className="pb-2">Description / Memo</th>
-                        <th className="pb-2 w-28 text-center">Qty / UoM</th>
-                        <th className="pb-2 w-28 text-right">Unit Price</th>
-                        <th className="pb-2 w-20 text-right">Tax %</th>
-                        <th className="pb-2 w-28 text-right pr-2">Total Amount</th>
+                        <th className="pb-2 pl-2 w-44">{tr('Product / Service')}</th>
+                        <th className="pb-2">{tr('Description / Memo')}</th>
+                        <th className="pb-2 w-28 text-center">{tr('Qty / UoM')}</th>
+                        <th className="pb-2 w-28 text-right">{tr('Unit Price')}</th>
+                        <th className="pb-2 w-20 text-right">{tr('Tax %')}</th>
+                        <th className="pb-2 w-28 text-right pr-2">{tr('Total Amount')}</th>
                         <th className="pb-2 w-10 text-center"></th>
                       </tr>
                     </thead>
@@ -1384,7 +1375,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                               onChange={(e) => handleProductSelect(item.id, e.target.value)}
                               className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-[11px] text-indigo-300 focus:outline-none focus:border-indigo-500 truncate"
                             >
-                              <option value="">-- Custom Item --</option>
+                              <option value="">{tr('-- Custom Item --')}</option>
                               {availableProducts.map((p) => (
                                 <option key={p.id} value={p.id}>
                                   {p.name} ({activeTenant.currency} {p.unitPrice})
@@ -1419,8 +1410,8 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                               />
                               <input
                                 type="text"
-                                placeholder="unit"
-                                title="Unit of Measure"
+                                placeholder={tr('unit')}
+                                title={tr('Unit of Measure')}
                                 value={item.unitOfMeasure || ''}
                                 onChange={(e) => updateLineItem(item.id, 'unitOfMeasure', e.target.value)}
                                 className="w-14 bg-slate-900 border border-slate-800 rounded-lg p-1 text-[10px] text-center font-mono text-slate-400 focus:outline-none focus:border-indigo-500"
@@ -1470,7 +1461,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                                   ? 'text-slate-700 cursor-not-allowed'
                                   : 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer'
                               }`}
-                              title="Remove item"
+                              title={tr('Remove item')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -1484,15 +1475,15 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 {/* TOTALS SUMMARY */}
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5 text-xs font-mono">
                   <div className="flex justify-between text-slate-400">
-                    <span>Subtotal:</span>
+                    <span>{tr('Subtotal:')}</span>
                     <span>{activeTenant.currency} {calculatedSubtotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-slate-400">
-                    <span>Calculated Tax Total:</span>
+                    <span>{tr('Calculated Tax Total:')}</span>
                     <span>{activeTenant.currency} {calculatedTaxTotal.toLocaleString()}</span>
                   </div>
                   <div className="flex justify-between text-slate-100 font-bold text-sm pt-2 border-t border-slate-800">
-                    <span>Total Amount Due:</span>
+                    <span>{tr('Total Amount Due:')}</span>
                     <span className="text-indigo-400">{activeTenant.currency} {calculatedTotalAmount.toLocaleString()}</span>
                   </div>
                 </div>
@@ -1595,9 +1586,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
           <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <BookmarkPlus className="w-5 h-5 text-indigo-400" />
-                Save Line Items as Template
-              </h3>
+                <BookmarkPlus className="w-5 h-5 text-indigo-400" />{tr('Save Line Items as Template')}</h3>
               <button
                 onClick={() => setShowSaveTemplateModal(false)}
                 className="text-slate-400 hover:text-slate-200 text-sm font-bold cursor-pointer"
@@ -1608,11 +1597,11 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
 
             <form onSubmit={handleSaveCurrentAsTemplate} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">Template Code</label>
+                <label className="block font-semibold text-slate-300 mb-1">{tr('Template Code')}</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. TMPL-CONSULTING-MONTHLY"
+                  placeholder={tr('e.g. TMPL-CONSULTING-MONTHLY')}
                   value={saveTmplCode}
                   onChange={(e) => setSaveTmplCode(e.target.value.toUpperCase())}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
@@ -1620,11 +1609,11 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-300 mb-1">Template Name</label>
+                <label className="block font-semibold text-slate-300 mb-1">{tr('Template Name')}</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Monthly Retainer Advisory & Architecture"
+                  placeholder={tr('e.g. Monthly Retainer Advisory & Architecture')}
                   value={saveTmplName}
                   onChange={(e) => setSaveTmplName(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -1633,54 +1622,48 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Category</label>
+                  <label className="block font-semibold text-slate-300 mb-1">{tr('Category')}</label>
                   <select
                     value={saveTmplCategory}
                     onChange={(e) => setSaveTmplCategory(e.target.value)}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-indigo-500"
                   >
-                    <option value="Professional Services">Professional Services</option>
-                    <option value="SaaS & Subscriptions">SaaS & Subscriptions</option>
-                    <option value="Property & Facilities">Property & Facilities</option>
-                    <option value="Education">Education</option>
-                    <option value="Healthcare">Healthcare</option>
-                    <option value="Custom">Custom</option>
+                    <option value="Professional Services">{tr('Professional Services')}</option>
+                    <option value="SaaS & Subscriptions">{tr('SaaS & Subscriptions')}</option>
+                    <option value="Property & Facilities">{tr('Property & Facilities')}</option>
+                    <option value="Education">{tr('Education')}</option>
+                    <option value="Healthcare">{tr('Healthcare')}</option>
+                    <option value="Custom">{tr('Custom')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-semibold text-slate-300 mb-1">Payment Terms</label>
+                  <label className="block font-semibold text-slate-300 mb-1">{tr('Payment Terms')}</label>
                   <select
                     value={saveTmplTerms}
                     onChange={(e) => setSaveTmplTerms(Number(e.target.value))}
                     className="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
                   >
-                    <option value={0}>Due on Receipt</option>
-                    <option value={15}>Net 15 Days</option>
-                    <option value={30}>Net 30 Days</option>
-                    <option value={45}>Net 45 Days</option>
+                    <option value={0}>{tr('Due on Receipt')}</option>
+                    <option value={15}>{tr('Net 15 Days')}</option>
+                    <option value={30}>{tr('Net 30 Days')}</option>
+                    <option value={45}>{tr('Net 45 Days')}</option>
                   </select>
                 </div>
               </div>
 
-              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-400 font-mono">
-                Will store <strong className="text-indigo-300">{lineItems.length} line item(s)</strong> with pre-set unit prices, tax rates, and GL account bindings.
-              </div>
+              <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-[11px] text-slate-400 font-mono">{tr('Will store')}<strong className="text-indigo-300">{lineItems.length} line item(s)</strong>{tr('with pre-set unit prices, tax rates, and GL account bindings.')}</div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowSaveTemplateModal(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-medium cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 cursor-pointer"
-                >
-                  Save Template
-                </button>
+                >{tr('Save Template')}</button>
               </div>
             </form>
           </div>
@@ -1714,7 +1697,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                   <CreditCard className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-bold text-white">Online Payment Gateway</h3>
+                  <h3 className="text-sm font-bold text-white">{tr('Online Payment Gateway')}</h3>
                   <p className="text-[11px] text-slate-400">Secure Merchant Checkout for Invoice #{onlinePayInvoice.invoiceNumber}</p>
                 </div>
               </div>
@@ -1731,14 +1714,12 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 <div className="w-14 h-14 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mx-auto border border-emerald-500/40">
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
-                <h4 className="text-base font-bold text-white">Payment Authorized & Settled!</h4>
+                <h4 className="text-base font-bold text-white">{tr('Payment Authorized & Settled!')}</h4>
                 <p className="text-xs text-slate-300 max-w-sm mx-auto">{onlinePaySuccessMessage}</p>
                 <button
                   onClick={() => setOnlinePayInvoice(null)}
                   className="mt-4 px-6 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl"
-                >
-                  Close Checkout
-                </button>
+                >{tr('Close Checkout')}</button>
               </div>
             ) : (
               <form
@@ -1759,15 +1740,15 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 {/* INVOICE SUMMARY CARD */}
                 <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 space-y-1.5 font-mono">
                   <div className="flex justify-between text-slate-400">
-                    <span>Customer Payee:</span>
+                    <span>{tr('Customer Payee:')}</span>
                     <span className="text-white font-sans font-bold">{onlinePayInvoice.customerName}</span>
                   </div>
                   <div className="flex justify-between text-slate-400">
-                    <span>Due Date:</span>
+                    <span>{tr('Due Date:')}</span>
                     <span className="text-slate-300">{onlinePayInvoice.dueDate}</span>
                   </div>
                   <div className="flex justify-between text-slate-300 pt-1 border-t border-slate-800 text-sm">
-                    <span className="font-bold">Total Amount Due:</span>
+                    <span className="font-bold">{tr('Total Amount Due:')}</span>
                     <span className="font-black text-emerald-400">
                       {onlinePayInvoice.currency} {(onlinePayInvoice.totalAmount - onlinePayInvoice.amountPaid).toLocaleString('en-US', { minimumFractionDigits: 2 })}
                     </span>
@@ -1776,7 +1757,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
 
                 {/* PAYMENT METHOD SELECTOR */}
                 <div className="space-y-1.5">
-                  <label className="text-slate-300 font-bold">Select Payment Gateway Method</label>
+                  <label className="text-slate-300 font-bold">{tr('Select Payment Gateway Method')}</label>
                   <div className="grid grid-cols-3 gap-2">
                     <button
                       type="button"
@@ -1788,7 +1769,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       }`}
                     >
                       <CreditCard className="w-4 h-4" />
-                      <span className="text-[10px]">Credit Card</span>
+                      <span className="text-[10px]">{tr('Credit Card')}</span>
                     </button>
 
                     <button
@@ -1801,7 +1782,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       }`}
                     >
                       <Building2 className="w-4 h-4" />
-                      <span className="text-[10px]">ACH Bank Wire</span>
+                      <span className="text-[10px]">{tr('ACH Bank Wire')}</span>
                     </button>
 
                     <button
@@ -1814,7 +1795,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                       }`}
                     >
                       <Smartphone className="w-4 h-4" />
-                      <span className="text-[10px]">Apple / Google Pay</span>
+                      <span className="text-[10px]">{tr('Apple / Google Pay')}</span>
                     </button>
                   </div>
                 </div>
@@ -1822,7 +1803,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 {onlinePayMethod === 'CREDIT_CARD' && (
                   <div className="space-y-2.5 bg-slate-950/60 p-3 rounded-2xl border border-slate-800">
                     <div>
-                      <label className="text-slate-400 text-[11px] block mb-1">Card Number</label>
+                      <label className="text-slate-400 text-[11px] block mb-1">{tr('Card Number')}</label>
                       <input
                         type="text"
                         value={cardNumber}
@@ -1832,7 +1813,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="text-slate-400 text-[11px] block mb-1">Expiration</label>
+                        <label className="text-slate-400 text-[11px] block mb-1">{tr('Expiration')}</label>
                         <input
                           type="text"
                           value={cardExpiry}
@@ -1841,7 +1822,7 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                         />
                       </div>
                       <div>
-                        <label className="text-slate-400 text-[11px] block mb-1">CVC / CVV</label>
+                        <label className="text-slate-400 text-[11px] block mb-1">{tr('CVC / CVV')}</label>
                         <input
                           type="text"
                           value={cardCvc}
@@ -1856,9 +1837,9 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                 <div className="flex items-center justify-between text-[11px] text-slate-400 pt-2 border-t border-slate-800">
                   <div className="flex items-center gap-1.5">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span>Encrypted with Stripe & Level 1 PCI DSS</span>
+                    <span>{tr('Encrypted with Stripe & Level 1 PCI DSS')}</span>
                   </div>
-                  <span className="font-bold text-slate-200">Instant GL Settlement</span>
+                  <span className="font-bold text-slate-200">{tr('Instant GL Settlement')}</span>
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-2">
@@ -1866,16 +1847,14 @@ export const InvoicingArView: React.FC<InvoicingArViewProps> = ({
                     type="button"
                     onClick={() => setOnlinePayInvoice(null)}
                     className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold"
-                  >
-                    Cancel
-                  </button>
+                  >{tr('Cancel')}</button>
                   <button
                     type="submit"
                     disabled={isProcessingOnlinePay}
                     className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl font-bold shadow-lg shadow-indigo-600/20 transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                   >
                     {isProcessingOnlinePay ? (
-                      <span>Authorizing Payment...</span>
+                      <span>{tr('Authorizing Payment...')}</span>
                     ) : (
                       <>
                         <Zap className="w-4 h-4 text-amber-300" />

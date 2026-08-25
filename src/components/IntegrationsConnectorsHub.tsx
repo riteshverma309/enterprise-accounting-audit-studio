@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   Workflow,
   Zap,
@@ -28,6 +29,7 @@ import { useAccounting } from '../context/AccountingContext';
 import { IntegrationConnector, ConnectorPlatform } from '../types';
 
 export const IntegrationsConnectorsHub: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     activeRole,
@@ -184,16 +186,11 @@ export const IntegrationsConnectorsHub: React.FC = () => {
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
               <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
-                <Workflow className="w-3 h-3" /> No-Code Integrations & Pre-Built Connectors
-              </span>
-              <span className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">
-                Bidirectional Double-Entry Sync
-              </span>
+                <Workflow className="w-3 h-3" />{tr('No-Code Integrations & Pre-Built Connectors')}</span>
+              <span className="px-2 py-0.5 rounded-md bg-purple-500/10 text-purple-400 border border-purple-500/20 text-xs font-mono">{tr('Bidirectional Double-Entry Sync')}</span>
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Zapier, Make & E-Commerce Integration Hub</h1>
-            <p className="text-sm text-slate-400 max-w-2xl">
-              Connect external SaaS applications, e-commerce storefronts, payment gateways, and CRM platforms with automated GL mapping and instant synchronization.
-            </p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">{tr('Zapier, Make & E-Commerce Integration Hub')}</h1>
+            <p className="text-sm text-slate-400 max-w-2xl">{tr('Connect external SaaS applications, e-commerce storefronts, payment gateways, and CRM platforms with automated GL mapping and instant synchronization.')}</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -204,7 +201,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
               className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/20 transition cursor-pointer"
             >
               <RefreshCw className={`w-4 h-4 ${syncingId ? 'animate-spin' : ''}`} />
-              <span>Sync All Connected Apps</span>
+              <span>{tr('Sync All Connected Apps')}</span>
             </button>
           </div>
         </div>
@@ -212,7 +209,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
         {/* METRICS ROW */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-slate-800/80">
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Active Connections</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Active Connections')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-emerald-400">
                 {tenantConnectors.filter((c) => c.status === 'CONNECTED').length}
@@ -222,25 +219,25 @@ export const IntegrationsConnectorsHub: React.FC = () => {
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Total Synced Records</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Total Synced Records')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-white">
                 {tenantConnectors.reduce((acc, c) => acc + c.stats.totalSyncedRecords, 0).toLocaleString()}
               </span>
-              <span className="text-xs text-slate-500 font-mono">transactions</span>
+              <span className="text-xs text-slate-500 font-mono">{tr('transactions')}</span>
             </div>
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Default Sync Frequency</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Default Sync Frequency')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-indigo-300 font-mono">15 min</span>
-              <span className="text-xs text-slate-500 font-mono">real-time webhook fallback</span>
+              <span className="text-xs text-slate-500 font-mono">{tr('real-time webhook fallback')}</span>
             </div>
           </div>
 
           <div className="p-3.5 bg-slate-950/60 rounded-2xl border border-slate-800/60">
-            <span className="text-xs text-slate-400 font-medium block">Double-Entry Assurance</span>
+            <span className="text-xs text-slate-400 font-medium block">{tr('Double-Entry Assurance')}</span>
             <div className="flex items-baseline gap-2 mt-1">
               <span className="text-xl font-bold text-purple-300 font-mono">100% Balanced</span>
               <span className="text-xs text-emerald-400 font-mono">DR = CR Check</span>
@@ -289,7 +286,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
           <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
           <input
             type="text"
-            placeholder="Search connectors by name..."
+            placeholder={tr('Search connectors by name...')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-slate-900 text-slate-200 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-800 focus:border-emerald-500 outline-none"
@@ -344,21 +341,21 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                 {/* SYNC CONFIG SUMMARY */}
                 <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800/80 space-y-2 text-xs">
                   <div className="flex items-center justify-between text-slate-400">
-                    <span>Sync Invoices / Orders:</span>
+                    <span>{tr("Sync Invoices / Orders:")}</span>
                     <span className={`font-bold ${conn.syncSettings.autoSyncInvoices ? 'text-emerald-400' : 'text-slate-500'}`}>
                       {conn.syncSettings.autoSyncInvoices ? 'Enabled' : 'Disabled'}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-slate-400">
-                    <span>Auto-Post to GL Ledger:</span>
+                    <span>{tr("Auto-Post to GL Ledger:")}</span>
                     <span className={`font-bold ${conn.syncSettings.autoPostJournals ? 'text-purple-400' : 'text-slate-500'}`}>
                       {conn.syncSettings.autoPostJournals ? 'Automatic' : 'Draft Review'}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-slate-400">
-                    <span>Total Synced:</span>
+                    <span>{tr("Total Synced:")}</span>
                     <span className="font-mono text-white font-bold">{conn.stats.totalSyncedRecords.toLocaleString()} recs</span>
                   </div>
                 </div>
@@ -377,7 +374,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                   className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                 >
                   <Sliders className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Configure</span>
+                  <span>{tr('Configure')}</span>
                 </button>
 
                 <div className="flex items-center gap-2">
@@ -398,7 +395,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                           }
                         }}
                         className="p-1.5 hover:bg-rose-500/10 text-slate-500 hover:text-rose-400 rounded-lg transition cursor-pointer"
-                        title="Disconnect connector"
+                        title={tr('Disconnect connector')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -407,9 +404,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                     <button
                       onClick={() => handleOpenConfig(conn)}
                       className="px-4 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-emerald-600/20 transition cursor-pointer"
-                    >
-                      Connect
-                    </button>
+                    >{tr('Connect')}</button>
                   )}
                 </div>
               </div>
@@ -444,9 +439,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
             <form onSubmit={handleSaveConfig} className="space-y-4 text-xs">
               {/* CREDENTIALS BASED ON PLATFORM */}
               <div className="space-y-3 p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
-                  Authentication & Target Endpoint
-                </span>
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block">{tr('Authentication & Target Endpoint')}</span>
 
                 {selectedConfigConnector.platform === 'STRIPE' && (
                   <div className="space-y-1">
@@ -454,7 +447,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                     <input
                       type="password"
                       required
-                      placeholder="rk_live_..."
+                      placeholder={tr('rk_live_...')}
                       value={configForm.apiKey}
                       onChange={(e) => setConfigForm({ ...configForm, apiKey: e.target.value })}
                       className="w-full bg-slate-900 text-slate-200 font-mono p-2.5 rounded-xl border border-slate-800 focus:border-emerald-500 outline-none"
@@ -469,17 +462,17 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                       <input
                         type="text"
                         required
-                        placeholder="your-brand.myshopify.com"
+                        placeholder={tr('your-brand.myshopify.com')}
                         value={configForm.storeDomain}
                         onChange={(e) => setConfigForm({ ...configForm, storeDomain: e.target.value })}
                         className="w-full bg-slate-900 text-slate-200 font-mono p-2.5 rounded-xl border border-slate-800 focus:border-emerald-500 outline-none"
                       />
                     </div>
                     <div className="space-y-1">
-                      <label className="block text-slate-400 font-bold">Custom App Admin Access Token</label>
+                      <label className="block text-slate-400 font-bold">{tr('Custom App Admin Access Token')}</label>
                       <input
                         type="password"
-                        placeholder="shpat_..."
+                        placeholder={tr('shpat_...')}
                         value={configForm.apiKey}
                         onChange={(e) => setConfigForm({ ...configForm, apiKey: e.target.value })}
                         className="w-full bg-slate-900 text-slate-200 font-mono p-2.5 rounded-xl border border-slate-800 focus:border-emerald-500 outline-none"
@@ -494,7 +487,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                     <input
                       type="url"
                       required
-                      placeholder="https://hooks.zapier.com/hooks/catch/..."
+                      placeholder={tr('https://hooks.zapier.com/hooks/catch/...')}
                       value={configForm.webhookUrl}
                       onChange={(e) => setConfigForm({ ...configForm, webhookUrl: e.target.value })}
                       className="w-full bg-slate-900 text-slate-200 font-mono p-2.5 rounded-xl border border-slate-800 focus:border-emerald-500 outline-none"
@@ -505,19 +498,17 @@ export const IntegrationsConnectorsHub: React.FC = () => {
 
               {/* GENERAL LEDGER MAPPINGS */}
               <div className="space-y-3 p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
-                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
-                  General Ledger Chart of Accounts Mapping
-                </span>
+                <span className="text-xs font-bold text-slate-300 uppercase tracking-wider block">{tr('General Ledger Chart of Accounts Mapping')}</span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
-                    <label className="block text-slate-400 font-bold">Default Revenue / Sales Account:</label>
+                    <label className="block text-slate-400 font-bold">{tr("Default Revenue / Sales Account:")}</label>
                     <select
                       value={configForm.defaultIncomeAccountId}
                       onChange={(e) => setConfigForm({ ...configForm, defaultIncomeAccountId: e.target.value })}
                       className="w-full bg-slate-900 text-slate-200 p-2.5 rounded-xl border border-slate-800 outline-none"
                     >
-                      <option value="">Select Revenue Account</option>
+                      <option value="">{tr('Select Revenue Account')}</option>
                       {revenueAccounts.map((a) => (
                         <option key={a.id} value={a.id}>
                           {a.code} — {a.name}
@@ -527,13 +518,13 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                   </div>
 
                   <div className="space-y-1">
-                    <label className="block text-slate-400 font-bold">Default Bank / Settlement Account:</label>
+                    <label className="block text-slate-400 font-bold">{tr("Default Bank / Settlement Account:")}</label>
                     <select
                       value={configForm.defaultBankAccountId}
                       onChange={(e) => setConfigForm({ ...configForm, defaultBankAccountId: e.target.value })}
                       className="w-full bg-slate-900 text-slate-200 p-2.5 rounded-xl border border-slate-800 outline-none"
                     >
-                      <option value="">Select Cash / Bank Account</option>
+                      <option value="">{tr('Select Cash / Bank Account')}</option>
                       {bankAccounts.map((a) => (
                         <option key={a.id} value={a.id}>
                           {a.code} — {a.name}
@@ -550,7 +541,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                     onChange={(e) => setConfigForm({ ...configForm, defaultExpenseAccountId: e.target.value })}
                     className="w-full bg-slate-900 text-slate-200 p-2.5 rounded-xl border border-slate-800 outline-none"
                   >
-                    <option value="">Select Expense Account</option>
+                    <option value="">{tr('Select Expense Account')}</option>
                     {expenseAccounts.map((a) => (
                       <option key={a.id} value={a.id}>
                         {a.code} — {a.name}
@@ -570,9 +561,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                     onChange={(e) => setConfigForm({ ...configForm, autoSyncInvoices: e.target.checked })}
                     className="rounded text-emerald-600 focus:ring-0 cursor-pointer"
                   />
-                  <label htmlFor="auto-sync-inv" className="text-slate-300 font-medium cursor-pointer">
-                    Auto-create Accounts Receivable invoices from external orders
-                  </label>
+                  <label htmlFor="auto-sync-inv" className="text-slate-300 font-medium cursor-pointer">{tr('Auto-create Accounts Receivable invoices from external orders')}</label>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -583,9 +572,7 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                     onChange={(e) => setConfigForm({ ...configForm, autoPostJournals: e.target.checked })}
                     className="rounded text-emerald-600 focus:ring-0 cursor-pointer"
                   />
-                  <label htmlFor="auto-post-gl" className="text-slate-300 font-medium cursor-pointer">
-                    Post double-entry journal vouchers to GL automatically upon settlement
-                  </label>
+                  <label htmlFor="auto-post-gl" className="text-slate-300 font-medium cursor-pointer">{tr('Post double-entry journal vouchers to GL automatically upon settlement')}</label>
                 </div>
               </div>
 
@@ -594,15 +581,11 @@ export const IntegrationsConnectorsHub: React.FC = () => {
                   type="button"
                   onClick={() => setSelectedConfigConnector(null)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-bold transition cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-bold shadow-lg shadow-emerald-600/20 transition cursor-pointer"
-                >
-                  Save & Connect Integration
-                </button>
+                >{tr('Save & Connect Integration')}</button>
               </div>
             </form>
           </div>

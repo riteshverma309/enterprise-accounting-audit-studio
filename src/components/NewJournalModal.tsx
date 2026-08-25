@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { X, Plus, Trash2, Scale, AlertTriangle, ShieldAlert } from 'lucide-react';
 import { JournalLine } from '../types';
 
@@ -9,6 +10,7 @@ interface NewJournalModalProps {
 }
 
 export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClose }) => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const { activeTenant, activeOrganization, activeBranch, accounts, postJournalEntry, activePlugin, activeRole } = useAccounting();
 
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -72,12 +74,12 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
     setErrorMsg(null);
 
     if (!description.trim()) {
-      setErrorMsg('Description is required.');
+      setErrorMsg(tr('Description is required.'));
       return;
     }
 
     if (!isBalanced) {
-      setErrorMsg(`DOUBLE-ENTRY IMBALANCE: Sum of Debits (${totalDebit}) does not match Sum of Credits (${totalCredit}). Imbalance: ${variance.toFixed(2)}`);
+      setErrorMsg(`${tr('Double-Entry Check')}: ${tr('Debit')} (${totalDebit}) ≠ ${tr('Credit')} (${totalCredit}). ${tr('Balance')}: ${variance.toFixed(2)}`);
       return;
     }
 
@@ -108,7 +110,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
     if (res.success) {
       onClose();
     } else {
-      setErrorMsg(res.error || 'Posting failed.');
+      setErrorMsg(res.error || tr('Posting failed.'));
     }
   };
 
@@ -121,8 +123,8 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
           <div className="flex items-center gap-2">
             <Scale className="w-5 h-5 text-indigo-400" />
             <div>
-              <h2 className="text-base font-bold text-white">Post Double-Entry Journal Transaction</h2>
-              <p className="text-xs text-slate-400">Entity: {activeTenant.name} ({activeTenant.currency})</p>
+              <h2 className="text-base font-bold text-white">{tr('Post Journal Entry')}</h2>
+              <p className="text-xs text-slate-400">{activeTenant.name} ({activeTenant.currency})</p>
             </div>
           </div>
           <button type="button" onClick={onClose} className="text-slate-400 hover:text-white cursor-pointer">
@@ -134,7 +136,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
         {activeRole === 'viewer' && (
           <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-amber-400" />
-            <span>Simulating "viewer" role. Submitting will trigger a 403 Forbidden audit log response.</span>
+            <span>{tr('Simulating "viewer" role. Submitting will trigger a 403 Forbidden audit log response.')}</span>
           </div>
         )}
 
@@ -149,7 +151,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
         {/* Basic Fields */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Transaction Date *</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Transaction Date')} *</label>
             <input
               type="date"
               value={date}
@@ -159,7 +161,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Description *</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Description')} *</label>
             <input
               type="text"
               value={description}
@@ -170,7 +172,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Reference / PO #</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Reference / PO #')}</label>
             <input
               type="text"
               value={reference}
@@ -184,13 +186,13 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
         {/* Journal Lines Table */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-200">Journal Entry Line Items</span>
+            <span className="text-xs font-bold text-slate-200">{tr('Journal Entry Line Items')}</span>
             <button
               type="button"
               onClick={handleAddLine}
               className="text-xs text-indigo-400 hover:text-indigo-300 font-bold flex items-center gap-1 cursor-pointer"
             >
-              <Plus className="w-3.5 h-3.5" /> Add Line
+              <Plus className="w-3.5 h-3.5" /> {tr('Add Line')}
             </button>
           </div>
 
@@ -206,7 +208,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
                 >
                   {accounts.map((a) => (
                     <option key={a.id} value={a.code}>
-                      [{a.code}] {a.name} ({a.type})
+                      [{a.code}] {a.name} ({tr(a.type)})
                     </option>
                   ))}
                 </select>
@@ -217,7 +219,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
                   step="0.01"
                   value={line.debit || ''}
                   onChange={(e) => handleAmountChange(idx, 'debit', parseFloat(e.target.value) || 0)}
-                  placeholder="Debit"
+                  placeholder={tr('Debit')}
                   className="w-28 bg-slate-900 text-slate-100 p-2 rounded-lg border border-slate-700 outline-none text-right font-bold"
                 />
 
@@ -227,7 +229,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
                   step="0.01"
                   value={line.credit || ''}
                   onChange={(e) => handleAmountChange(idx, 'credit', parseFloat(e.target.value) || 0)}
-                  placeholder="Credit"
+                  placeholder={tr('Credit')}
                   className="w-28 bg-slate-900 text-slate-100 p-2 rounded-lg border border-slate-700 outline-none text-right font-bold"
                 />
 
@@ -251,11 +253,11 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
           isBalanced ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
         }`}>
           <div>
-            <span className="font-bold">Total Debits:</span> {activeTenant.currency} {totalDebit.toFixed(2)} |{' '}
-            <span className="font-bold">Total Credits:</span> {activeTenant.currency} {totalCredit.toFixed(2)}
+            <span className="font-bold">{tr('Debit')}:</span> {formatCurrency(totalDebit, activeTenant.currency)} |{' '}
+            <span className="font-bold">{tr('Credit')}:</span> {formatCurrency(totalCredit, activeTenant.currency)}
           </div>
           <span className="font-extrabold text-sm">
-            {isBalanced ? '✓ DEBITS = CREDITS BALANCED' : `IMBALANCE: ${variance.toFixed(2)}`}
+            {isBalanced ? `✓ ${tr('DEBITS = CREDITS')}` : `${tr('Double-Entry Check')} ${tr('Balance')}: ${variance.toFixed(2)}`}
           </span>
         </div>
 
@@ -266,7 +268,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
             onClick={onClose}
             className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl cursor-pointer"
           >
-            Cancel
+            {tr('Cancel')}
           </button>
           <button
             type="submit"
@@ -277,7 +279,7 @@ export const NewJournalModal: React.FC<NewJournalModalProps> = ({ isOpen, onClos
                 : 'bg-slate-800 text-slate-500 cursor-not-allowed'
             }`}
           >
-            Post Journal Entry to General Ledger
+            {tr('Post Journal Entry')}
           </button>
         </div>
 

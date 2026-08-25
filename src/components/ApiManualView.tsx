@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   Terminal,
   BookOpen,
@@ -30,6 +31,7 @@ import {
 import { useAccounting } from '../context/AccountingContext';
 
 export const ApiManualView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const { activeTenant, activeRole, userEmail } = useAccounting();
 
   // Navigation tabs within this view
@@ -468,7 +470,7 @@ Features:
 
 API Authentication & Headers:
 • Base URL: https://ais-dev-gx4djmas3nxo3hsvf3shud-164105144910.asia-east1.run.app/api/v1
-• Authentication Header: X-API-Key: <your_secret_api_key> or Authorization: Bearer <your_token>
+• Authentication Header: X-API-Key: <your_secret_api_key> {tr('or Authorization: Bearer')} <your_token>
 • Tenant Context Header: X-Tenant-ID: <tenant_id> (e.g., t-acme-us)
 • Response Format: Standard JSON with success boolean, status code, metadata, and structured data payloads.`,
     },
@@ -513,15 +515,10 @@ API Authentication & Headers:
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-black text-white tracking-tight flex items-center gap-2">
-              <Terminal className="w-6 h-6 text-purple-400" /> Complete User Manual & Developer REST API Suite
-            </h1>
-            <span className="px-2.5 py-0.5 bg-purple-500/10 text-purple-300 font-mono text-[11px] rounded-full font-bold border border-purple-500/30">
-              OpenAPI 3.0 Ready
-            </span>
+              <Terminal className="w-6 h-6 text-purple-400" />{tr('Complete User Manual & Developer REST API Suite')}</h1>
+            <span className="px-2.5 py-0.5 bg-purple-500/10 text-purple-300 font-mono text-[11px] rounded-full font-bold border border-purple-500/30">{tr('OpenAPI 3.0 Ready')}</span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
-            Exhaustive operational user guide and direct REST API integration interface for third-party applications, microservices, and mobile apps.
-          </p>
+          <p className="text-xs text-slate-400 mt-1">{tr('Exhaustive operational user guide and direct REST API integration interface for third-party applications, microservices, and mobile apps.')}</p>
         </div>
 
         {/* TOP LEVEL NAVIGATION TABS */}
@@ -535,7 +532,7 @@ API Authentication & Headers:
             }`}
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>Interactive Swagger UI</span>
+            <span>{tr('Interactive Swagger UI')}</span>
           </button>
 
           <button
@@ -547,7 +544,7 @@ API Authentication & Headers:
             }`}
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Exhaustive User Manual</span>
+            <span>{tr('Exhaustive User Manual')}</span>
           </button>
 
           <button
@@ -559,7 +556,7 @@ API Authentication & Headers:
             }`}
           >
             <Play className="w-3.5 h-3.5 text-amber-300" />
-            <span>API Tester</span>
+            <span>{tr('API Tester')}</span>
           </button>
 
           <button
@@ -571,7 +568,7 @@ API Authentication & Headers:
             }`}
           >
             <Key className="w-3.5 h-3.5" />
-            <span>API Keys & Snippets</span>
+            <span>{tr('API Keys & Snippets')}</span>
           </button>
 
           <button
@@ -583,7 +580,7 @@ API Authentication & Headers:
             }`}
           >
             <Code2 className="w-3.5 h-3.5" />
-            <span>OpenAPI Spec</span>
+            <span>{tr('OpenAPI Spec')}</span>
           </button>
         </div>
       </div>
@@ -596,22 +593,18 @@ API Authentication & Headers:
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
-                  <div className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg font-mono text-xs font-bold">
-                    Swagger UI 3.0
-                  </div>
-                  <h2 className="text-lg font-black text-white tracking-tight">
-                    Enterprise Multi-Tenant Financial REST API v1.0-GA
-                  </h2>
+                  <div className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-lg font-mono text-xs font-bold">{tr('Swagger UI 3.0')}</div>
+                  <h2 className="text-lg font-black text-white tracking-tight">{tr('Enterprise Multi-Tenant Financial REST API v1.0-GA')}</h2>
                 </div>
                 <p className="text-xs text-slate-400">
-                  OpenAPI 3.0.3 Specification • Server: <code className="text-purple-300 font-mono">https://ais-dev-gx4djmas3nxo3hsvf3shud-164105144910.asia-east1.run.app/api/v1</code>
+                  OpenAPI 3.0.3 Specification • Server: <code className="text-purple-300 font-mono">{tr('https://ais-dev-gx4djmas3nxo3hsvf3shud-164105144910.asia-east1.run.app/api/v1')}</code>
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
                 <div className="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 font-mono text-xs flex items-center gap-2">
                   <Lock className="w-3.5 h-3.5 text-amber-400" />
-                  <span className="text-slate-400">Auth:</span>
+                  <span className="text-slate-400">{tr('Auth:')}</span>
                   <span className="text-amber-300 font-bold">{generatedKey ? 'X-API-Key Active' : 'Unauthenticated'}</span>
                 </div>
 
@@ -621,9 +614,7 @@ API Authentication & Headers:
                     setGeneratedKey(newKey);
                   }}
                   className="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow cursor-pointer transition"
-                >
-                  Authorize / Rotate Token
-                </button>
+                >{tr('Authorize / Rotate Token')}</button>
               </div>
             </div>
 
@@ -631,24 +622,24 @@ API Authentication & Headers:
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center gap-3">
                 <ShieldCheck className="w-5 h-5 text-emerald-400" />
                 <div>
-                  <div className="font-bold text-white">X-API-Key Security</div>
-                  <div className="text-[11px] text-slate-400">Header-based token authorization</div>
+                  <div className="font-bold text-white">{tr('X-API-Key Security')}</div>
+                  <div className="text-[11px] text-slate-400">{tr('Header-based token authorization')}</div>
                 </div>
               </div>
 
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center gap-3">
                 <Globe className="w-5 h-5 text-indigo-400" />
                 <div>
-                  <div className="font-bold text-white">X-Tenant-ID Header</div>
-                  <div className="text-[11px] text-slate-400">Multi-tenant context isolation</div>
+                  <div className="font-bold text-white">{tr('X-Tenant-ID Header')}</div>
+                  <div className="text-[11px] text-slate-400">{tr('Multi-tenant context isolation')}</div>
                 </div>
               </div>
 
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center gap-3">
                 <Code2 className="w-5 h-5 text-purple-400" />
                 <div>
-                  <div className="font-bold text-white">JSON Payloads</div>
-                  <div className="text-[11px] text-slate-400">RFC 8259 Compliant JSON</div>
+                  <div className="font-bold text-white">{tr('JSON Payloads')}</div>
+                  <div className="text-[11px] text-slate-400">{tr('RFC 8259 Compliant JSON')}</div>
                 </div>
               </div>
             </div>
@@ -658,7 +649,7 @@ API Authentication & Headers:
           <div className="space-y-4">
             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
               <span>API Gateway Routes ({endpoints.length} Endpoints Available)</span>
-              <span className="text-purple-400">Click any endpoint to Expand & Try It Out</span>
+              <span className="text-purple-400">{tr('Click any endpoint to Expand & Try It Out')}</span>
             </div>
 
             {endpoints.map((ep) => {
@@ -735,7 +726,7 @@ API Authentication & Headers:
                       {/* PARAMETERS & HEADERS */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                         <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
-                          <label className="block text-slate-400 font-bold">X-API-Key (Header):</label>
+                          <label className="block text-slate-400 font-bold">{tr('X-API-Key (Header):')}</label>
                           <input
                             type="text"
                             value={generatedKey}
@@ -745,7 +736,7 @@ API Authentication & Headers:
                         </div>
 
                         <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 space-y-1">
-                          <label className="block text-slate-400 font-bold">X-Tenant-ID (Header):</label>
+                          <label className="block text-slate-400 font-bold">{tr('X-Tenant-ID (Header):')}</label>
                           <input
                             type="text"
                             value={customTenantHeader}
@@ -758,7 +749,7 @@ API Authentication & Headers:
                       {/* REQUEST BODY IF POST */}
                       {!isGet && (
                         <div className="space-y-1">
-                          <label className="block text-xs font-bold text-slate-400">Request Body Schema (application/json):</label>
+                          <label className="block text-xs font-bold text-slate-400">{tr('Request Body Schema (application/json):')}</label>
                           <textarea
                             rows={6}
                             value={requestBody}
@@ -773,7 +764,7 @@ API Authentication & Headers:
                         <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-2">
                           <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-bold text-white">HTTP Server Response:</span>
+                              <span className="text-xs font-bold text-white">{tr('HTTP Server Response:')}</span>
                               <span
                                 className={`px-2 py-0.5 rounded text-xs font-mono font-bold ${
                                   apiResponse.status >= 200 && apiResponse.status < 300
@@ -809,7 +800,7 @@ API Authentication & Headers:
               <Search className="w-4 h-4 text-slate-500 absolute left-3 top-2.5" />
               <input
                 type="text"
-                placeholder="Search manual by topic, role, module, or regulation (e.g. SOX, Super User, General Ledger, Tax)..."
+                placeholder={tr('Search manual by topic, role, module, or regulation (e.g. SOX, Super User, General Ledger, Tax)...')}
                 value={manualSearch}
                 onChange={(e) => setManualSearch(e.target.value)}
                 className="w-full bg-slate-950 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-xl border border-slate-800 focus:border-purple-500 outline-none"
@@ -847,11 +838,8 @@ API Authentication & Headers:
           <div className="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-sm">
             <div className="flex items-center justify-between pb-2 border-b border-slate-800">
               <span className="text-xs font-bold text-slate-300 flex items-center gap-2">
-                <Server className="w-4 h-4 text-purple-400" /> REST API Endpoints
-              </span>
-              <span className="text-[10px] bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded font-mono font-bold">
-                v1.0-GA
-              </span>
+                <Server className="w-4 h-4 text-purple-400" />{tr('REST API Endpoints')}</span>
+              <span className="text-[10px] bg-purple-500/10 text-purple-300 px-2 py-0.5 rounded font-mono font-bold">{tr('v1.0-GA')}</span>
             </div>
 
             <div className="space-y-1 max-h-[580px] overflow-y-auto pr-1">
@@ -928,7 +916,7 @@ API Authentication & Headers:
               {/* REQUEST HEADERS & PARAMS */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">X-API-Key Header:</label>
+                  <label className="block text-slate-400 font-bold mb-1">{tr('X-API-Key Header:')}</label>
                   <input
                     type="text"
                     value={generatedKey}
@@ -938,7 +926,7 @@ API Authentication & Headers:
                 </div>
 
                 <div>
-                  <label className="block text-slate-400 font-bold mb-1">X-Tenant-ID Context Header:</label>
+                  <label className="block text-slate-400 font-bold mb-1">{tr('X-Tenant-ID Context Header:')}</label>
                   <input
                     type="text"
                     value={customTenantHeader}
@@ -969,7 +957,7 @@ API Authentication & Headers:
               <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-lg">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-800">
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-white">Live API Server Response:</span>
+                    <span className="text-xs font-bold text-white">{tr('Live API Server Response:')}</span>
                     <span
                       className={`px-2.5 py-0.5 rounded text-xs font-mono font-bold ${
                         apiResponse.status >= 200 && apiResponse.status < 300
@@ -1006,29 +994,27 @@ API Authentication & Headers:
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2">
                 <Key className="w-5 h-5 text-amber-400" />
-                <h3 className="text-sm font-bold text-white">API Keys & Authentication Secret Tokens</h3>
+                <h3 className="text-sm font-bold text-white">{tr('API Keys & Authentication Secret Tokens')}</h3>
               </div>
               <button
                 onClick={() => setGeneratedKey(`sec_live_${Math.random().toString(36).substring(2, 18)}`)}
                 className="bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-700 transition cursor-pointer"
-              >
-                Rotate API Key
-              </button>
+              >{tr('Rotate API Key')}</button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-                <span className="text-slate-400 text-[11px]">Active API Gateway Token:</span>
+                <span className="text-slate-400 text-[11px]">{tr('Active API Gateway Token:')}</span>
                 <div className="font-mono text-amber-300 font-bold truncate">{generatedKey}</div>
               </div>
 
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-                <span className="text-slate-400 text-[11px]">Granted Scope Level:</span>
+                <span className="text-slate-400 text-[11px]">{tr('Granted Scope Level:')}</span>
                 <div className="font-mono text-purple-300 font-bold uppercase">{activeRole}</div>
               </div>
 
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-1">
-                <span className="text-slate-400 text-[11px]">Default Entity Context:</span>
+                <span className="text-slate-400 text-[11px]">{tr('Default Entity Context:')}</span>
                 <div className="font-mono text-indigo-300 font-bold">{activeTenant.name} ({activeTenant.id})</div>
               </div>
             </div>
@@ -1049,25 +1035,19 @@ API Authentication & Headers:
                     className={`px-3 py-1 rounded-lg font-bold cursor-pointer transition ${
                       activeCodeLang === 'CURL' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
                     }`}
-                  >
-                    cURL
-                  </button>
+                  >{tr('cURL')}</button>
                   <button
                     onClick={() => setActiveCodeLang('JS')}
                     className={`px-3 py-1 rounded-lg font-bold cursor-pointer transition ${
                       activeCodeLang === 'JS' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
                     }`}
-                  >
-                    JavaScript
-                  </button>
+                  >{tr('JavaScript')}</button>
                   <button
                     onClick={() => setActiveCodeLang('PYTHON')}
                     className={`px-3 py-1 rounded-lg font-bold cursor-pointer transition ${
                       activeCodeLang === 'PYTHON' ? 'bg-purple-600 text-white' : 'text-slate-400 hover:text-white'
                     }`}
-                  >
-                    Python
-                  </button>
+                  >{tr('Python')}</button>
                 </div>
 
                 <button
@@ -1097,7 +1077,7 @@ API Authentication & Headers:
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
             <div className="flex items-center gap-2">
               <Code2 className="w-5 h-5 text-indigo-400" />
-              <h3 className="text-sm font-bold text-white">OpenAPI 3.0 JSON Specification</h3>
+              <h3 className="text-sm font-bold text-white">{tr('OpenAPI 3.0 JSON Specification')}</h3>
             </div>
 
             <button
@@ -1108,13 +1088,11 @@ API Authentication & Headers:
               className="flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold px-3 py-2 rounded-xl border border-slate-700 transition cursor-pointer"
             >
               <Download className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Export OpenAPI JSON</span>
+              <span>{tr('Export OpenAPI JSON')}</span>
             </button>
           </div>
 
-          <p className="text-xs text-slate-400">
-            You can import this OpenAPI 3.0 JSON specification directly into Postman, Insomnia, Swagger UI, or automated client code generators (Swagger Codegen / OpenAPI Generator).
-          </p>
+          <p className="text-xs text-slate-400">{tr('You can import this OpenAPI 3.0 JSON specification directly into Postman, Insomnia, Swagger UI, or automated client code generators (Swagger Codegen / OpenAPI Generator).')}</p>
 
           <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-indigo-300 max-h-[500px] overflow-y-auto">
             <pre>{JSON.stringify({

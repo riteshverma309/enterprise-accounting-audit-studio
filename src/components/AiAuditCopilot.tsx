@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   Sparkles,
@@ -29,6 +30,7 @@ import {
 import { GoogleGenAI } from '@google/genai';
 
 export const AiAuditCopilot: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     activeRole,
@@ -345,7 +347,7 @@ Provide a concise, highly professional forensic breakdown with:
               <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-indigo-600/30">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-lg font-bold text-white">AI Forensic Audit & Compliance Copilot</h1>
+              <h1 className="text-lg font-bold text-white">{tr('AI Forensic Audit & Compliance Copilot')}</h1>
               
               {/* Entity Scope Badge */}
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 border border-slate-700 rounded-lg text-xs font-semibold text-slate-200">
@@ -362,13 +364,11 @@ Provide a concise, highly professional forensic breakdown with:
               {/* Entity Isolation Lock Badge */}
               <div className="flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
                 <Lock className="w-3 h-3" />
-                <span>Entity Isolated Key</span>
+                <span>{tr('Entity Isolated Key')}</span>
               </div>
             </div>
 
-            <p className="text-xs text-slate-400 mt-1.5">
-              Forensic audit anomaly detection, GAAP/IFRS statutory compliance, and double-entry reconciliation.
-            </p>
+            <p className="text-xs text-slate-400 mt-1.5">{tr('Forensic audit anomaly detection, GAAP/IFRS statutory compliance, and double-entry reconciliation.')}</p>
           </div>
 
           {/* Action Buttons & Tabs */}
@@ -383,7 +383,7 @@ Provide a concise, highly professional forensic breakdown with:
                 }`}
               >
                 <MessageSquare className="w-3.5 h-3.5" />
-                <span>Audit Chat</span>
+                <span>{tr('Audit Chat')}</span>
               </button>
               <button
                 onClick={() => setActiveViewTab('usage_logs')}
@@ -405,15 +405,15 @@ Provide a concise, highly professional forensic breakdown with:
                 className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-600 text-white px-3.5 py-2 rounded-xl text-xs font-semibold shadow-md shadow-indigo-600/20 border border-indigo-500/30 transition cursor-pointer"
               >
                 <Sliders className="w-3.5 h-3.5" />
-                <span>Configure Entity Key & Quota</span>
+                <span>{tr('Configure Entity Key & Quota')}</span>
               </button>
             ) : (
               <div
-                title="Only Entity Admins and Super Users can modify the entity API Key and Token Quota"
+                title={tr('Only Entity Admins and Super Users can modify the entity API Key and Token Quota')}
                 className="flex items-center gap-1.5 bg-slate-800/80 text-slate-400 px-3 py-2 rounded-xl text-xs border border-slate-700/60"
               >
                 <Lock className="w-3.5 h-3.5 text-slate-500" />
-                <span>Entity Admin Configured</span>
+                <span>{tr('Entity Admin Configured')}</span>
               </div>
             )}
           </div>
@@ -465,7 +465,7 @@ Provide a concise, highly professional forensic breakdown with:
 
           {/* Key Status Metric */}
           <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-800 flex flex-col justify-between">
-            <span className="text-[11px] text-slate-400 font-medium">Entity API Key Status</span>
+            <span className="text-[11px] text-slate-400 font-medium">{tr('Entity API Key Status')}</span>
             <div className="flex items-center justify-between mt-1">
               <div className="flex items-center gap-1.5">
                 <KeyRound className={`w-4 h-4 ${activeTenantAiConfig.isKeyConfigured ? 'text-emerald-400' : 'text-amber-400'}`} />
@@ -491,15 +491,15 @@ Provide a concise, highly professional forensic breakdown with:
           {/* Queries Run & Admin Reset */}
           <div className="bg-slate-950/80 rounded-xl p-3 border border-slate-800 flex flex-col justify-between">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] text-slate-400 font-medium">Cycle Audit Requests</span>
+              <span className="text-[11px] text-slate-400 font-medium">{tr('Cycle Audit Requests')}</span>
               {canConfigureEntityAi && tokensUsed > 0 && (
                 <button
                   onClick={handleResetQuota}
-                  title="Reset token consumption for this billing period"
+                  title={tr('Reset token consumption for this billing period')}
                   className="text-[10px] text-slate-400 hover:text-indigo-300 flex items-center gap-1 cursor-pointer transition"
                 >
                   <RotateCcw className="w-3 h-3" />
-                  <span>Reset</span>
+                  <span>{tr('Reset')}</span>
                 </button>
               )}
             </div>
@@ -507,7 +507,7 @@ Provide a concise, highly professional forensic breakdown with:
               <span className="text-lg font-bold text-white font-mono">
                 {activeTenantAiConfig.requestsCountThisPeriod || 0}
               </span>
-              <span className="text-[11px] text-slate-400">queries completed</span>
+              <span className="text-[11px] text-slate-400">{tr('queries completed')}</span>
             </div>
             <span className="text-[10px] text-slate-500 mt-1 font-mono">
               Lifetime: {(activeTenantAiConfig.totalTokensAllTime || 0).toLocaleString()} tokens
@@ -526,17 +526,13 @@ Provide a concise, highly professional forensic breakdown with:
             <p className="font-bold text-rose-300 text-sm">
               Entity Token Quota Exceeded ({tokensUsed.toLocaleString()} / {quotaLimit.toLocaleString()} tokens)
             </p>
-            <p className="mt-0.5 text-rose-200/90 leading-relaxed">
-              The AI Audit Copilot is temporarily paused for <strong>{activeTenant.name}</strong> to prevent unintended token consumption. An Entity Administrator or Super User can expand the monthly quota limit or reset the cycle in Entity AI Settings.
-            </p>
+            <p className="mt-0.5 text-rose-200/90 leading-relaxed">{tr('The AI Audit Copilot is temporarily paused for')}<strong>{activeTenant.name}</strong>{tr('to prevent unintended token consumption. An Entity Administrator or Super User can expand the monthly quota limit or reset the cycle in Entity AI Settings.')}</p>
           </div>
           {canConfigureEntityAi && (
             <button
               onClick={handleOpenConfigModal}
               className="shrink-0 bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-xl transition cursor-pointer shadow"
-            >
-              Adjust Quota
-            </button>
+            >{tr('Adjust Quota')}</button>
           )}
         </div>
       )}
@@ -546,16 +542,14 @@ Provide a concise, highly professional forensic breakdown with:
           <div className="flex items-center gap-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
             <span>
-              <strong>Quota Alert:</strong> {activeTenant.name} has consumed <strong>{usagePercentage}%</strong> of its monthly token allocation ({tokensUsed.toLocaleString()} / {quotaLimit.toLocaleString()} tokens).
+              <strong>{tr('Quota Alert:')}</strong> {activeTenant.name} has consumed <strong>{usagePercentage}%</strong> of its monthly token allocation ({tokensUsed.toLocaleString()} / {quotaLimit.toLocaleString()} tokens).
             </span>
           </div>
           {canConfigureEntityAi && (
             <button
               onClick={handleOpenConfigModal}
               className="shrink-0 text-amber-300 hover:text-amber-100 font-semibold underline text-xs cursor-pointer"
-            >
-              Increase Quota
-            </button>
+            >{tr('Increase Quota')}</button>
           )}
         </div>
       )}
@@ -629,12 +623,12 @@ Provide a concise, highly professional forensic breakdown with:
                         {copiedIndex === idx ? (
                           <>
                             <Check className="w-3 h-3 text-emerald-400" />
-                            <span className="text-emerald-400">Copied</span>
+                            <span className="text-emerald-400">{tr('Copied')}</span>
                           </>
                         ) : (
                           <>
                             <Copy className="w-3 h-3" />
-                            <span>Copy Report</span>
+                            <span>{tr('Copy Report')}</span>
                           </>
                         )}
                       </button>
@@ -702,7 +696,7 @@ Provide a concise, highly professional forensic breakdown with:
                 className="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-1.5 rounded-xl border border-slate-700 transition flex items-center gap-1.5 cursor-pointer"
               >
                 <RotateCcw className="w-3.5 h-3.5 text-amber-400" />
-                <span>Reset Token Counter</span>
+                <span>{tr('Reset Token Counter')}</span>
               </button>
             )}
           </div>
@@ -716,13 +710,13 @@ Provide a concise, highly professional forensic breakdown with:
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
                   <tr className="border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider bg-slate-950/40">
-                    <th className="py-2.5 px-3">Timestamp</th>
-                    <th className="py-2.5 px-3">Auditor / User</th>
-                    <th className="py-2.5 px-3">Query Topic</th>
-                    <th className="py-2.5 px-3">Model</th>
-                    <th className="py-2.5 px-3 text-right">Prompt Tokens</th>
-                    <th className="py-2.5 px-3 text-right">Response Tokens</th>
-                    <th className="py-2.5 px-3 text-right">Total Tokens</th>
+                    <th className="py-2.5 px-3">{tr('Timestamp')}</th>
+                    <th className="py-2.5 px-3">{tr('Auditor / User')}</th>
+                    <th className="py-2.5 px-3">{tr('Query Topic')}</th>
+                    <th className="py-2.5 px-3">{tr('Model')}</th>
+                    <th className="py-2.5 px-3 text-right">{tr('Prompt Tokens')}</th>
+                    <th className="py-2.5 px-3 text-right">{tr('Response Tokens')}</th>
+                    <th className="py-2.5 px-3 text-right">{tr('Total Tokens')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 font-mono text-slate-300 text-[11px]">
@@ -760,9 +754,8 @@ Provide a concise, highly professional forensic breakdown with:
                   <KeyRound className="w-4 h-4 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-white">Entity AI Copilot Configuration</h2>
-                  <p className="text-xs text-slate-400">
-                    Dedicated API key & token quotas for <strong>{activeTenant.name}</strong> ({activeTenant.code})
+                  <h2 className="text-base font-bold text-white">{tr('Entity AI Copilot Configuration')}</h2>
+                  <p className="text-xs text-slate-400">{tr('Dedicated API key & token quotas for')}<strong>{activeTenant.name}</strong> ({activeTenant.code})
                   </p>
                 </div>
               </div>
@@ -778,8 +771,7 @@ Provide a concise, highly professional forensic breakdown with:
             <div className="bg-indigo-950/40 border-b border-indigo-500/20 px-5 py-3 flex items-center gap-2.5 text-xs text-indigo-200">
               <Lock className="w-4 h-4 text-indigo-400 shrink-0" />
               <span>
-                <strong>SOX 404 & GDPR Isolation:</strong> This API key and quota will remain strictly available for <strong>{activeTenant.name}</strong> only. Other entities in the group cannot access this key or consume its token quota.
-              </span>
+                <strong>{tr('SOX 404 & GDPR Isolation:')}</strong> {tr('This API key and quota will remain strictly available for')} <strong>{activeTenant.name}</strong>{tr('only. Other entities in the group cannot access this key or consume its token quota.')}</span>
             </div>
 
             {/* Modal Tabs */}
@@ -793,7 +785,7 @@ Provide a concise, highly professional forensic breakdown with:
                 }`}
               >
                 <KeyRound className="w-3.5 h-3.5" />
-                <span>API Key & Model</span>
+                <span>{tr('API Key & Model')}</span>
               </button>
               <button
                 onClick={() => setConfigTab('quota_limits')}
@@ -804,7 +796,7 @@ Provide a concise, highly professional forensic breakdown with:
                 }`}
               >
                 <Sliders className="w-3.5 h-3.5" />
-                <span>Token Quota Limits & Safety</span>
+                <span>{tr('Token Quota Limits & Safety')}</span>
               </button>
               <button
                 onClick={() => setConfigTab('instructions')}
@@ -815,7 +807,7 @@ Provide a concise, highly professional forensic breakdown with:
                 }`}
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
-                <span>Audit Directives</span>
+                <span>{tr('Audit Directives')}</span>
               </button>
             </div>
 
@@ -826,15 +818,13 @@ Provide a concise, highly professional forensic breakdown with:
               {configTab === 'api_key' && (
                 <div className="space-y-4 text-xs">
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
-                      Entity Gemini AI API Key
-                    </label>
+                    <label className="block text-slate-300 font-semibold mb-1">{tr('Entity Gemini AI API Key')}</label>
                     <div className="relative">
                       <input
                         type={showKey ? 'text' : 'password'}
                         value={keyInput}
                         onChange={(e) => setKeyInput(e.target.value)}
-                        placeholder="AIzaSy..."
+                        placeholder={tr('AIzaSy...')}
                         className="w-full bg-slate-950 text-slate-100 font-mono text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500 pr-20"
                       />
                       <div className="absolute right-2 top-2 flex items-center gap-1">
@@ -847,24 +837,20 @@ Provide a concise, highly professional forensic breakdown with:
                         </button>
                       </div>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      Each entity admin can configure their own Google Gemini API key. If left blank, the platform fallback key is utilized.
-                    </p>
+                    <p className="text-[11px] text-slate-500 mt-1">{tr('Each entity admin can configure their own Google Gemini API key. If left blank, the platform fallback key is utilized.')}</p>
                   </div>
 
                   {/* Primary Model Selection */}
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
-                      Primary AI Reasoning Model
-                    </label>
+                    <label className="block text-slate-300 font-semibold mb-1">{tr('Primary AI Reasoning Model')}</label>
                     <select
                       value={modelSelect}
                       onChange={(e) => setModelSelect(e.target.value)}
                       className="w-full bg-slate-950 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"
                     >
-                      <option value="gemini-2.5-flash">Gemini 2.5 Flash (Fast, high-throughput financial auditing)</option>
-                      <option value="gemini-3.7-flash">Gemini 3.7 Flash (Next-gen complex forensic reasoning)</option>
-                      <option value="gemini-3.1-pro-preview">Gemini 3.1 Pro (Deep statutory compliance & complex tax code analysis)</option>
+                      <option value="gemini-2.5-flash">{tr('Gemini 2.5 Flash (Fast, high-throughput financial auditing)')}</option>
+                      <option value="gemini-3.7-flash">{tr('Gemini 3.7 Flash (Next-gen complex forensic reasoning)')}</option>
+                      <option value="gemini-3.1-pro-preview">{tr('Gemini 3.1 Pro (Deep statutory compliance & complex tax code analysis)')}</option>
                     </select>
                   </div>
 
@@ -896,14 +882,12 @@ Provide a concise, highly professional forensic breakdown with:
               {configTab === 'quota_limits' && (
                 <div className="space-y-4 text-xs">
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
-                      Token Quota Limit (Per Billing Cycle)
-                    </label>
+                    <label className="block text-slate-300 font-semibold mb-1">{tr('Token Quota Limit (Per Billing Cycle)')}</label>
                     <input
                       type="number"
                       value={quotaInput}
                       onChange={(e) => setQuotaInput(Number(e.target.value))}
-                      placeholder="e.g. 500000 (0 for unlimited)"
+                      placeholder={tr('e.g. 500000 (0 for unlimited)')}
                       className="w-full bg-slate-950 text-slate-100 font-mono text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                     <div className="flex flex-wrap gap-2 mt-2">
@@ -927,17 +911,15 @@ Provide a concise, highly professional forensic breakdown with:
                   {/* Quota Reset Cycle */}
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-slate-300 font-semibold mb-1">
-                        Quota Reset Frequency
-                      </label>
+                      <label className="block text-slate-300 font-semibold mb-1">{tr('Quota Reset Frequency')}</label>
                       <select
                         value={resetCycle}
                         onChange={(e) => setResetCycle(e.target.value as any)}
                         className="w-full bg-slate-950 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"
                       >
-                        <option value="MONTHLY">Monthly (1st of each month)</option>
-                        <option value="DAILY">Daily (Rolling 24 Hours)</option>
-                        <option value="TOTAL">Total Lifetime (No auto-reset)</option>
+                        <option value="MONTHLY">{tr('Monthly (1st of each month)')}</option>
+                        <option value="DAILY">{tr('Daily (Rolling 24 Hours)')}</option>
+                        <option value="TOTAL">{tr('Total Lifetime (No auto-reset)')}</option>
                       </select>
                     </div>
 
@@ -950,10 +932,10 @@ Provide a concise, highly professional forensic breakdown with:
                         onChange={(e) => setAlertThreshold(Number(e.target.value))}
                         className="w-full bg-slate-950 text-slate-200 text-xs px-3.5 py-2.5 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500"
                       >
-                        <option value={70}>70% Capacity</option>
-                        <option value={80}>80% Capacity (Recommended)</option>
-                        <option value={90}>90% Capacity</option>
-                        <option value={95}>95% Capacity</option>
+                        <option value={70}>{tr('70% Capacity')}</option>
+                        <option value={80}>{tr('80% Capacity (Recommended)')}</option>
+                        <option value={90}>{tr('90% Capacity')}</option>
+                        <option value={95}>{tr('95% Capacity')}</option>
                       </select>
                     </div>
                   </div>
@@ -961,7 +943,7 @@ Provide a concise, highly professional forensic breakdown with:
                   {/* Enforce Strict Block Toggle */}
                   <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center justify-between">
                     <div>
-                      <span className="font-semibold text-slate-200 block">Enforce Strict Quota Limit Block</span>
+                      <span className="font-semibold text-slate-200 block">{tr('Enforce Strict Quota Limit Block')}</span>
                       <span className="text-[11px] text-slate-400">
                         Automatically pauses AI Audit queries when {activeTenant.code} reaches 100% of its token quota.
                       </span>
@@ -983,14 +965,12 @@ Provide a concise, highly professional forensic breakdown with:
               {configTab === 'instructions' && (
                 <div className="space-y-3 text-xs">
                   <div>
-                    <label className="block text-slate-300 font-semibold mb-1">
-                      Entity-Specific Forensic Audit Directives
-                    </label>
+                    <label className="block text-slate-300 font-semibold mb-1">{tr('Entity-Specific Forensic Audit Directives')}</label>
                     <textarea
                       rows={5}
                       value={customInstructions}
                       onChange={(e) => setCustomInstructions(e.target.value)}
-                      placeholder="e.g., Focus on US GAAP ASC 606 multi-element revenue recognition, flag all journal entries exceeding $25,000, and ensure strict compliance with Sarbanes-Oxley 404 segregation of duties."
+                      placeholder={tr('e.g., Focus on US GAAP ASC 606 multi-element revenue recognition, flag all journal entries exceeding $25,000, and ensure strict compliance with Sarbanes-Oxley 404 segregation of duties.')}
                       className="w-full bg-slate-950 text-slate-100 text-xs p-3 rounded-xl border border-slate-800 outline-none focus:ring-2 focus:ring-indigo-500 placeholder:text-slate-600 leading-relaxed"
                     />
                     <p className="text-[11px] text-slate-500 mt-1">
@@ -1027,16 +1007,12 @@ Provide a concise, highly professional forensic breakdown with:
                   type="button"
                   onClick={() => setIsConfigModalOpen(false)}
                   className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="button"
                   onClick={handleSaveConfig}
                   className="px-5 py-2 rounded-xl text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30 transition cursor-pointer"
-                >
-                  Save Entity AI Configuration
-                </button>
+                >{tr('Save Entity AI Configuration')}</button>
               </div>
             </div>
 

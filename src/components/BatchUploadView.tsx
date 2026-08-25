@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   UploadCloud,
   FileCode,
@@ -23,6 +24,7 @@ import { ParsedTransactionUpload } from '../types';
 import { UPLOAD_TEMPLATES, downloadCsvFile, DownloadTemplateInfo } from '../utils/templateGenerator';
 
 export const BatchUploadView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     accounts,
@@ -292,14 +294,14 @@ export const BatchUploadView: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-black text-white tracking-tight">
-              Entity Onboarding & Data Import Center
+              {tr('Entity Onboarding & Data Import Center')}
             </h1>
             <span className="px-2.5 py-0.5 bg-indigo-500/10 text-indigo-400 font-mono text-[11px] rounded-full font-semibold border border-indigo-500/30">
               {activeTenant.name} ({activeTenant.code}) • {activeTenant.currency}
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Download standard setup CSV templates, upload bulk datasets, and post transactions directly into the double-entry accounting engine.
+            {tr('Download standard setup CSV templates, upload bulk datasets, and post transactions directly into the double-entry accounting engine.')}
           </p>
         </div>
 
@@ -309,7 +311,7 @@ export const BatchUploadView: React.FC = () => {
             className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-lg shadow-indigo-600/20 transition cursor-pointer"
           >
             <Download className="w-4 h-4" />
-            <span>Download All {UPLOAD_TEMPLATES.length} CSV Templates</span>
+            <span>{tr('Download All CSV Templates')}</span>
           </button>
         </div>
       </div>
@@ -319,7 +321,7 @@ export const BatchUploadView: React.FC = () => {
         <div className="p-4 bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center gap-3 text-amber-300 text-xs">
           <ShieldAlert className="w-5 h-5 shrink-0 text-amber-400" />
           <div>
-            <span className="font-bold">Role Privilege Warning (viewer):</span> You are currently simulating the "viewer" role. You can download templates and parse datasets, but executing batch posts will trigger an explicit <code className="bg-amber-950 px-1 py-0.5 rounded font-mono">HTTP 403 FORBIDDEN</code> audit error.
+            <span className="font-bold">{tr('Role Privilege Warning (viewer):')}</span> {tr('You are currently simulating the "viewer" role. You can download templates and parse datasets, but executing batch posts will trigger an explicit')} <code className="bg-amber-950 px-1 py-0.5 rounded font-mono">{tr('HTTP 403 FORBIDDEN')}</code> {tr('audit error.')}
           </div>
         </div>
       )}
@@ -330,8 +332,8 @@ export const BatchUploadView: React.FC = () => {
           <div className="flex items-center gap-2">
             <FileSpreadsheet className="w-5 h-5 text-indigo-400" />
             <div>
-              <h2 className="text-sm font-bold text-white">Entity Import Template Repository</h2>
-              <p className="text-[11px] text-slate-400">Download formatted CSV files with pre-populated sample rows tailored for {activeTenant.name}</p>
+              <h2 className="text-sm font-bold text-white">{tr('Entity Import Template Repository')}</h2>
+              <p className="text-[11px] text-slate-400">{tr('Download formatted CSV files with pre-populated sample rows tailored for')} {activeTenant.name}</p>
             </div>
           </div>
         </div>
@@ -351,16 +353,16 @@ export const BatchUploadView: React.FC = () => {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] uppercase font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-slate-900 text-indigo-400 border border-slate-800">
-                      {tmpl.category}
+                      {tr(tmpl.category)}
                     </span>
                     {isSelected && (
                       <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Selected
+                        <Check className="w-3 h-3" /> {tr('Selected')}
                       </span>
                     )}
                   </div>
-                  <h3 className="font-bold text-white text-xs">{tmpl.title}</h3>
-                  <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">{tmpl.description}</p>
+                  <h3 className="font-bold text-white text-xs">{tr(tmpl.title)}</h3>
+                  <p className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">{tr(tmpl.description)}</p>
                 </div>
 
                 <div className="flex items-center gap-2 pt-3 mt-3 border-t border-slate-800/80">
@@ -368,14 +370,14 @@ export const BatchUploadView: React.FC = () => {
                     onClick={() => handleDownloadTemplate(tmpl)}
                     className="flex-1 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold rounded-lg border border-slate-700 flex items-center justify-center gap-1.5 transition text-[11px] cursor-pointer"
                   >
-                    <Download className="w-3.5 h-3.5" /> Download CSV
+                    <Download className="w-3.5 h-3.5" /> {tr('Download CSV')}
                   </button>
 
                   <button
                     onClick={() => handleSelectTemplateAndLoad(tmpl)}
                     className="py-1.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg flex items-center justify-center gap-1 transition text-[11px] cursor-pointer"
                   >
-                    <span>Load Sample</span>
+                    <span>{tr('Load Sample')}</span>
                   </button>
                 </div>
               </div>
@@ -401,8 +403,8 @@ export const BatchUploadView: React.FC = () => {
           <div>
             <p className="font-bold text-sm">
               {uploadResult.success
-                ? `Import Execution Successful! Processed ${uploadResult.postedCount} record(s).`
-                : 'Batch Posting Failed / Forbidden'}
+                ? `${tr('Import Execution Successful!')} ${tr('Processed')} ${uploadResult.postedCount} ${tr('record(s).')}`
+                : tr('Batch Posting Failed / Forbidden')}
             </p>
             {uploadResult.errors.length > 0 && (
               <ul className="list-disc list-inside mt-1 space-y-0.5 font-mono text-[11px]">
@@ -423,7 +425,7 @@ export const BatchUploadView: React.FC = () => {
           
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-white flex items-center gap-1.5">
-              <UploadCloud className="w-4 h-4 text-indigo-400" /> Data Importer & Raw File Editor
+              <UploadCloud className="w-4 h-4 text-indigo-400" /> {tr('Data Importer & Raw File Editor')}
             </span>
 
             <div className="flex items-center gap-2">
@@ -437,7 +439,7 @@ export const BatchUploadView: React.FC = () => {
               >
                 {UPLOAD_TEMPLATES.map((t) => (
                   <option key={t.id} value={t.id}>
-                    {t.title}
+                    {tr(t.title)}
                   </option>
                 ))}
               </select>
@@ -456,9 +458,7 @@ export const BatchUploadView: React.FC = () => {
                   className={`px-2.5 py-1 text-[10px] font-mono font-bold rounded-lg ${
                     format === 'json' ? 'bg-indigo-600 text-white' : 'text-slate-400 hover:text-slate-200'
                   }`}
-                >
-                  JSON
-                </button>
+                >{tr('JSON')}</button>
               </div>
             </div>
           </div>
@@ -490,8 +490,8 @@ export const BatchUploadView: React.FC = () => {
               className="hidden"
             />
             <FolderUp className={`w-8 h-8 mb-2 ${isDragOver ? 'text-indigo-400 animate-bounce' : 'text-slate-500'}`} />
-            <p className="text-xs font-bold text-white">Drag & drop your updated CSV or JSON file here</p>
-            <p className="text-[11px] text-slate-400 mt-0.5">Or click to browse computer files (.csv, .json)</p>
+            <p className="text-xs font-bold text-white">{tr('Drag & drop your updated CSV or JSON file here')}</p>
+            <p className="text-[11px] text-slate-400 mt-0.5">{tr('Or click to browse computer files (.csv, .json)')}</p>
           </div>
 
           {/* TEXT AREA EDITOR */}
@@ -508,7 +508,7 @@ export const BatchUploadView: React.FC = () => {
           />
 
           <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Chart of Accounts Loaded: {accounts.length} codes</span>
+            <span>{tr('Chart of Accounts Loaded:')} {formatNumber(accounts.length)} {tr('codes')}</span>
             {rawText && (
               <button
                 onClick={() => {
@@ -517,7 +517,7 @@ export const BatchUploadView: React.FC = () => {
                 }}
                 className="text-slate-400 hover:text-rose-400 flex items-center gap-1 cursor-pointer text-xs"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Clear Content
+                <Trash2 className="w-3.5 h-3.5" /> {tr('Clear Content')}
               </button>
             )}
           </div>
@@ -529,16 +529,16 @@ export const BatchUploadView: React.FC = () => {
           <div className="space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div>
-                <h3 className="text-sm font-bold text-white">{activeTemplate.title} Preview</h3>
-                <p className="text-xs text-slate-400">Live schema & double-entry validation prior to GL posting</p>
+                <h3 className="text-sm font-bold text-white">{tr(activeTemplate.title)} {tr('Preview')}</h3>
+                <p className="text-xs text-slate-400">{tr('Live schema & double-entry validation prior to GL posting')}</p>
               </div>
 
               {importCategory === 'journal_entries' && (
                 <div className="flex items-center gap-2 text-xs font-mono">
-                  <span className="px-2 py-1 bg-slate-800 text-slate-300 rounded font-bold">Total: {parsedRows.length}</span>
-                  <span className="px-2 py-1 bg-emerald-500/20 text-emerald-300 rounded font-bold">Valid: {validCount}</span>
+                  <span className="px-2 py-1 bg-slate-800 text-slate-300 rounded font-bold">{tr('Total')}: {formatNumber(parsedRows.length)}</span>
+                  <span className="px-2 py-1 bg-emerald-500/20 text-emerald-300 rounded font-bold">{tr('Valid')}: {formatNumber(validCount)}</span>
                   {invalidCount > 0 && (
-                    <span className="px-2 py-1 bg-rose-500/20 text-rose-300 rounded font-bold">Invalid: {invalidCount}</span>
+                    <span className="px-2 py-1 bg-rose-500/20 text-rose-300 rounded font-bold">{tr('Invalid')}: {formatNumber(invalidCount)}</span>
                   )}
                 </div>
               )}
@@ -550,13 +550,13 @@ export const BatchUploadView: React.FC = () => {
                 <table className="w-full text-left text-xs text-slate-300">
                   <thead className="bg-slate-950 text-slate-400 font-mono text-[10px] uppercase border-b border-slate-800">
                     <tr>
-                      <th className="p-2">Row</th>
-                      <th className="p-2">Date</th>
-                      <th className="p-2">Description</th>
-                      <th className="p-2">Debit</th>
-                      <th className="p-2">Credit</th>
-                      <th className="p-2 text-right">Amount</th>
-                      <th className="p-2 text-center">Status</th>
+                      <th className="p-2">{tr('Row')}</th>
+                      <th className="p-2">{tr('Date')}</th>
+                      <th className="p-2">{tr('Description')}</th>
+                      <th className="p-2">{tr('Debit')}</th>
+                      <th className="p-2">{tr('Credit')}</th>
+                      <th className="p-2 text-right">{tr('Amount')}</th>
+                      <th className="p-2 text-center">{tr('Status')}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
@@ -571,19 +571,19 @@ export const BatchUploadView: React.FC = () => {
                         <td className="p-2 font-bold text-indigo-300">{row.accountCodeDebit}</td>
                         <td className="p-2 font-bold text-indigo-300">{row.accountCodeCredit}</td>
                         <td className="p-2 text-right font-bold text-white">
-                          {activeTenant.currency} {row.amount.toLocaleString()}
+                          {formatCurrency(row.amount, activeTenant.currency)}
                         </td>
                         <td className="p-2 text-center">
                           {row.isValid ? (
                             <span className="inline-flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded font-bold">
-                              <CheckCircle2 className="w-3 h-3" /> Valid
+                              <CheckCircle2 className="w-3 h-3" /> {tr('Valid')}
                             </span>
                           ) : (
                             <span
                               title={row.errors.join(', ')}
                               className="inline-flex items-center gap-1 text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded font-bold cursor-help"
                             >
-                              <AlertTriangle className="w-3 h-3" /> Error
+                              <AlertTriangle className="w-3 h-3" /> {tr('Error')}
                             </span>
                           )}
                         </td>
@@ -594,7 +594,7 @@ export const BatchUploadView: React.FC = () => {
               ) : (
                 <div className="space-y-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-400">
-                    <Info className="w-4 h-4" /> Expected Field Specifications for {activeTemplate.title}
+                    <Info className="w-4 h-4" /> {tr('Expected Field Specifications for')} {tr(activeTemplate.title)}
                   </div>
                   <div className="space-y-1.5 text-xs">
                     {activeTemplate.fieldDocs.map((f) => (
@@ -602,11 +602,11 @@ export const BatchUploadView: React.FC = () => {
                         <div>
                           <span className="font-mono font-bold text-white">{f.field}</span>
                           {f.required ? (
-                            <span className="ml-1 text-[9px] text-rose-400 font-bold uppercase">(Required)</span>
+                            <span className="ml-1 text-[9px] text-rose-400 font-bold uppercase">({tr('Required')})</span>
                           ) : (
-                            <span className="ml-1 text-[9px] text-slate-500 font-bold uppercase">(Optional)</span>
+                            <span className="ml-1 text-[9px] text-slate-500 font-bold uppercase">({tr('Optional')})</span>
                           )}
-                          <p className="text-slate-400 text-[10px]">{f.description}</p>
+                          <p className="text-slate-400 text-[10px]">{tr(f.description)}</p>
                         </div>
                       </div>
                     ))}
@@ -621,13 +621,13 @@ export const BatchUploadView: React.FC = () => {
             <div className="text-xs text-slate-400">
               {importCategory === 'journal_entries' ? (
                 <>
-                  Batch Sum Total:{' '}
+                  {tr('Batch Sum Total:')}{' '}
                   <span className="font-mono font-bold text-white">
-                    {activeTenant.currency} {totalBatchSum.toLocaleString()}
+                    {formatCurrency(totalBatchSum, activeTenant.currency)}
                   </span>
                 </>
               ) : (
-                <span>Ready to execute import into {activeTenant.name}</span>
+                <span>{tr('Ready to execute import into')} {activeTenant.name}</span>
               )}
             </div>
 
@@ -641,7 +641,7 @@ export const BatchUploadView: React.FC = () => {
               }`}
             >
               <Send className="w-4 h-4" />
-              <span>Execute Batch Import into Entity</span>
+              <span>{tr('Execute Batch Import into Entity')}</span>
             </button>
           </div>
 

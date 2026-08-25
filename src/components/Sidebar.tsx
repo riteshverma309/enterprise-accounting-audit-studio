@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   LayoutDashboard,
   UploadCloud,
@@ -34,6 +34,7 @@ import {
   Network,
   Building2,
   CheckCircle2,
+  ClipboardCheck,
 } from 'lucide-react';
 import { TranslationKey } from '../i18n/translations';
 
@@ -47,6 +48,7 @@ export type TabType =
   | 'ledger'
   | 'invoicing_ar'
   | 'recurring_billing'
+  | 'purchase_orders'
   | 'payables_ap'
   | 'expenses'
   | 'inventory'
@@ -91,8 +93,8 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const { activeRole, activeTenant, getRoleAllowedMenus } = useAccounting();
-  const { t } = useLanguage();
 
   const isSuperAdmin = activeRole === 'super_user';
   const isPartnerRole = activeRole === 'vendor' || activeRole === 'customer';
@@ -112,6 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'ledger', translationKey: 'tab_ledger', labelFallback: 'General Ledger & CoA', icon: <BookOpenCheck className="w-4 h-4" /> },
     { id: 'invoicing_ar', translationKey: 'tab_invoicing_ar', labelFallback: 'Accounts Receivable (AR)', icon: <Receipt className="w-4 h-4" />, badge: 'Invoicing' },
     { id: 'recurring_billing', translationKey: 'tab_recurring_billing', labelFallback: 'Recurring Billing', icon: <Repeat className="w-4 h-4" />, badge: 'Schedules' },
+    { id: 'purchase_orders', translationKey: 'tab_purchase_orders', labelFallback: 'Purchase Orders (PO)', icon: <ClipboardCheck className="w-4 h-4" />, badge: 'Approvals' },
     { id: 'payables_ap', translationKey: 'tab_payables_ap', labelFallback: 'Accounts Payable (AP)', icon: <CreditCard className="w-4 h-4" />, badge: 'Bills' },
     { id: 'expenses', translationKey: 'tab_expenses', labelFallback: 'Expenses & Mileage', icon: <Car className="w-4 h-4" />, badge: 'Receipts' },
     { id: 'inventory', translationKey: 'tab_inventory', labelFallback: 'Inventory & Stock', icon: <Boxes className="w-4 h-4" />, badge: 'Valuation' },

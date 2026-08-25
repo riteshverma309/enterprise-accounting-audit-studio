@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAccounting } from '../context/AccountingContext';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   TrendingUp,
   DollarSign,
@@ -34,10 +34,10 @@ interface DashboardViewProps {
   onOpenNewJournalModal: () => void;
 }
 
-export const DashboardView: React.FC<DashboardViewProps> = ({
-  setActiveTab,
+export const DashboardView: React.FC<DashboardViewProps> = ({ setActiveTab,
   onOpenNewJournalModal,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     balanceSheet,
@@ -46,8 +46,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     auditLogs,
     accounts,
   } = useAccounting();
-
-  const { t, tr } = useLanguage();
 
   // Monthly Revenue vs Expense dummy aggregation from accounts
   const chartData = [
@@ -140,7 +138,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {currencySymbol}{incomeStatement.totalRevenue.toLocaleString()}
           </p>
           <div className="flex items-center gap-1 text-[11px] text-slate-400 mt-2">
-            <span>Recognized under {activeTenant.pluginId.toUpperCase()}</span>
+            <span>{tr('Recognized under')} {activeTenant.pluginId.toUpperCase()}</span>
           </div>
         </div>
 
@@ -174,7 +172,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <p className="text-[11px] text-slate-400 mt-1">
             {balanceSheet.isBalanced
               ? tr('Zero variance detected across all accounts')
-              : 'Variance detected in ledger balances'}
+              : tr('Variance detected in ledger balances')}
           </p>
         </div>
 
@@ -287,7 +285,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   <span className="font-mono text-xs font-bold text-white">
                     {currencySymbol}{entry.totalDebit.toLocaleString()}
                   </span>
-                  <p className="text-[10px] text-slate-400 font-mono">{entry.lines.length} Lines</p>
+                  <p className="text-[10px] text-slate-400 font-mono">{entry.lines.length} {tr('Lines')}</p>
                 </div>
               </div>
             ))}

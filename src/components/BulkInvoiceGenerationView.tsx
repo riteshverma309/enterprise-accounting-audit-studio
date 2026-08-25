@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import {
   Layers,
@@ -46,10 +47,10 @@ interface BulkInvoiceGenerationViewProps {
   onNavigateToTemplates?: () => void;
 }
 
-export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps> = ({
-  onNavigateToInvoice,
+export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps> = ({ onNavigateToInvoice,
   onNavigateToTemplates,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     customers,
@@ -327,7 +328,7 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
         <div className="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
           <div className="p-5 border-b border-slate-200 flex items-center justify-between">
             <div>
-              <h3 className="text-base font-semibold text-slate-900">Bulk Invoicing Batch Audit Logs</h3>
+              <h3 className="text-base font-semibold text-slate-900">{tr('Bulk Invoicing Batch Audit Logs')}</h3>
               <p className="text-sm text-slate-500">
                 History of all atomic bulk invoice runs, segment breakdowns, and reversal status.
               </p>
@@ -337,8 +338,8 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
           {bulkInvoiceBatches.length === 0 ? (
             <div className="p-12 text-center text-slate-500">
               <Layers className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-              <p className="font-medium text-slate-700">No bulk batches generated yet</p>
-              <p className="text-sm mt-1">Start a new batch run to generate invoices for customer groups.</p>
+              <p className="font-medium text-slate-700">{tr('No bulk batches generated yet')}</p>
+              <p className="text-sm mt-1">{tr('Start a new batch run to generate invoices for customer groups.')}</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-200">
@@ -363,23 +364,23 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                       </div>
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500 pt-1">
                         <span>
-                          <strong>Run Date:</strong> {new Date(batch.createdAt).toLocaleString()}
+                          <strong>{tr('Run Date:')}</strong> {new Date(batch.createdAt).toLocaleString()}
                         </span>
                         <span>
-                          <strong>Operator:</strong> {batch.createdBy}
+                          <strong>{tr('Operator:')}</strong> {batch.createdBy}
                         </span>
                         <span>
-                          <strong>Grouping Field:</strong> {batch.groupingAttributeName}
+                          <strong>{tr('Grouping Field:')}</strong> {batch.groupingAttributeName}
                         </span>
                         <span>
-                          <strong>Groups Count:</strong> {batch.groupsCount}
+                          <strong>{tr('Groups Count:')}</strong> {batch.groupsCount}
                         </span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4">
                       <div className="text-right">
-                        <div className="text-xs text-slate-500">Total Batch Value</div>
+                        <div className="text-xs text-slate-500">{tr('Total Batch Value')}</div>
                         <div className="text-lg font-bold text-slate-900">
                           {activeTenant.currency} {batch.totalBatchAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </div>
@@ -403,7 +404,7 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
 
                   {/* Group breakdown chips */}
                   <div className="mt-4 pt-3 border-t border-slate-100">
-                    <div className="text-xs font-semibold text-slate-600 mb-2">Group Breakdown & Assigned Templates:</div>
+                    <div className="text-xs font-semibold text-slate-600 mb-2">{tr('Group Breakdown & Assigned Templates:')}</div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                       {batch.groupBreakdowns.map((grp) => (
                         <div
@@ -461,8 +462,8 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                   {wizardStep > 1 ? <Check className="w-4 h-4" /> : '1'}
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Step 1</div>
-                  <div className="text-sm font-medium leading-none">Customer Segmentation</div>
+                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">{tr('Step 1')}</div>
+                  <div className="text-sm font-medium leading-none">{tr('Customer Segmentation')}</div>
                 </div>
               </div>
 
@@ -488,8 +489,8 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                   {wizardStep > 2 ? <Check className="w-4 h-4" /> : '2'}
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Step 2</div>
-                  <div className="text-sm font-medium leading-none">Template Mapping</div>
+                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">{tr('Step 2')}</div>
+                  <div className="text-sm font-medium leading-none">{tr('Template Mapping')}</div>
                 </div>
               </div>
 
@@ -515,8 +516,8 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                   {wizardStep > 3 ? <Check className="w-4 h-4" /> : '3'}
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Step 3</div>
-                  <div className="text-sm font-medium leading-none">Preview & Validate</div>
+                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">{tr('Step 3')}</div>
+                  <div className="text-sm font-medium leading-none">{tr('Preview & Validate')}</div>
                 </div>
               </div>
 
@@ -535,8 +536,8 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                   4
                 </div>
                 <div>
-                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">Step 4</div>
-                  <div className="text-sm font-medium leading-none">Post & Ledger Summary</div>
+                  <div className="text-xs uppercase tracking-wider text-slate-500 font-semibold">{tr('Step 4')}</div>
+                  <div className="text-sm font-medium leading-none">{tr('Post & Ledger Summary')}</div>
                 </div>
               </div>
             </div>
@@ -547,9 +548,9 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
             <div className="space-y-6">
               <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-6">
                 <div className="border-b border-slate-200 pb-4">
-                  <h3 className="text-lg font-bold text-slate-900">Configure Customer Segmentation Attribute</h3>
+                  <h3 className="text-lg font-bold text-slate-900">{tr('Configure Customer Segmentation Attribute')}</h3>
                   <p className="text-sm text-slate-500 mt-1">
-                    Select a customer attribute (Boolean flag like <code>IsCommercial</code>, or text fields like <code>unit_wing</code>, <code>category</code>, or custom attributes) to dynamically generate target customer groups.
+                    Select a customer attribute (Boolean flag like <code>{tr('IsCommercial')}</code>{tr(', or text fields like')} <code>{tr('unit_wing')}</code>, <code>{tr('category')}</code>, or custom attributes) to dynamically generate target customer groups.
                   </p>
                 </div>
 
@@ -564,7 +565,7 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                       value={batchTitle}
                       onChange={(e) => setBatchTitle(e.target.value)}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium"
-                      placeholder="e.g. Society Maintenance & Assessment Run - August 2026"
+                      placeholder={tr('e.g. Society Maintenance & Assessment Run - August 2026')}
                     />
                   </div>
                   <div>
@@ -576,7 +577,7 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                       value={billingPeriod}
                       onChange={(e) => setBillingPeriod(e.target.value)}
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium"
-                      placeholder="e.g. August 2026 or Q3 2026"
+                      placeholder={tr('e.g. August 2026 or Q3 2026')}
                     />
                   </div>
                 </div>
@@ -605,7 +606,7 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                           <CheckCircle2 className="w-5 h-5 text-indigo-600" />
                         )}
                       </div>
-                      <h4 className="font-bold text-slate-900 text-sm">All Customers (Unified)</h4>
+                      <h4 className="font-bold text-slate-900 text-sm">{tr('All Customers (Unified)')}</h4>
                       <p className="text-xs text-slate-500 mt-1">
                         Apply a uniform invoice template across all {customers.length} customer records.
                       </p>
@@ -693,11 +694,11 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                           </div>
 
                           <div className="text-xs text-slate-500">
-                            <strong>Filter Criteria:</strong> {grp.displayValueLabel || String(grp.matchValue)}
+                            <strong>{tr('Filter Criteria:')}</strong> {grp.displayValueLabel || String(grp.matchValue)}
                           </div>
 
                           <div className="text-xs text-slate-600 line-clamp-1">
-                            <strong>Members:</strong>{' '}
+                            <strong>{tr('Members:')}</strong>{' '}
                             {matchedCusts.map((c) => c.name).join(', ') || 'No customers in this segment'}
                           </div>
                         </div>
@@ -727,7 +728,7 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
               <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Map Invoice Templates & Dynamic Rules</h3>
+                    <h3 className="text-lg font-bold text-slate-900">{tr('Map Invoice Templates & Dynamic Rules')}</h3>
                     <p className="text-sm text-slate-500 mt-1">
                       Assign a distinct invoice template, rate multiplier, and dynamic formula per customer group.
                     </p>
@@ -841,10 +842,10 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                                   }
                                   className="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-medium"
                                 >
-                                  <option value="">-- No Multiplier (Fixed Template Quantities) --</option>
-                                  <option value="carpet_area_sqft">Carpet Area in Sq Ft (carpet_area_sqft)</option>
-                                  <option value="seat_count">Enterprise User Seats (seat_count)</option>
-                                  <option value="patient_cohort_size">Cohort Patient Size (patient_cohort_size)</option>
+                                  <option value="">{tr('-- No Multiplier (Fixed Template Quantities) --')}</option>
+                                  <option value="carpet_area_sqft">{tr('Carpet Area in Sq Ft (carpet_area_sqft)')}</option>
+                                  <option value="seat_count">{tr('Enterprise User Seats (seat_count)')}</option>
+                                  <option value="patient_cohort_size">{tr('Cohort Patient Size (patient_cohort_size)')}</option>
                                   {customAttributeDefinitions
                                     .filter((d) => d.dataType === 'number')
                                     .map((d) => (
@@ -937,7 +938,7 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
               <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-xs space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-900">Pre-Flight Batch Validation & Invoice Preview</h3>
+                    <h3 className="text-lg font-bold text-slate-900">{tr('Pre-Flight Batch Validation & Invoice Preview')}</h3>
                     <p className="text-sm text-slate-500 mt-1">
                       Review all computed line items, area-multipliers, tax totals, and customer details before posting to the ledger.
                     </p>
@@ -956,33 +957,33 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                 {/* Pre-flight Metrics Cards */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   <div className="p-4 bg-indigo-50/70 border border-indigo-100 rounded-xl">
-                    <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider">Total Invoices</div>
+                    <div className="text-xs font-semibold text-indigo-700 uppercase tracking-wider">{tr('Total Invoices')}</div>
                     <div className="text-2xl font-black text-indigo-950 mt-1">{previewMetrics.count}</div>
                     <div className="text-xs text-indigo-600 mt-0.5">Across {groupConfigs.filter(g => !g.isExcluded).length} groups</div>
                   </div>
 
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Subtotal Value</div>
+                    <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">{tr('Subtotal Value')}</div>
                     <div className="text-2xl font-black text-slate-900 mt-1">
                       {activeTenant.currency} {previewMetrics.subtotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
-                    <div className="text-xs text-slate-500 mt-0.5">Base net revenue</div>
+                    <div className="text-xs text-slate-500 mt-0.5">{tr('Base net revenue')}</div>
                   </div>
 
                   <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                    <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">Tax Liability</div>
+                    <div className="text-xs font-semibold text-slate-600 uppercase tracking-wider">{tr('Tax Liability')}</div>
                     <div className="text-2xl font-black text-slate-900 mt-1">
                       {activeTenant.currency} {previewMetrics.taxTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
-                    <div className="text-xs text-slate-500 mt-0.5">Credit to Acc 2110</div>
+                    <div className="text-xs text-slate-500 mt-0.5">{tr('Credit to Acc 2110')}</div>
                   </div>
 
                   <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl">
-                    <div className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">Total Batch Amount</div>
+                    <div className="text-xs font-semibold text-emerald-800 uppercase tracking-wider">{tr('Total Batch Amount')}</div>
                     <div className="text-2xl font-black text-emerald-950 mt-1">
                       {activeTenant.currency} {previewMetrics.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
-                    <div className="text-xs text-emerald-700 mt-0.5">Debit to Acc 1100 AR</div>
+                    <div className="text-xs text-emerald-700 mt-0.5">{tr('Debit to Acc 1100 AR')}</div>
                   </div>
                 </div>
 
@@ -994,13 +995,13 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                       type="text"
                       value={previewSearch}
                       onChange={(e) => setPreviewSearch(e.target.value)}
-                      placeholder="Search customer name or code..."
+                      placeholder={tr('Search customer name or code...')}
                       className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs"
                     />
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500 font-medium">Filter Group:</span>
+                    <span className="text-xs text-slate-500 font-medium">{tr('Filter Group:')}</span>
                     <select
                       value={previewGroupFilter}
                       onChange={(e) => setPreviewGroupFilter(e.target.value)}
@@ -1021,12 +1022,12 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-50 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
                       <tr>
-                        <th className="py-3 px-3">Include</th>
-                        <th className="py-3 px-3">Customer</th>
-                        <th className="py-3 px-3">Group & Template</th>
-                        <th className="py-3 px-3">Line Items Summary & Formula Trace</th>
-                        <th className="py-3 px-3 text-right">Subtotal</th>
-                        <th className="py-3 px-3 text-right">Tax</th>
+                        <th className="py-3 px-3">{tr('Include')}</th>
+                        <th className="py-3 px-3">{tr('Customer')}</th>
+                        <th className="py-3 px-3">{tr('Group & Template')}</th>
+                        <th className="py-3 px-3">{tr('Line Items Summary & Formula Trace')}</th>
+                        <th className="py-3 px-3 text-right">{tr('Subtotal')}</th>
+                        <th className="py-3 px-3 text-right">{tr('Tax')}</th>
                         <th className="py-3 px-3 text-right">Total ({activeTenant.currency})</th>
                       </tr>
                     </thead>
@@ -1161,11 +1162,11 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
               <div className="max-w-2xl mx-auto bg-slate-50 p-6 rounded-xl border border-slate-200 text-left space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-200 pb-3">
                   <div>
-                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Batch Reference</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">{tr('Batch Reference')}</span>
                     <div className="text-lg font-mono font-black text-indigo-700">{lastCommittedBatch.batchNumber}</div>
                   </div>
                   <div className="text-right">
-                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Value</span>
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">{tr('Total Value')}</span>
                     <div className="text-lg font-black text-emerald-700">
                       {activeTenant.currency} {lastCommittedBatch.totalBatchAmount.toFixed(2)}
                     </div>
@@ -1174,22 +1175,22 @@ export const BulkInvoiceGenerationView: React.FC<BulkInvoiceGenerationViewProps>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
                   <div>
-                    <span className="text-slate-500">Invoices Generated:</span>
+                    <span className="text-slate-500">{tr('Invoices Generated:')}</span>
                     <div className="font-bold text-slate-900">{lastCommittedBatch.totalInvoicesGenerated}</div>
                   </div>
                   <div>
-                    <span className="text-slate-500">Groups Processed:</span>
+                    <span className="text-slate-500">{tr('Groups Processed:')}</span>
                     <div className="font-bold text-slate-900">{lastCommittedBatch.groupsCount} Groups</div>
                   </div>
                   <div>
-                    <span className="text-slate-500">Tax Payable (Acc 2110):</span>
+                    <span className="text-slate-500">{tr('Tax Payable (Acc 2110):')}</span>
                     <div className="font-bold text-slate-900">{activeTenant.currency} {lastCommittedBatch.totalTaxAmount.toFixed(2)}</div>
                   </div>
                 </div>
 
                 {/* Groups list */}
                 <div className="border-t border-slate-200 pt-3">
-                  <div className="text-xs font-bold text-slate-700 mb-2">Group Breakdown:</div>
+                  <div className="text-xs font-bold text-slate-700 mb-2">{tr('Group Breakdown:')}</div>
                   <div className="space-y-1.5">
                     {lastCommittedBatch.groupBreakdowns.map((grp) => (
                       <div key={grp.groupId} className="flex items-center justify-between text-xs p-2 bg-white rounded border border-slate-200">

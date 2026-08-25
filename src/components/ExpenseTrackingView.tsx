@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { useAccounting } from '../context/AccountingContext';
 import { ExpenseReceipt, MileageLogEntry } from '../types';
 import {
@@ -26,6 +27,7 @@ import {
 } from 'lucide-react';
 
 export const ExpenseTrackingView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     expenseReceipts,
@@ -284,18 +286,12 @@ export const ExpenseTrackingView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">
-              Spend Management
-            </span>
-            <span className="text-xs text-slate-400">IRS Form 2106 & SOX Expense Compliance</span>
+            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 uppercase tracking-wider">{tr('Spend Management')}</span>
+            <span className="text-xs text-slate-400">{tr('IRS Form 2106 & SOX Expense Compliance')}</span>
           </div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2.5">
-            <Receipt className="w-6 h-6 text-emerald-400" />
-            Expense & Mileage Tracking
-          </h1>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Capture OCR digital receipts, categorize daily business disbursements, and compute tax-deductible mileage logs with 1-click General Ledger posting.
-          </p>
+            <Receipt className="w-6 h-6 text-emerald-400" />{tr('Expense & Mileage Tracking')}</h1>
+          <p className="text-sm text-slate-400 mt-0.5">{tr('Capture OCR digital receipts, categorize daily business disbursements, and compute tax-deductible mileage logs with 1-click General Ledger posting.')}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -307,9 +303,7 @@ export const ExpenseTrackingView: React.FC = () => {
               }}
               className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              Capture / Log Expense
-            </button>
+              <Plus className="w-4 h-4" />{tr('Capture / Log Expense')}</button>
           ) : (
             <button
               onClick={() => {
@@ -318,9 +312,7 @@ export const ExpenseTrackingView: React.FC = () => {
               }}
               className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
             >
-              <Plus className="w-4 h-4" />
-              Log Business Trip
-            </button>
+              <Plus className="w-4 h-4" />{tr('Log Business Trip')}</button>
           )}
         </div>
       </div>
@@ -329,31 +321,28 @@ export const ExpenseTrackingView: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Total Logged Expenses</span>
+            <span className="text-xs font-medium">{tr('Total Logged Expenses')}</span>
             <DollarSign className="w-4 h-4 text-emerald-400" />
           </div>
           <div className="text-2xl font-bold text-slate-100">
             ${totalExpenseAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
           </div>
           <div className="text-[11px] text-slate-400 mt-1 flex items-center gap-1">
-            <span className="text-emerald-400 font-medium">{expenseReceipts.filter((r) => r.tenantId === activeTenant.id).length}</span> receipts across active fiscal period
-          </div>
+            <span className="text-emerald-400 font-medium">{expenseReceipts.filter((r) => r.tenantId === activeTenant.id).length}</span>{tr('receipts across active fiscal period')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Pending GL Posting</span>
+            <span className="text-xs font-medium">{tr('Pending GL Posting')}</span>
             <Clock className="w-4 h-4 text-amber-400" />
           </div>
           <div className="text-2xl font-bold text-amber-400">{pendingGlExpenseCount}</div>
-          <div className="text-[11px] text-slate-400 mt-1">
-            Receipts awaiting journal posting & double-entry sync
-          </div>
+          <div className="text-[11px] text-slate-400 mt-1">{tr('Receipts awaiting journal posting & double-entry sync')}</div>
         </div>
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Mileage Tax Deductions</span>
+            <span className="text-xs font-medium">{tr('Mileage Tax Deductions')}</span>
             <Car className="w-4 h-4 text-indigo-400" />
           </div>
           <div className="text-2xl font-bold text-indigo-400">
@@ -366,11 +355,11 @@ export const ExpenseTrackingView: React.FC = () => {
 
         <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-xs font-medium">Business Travel Miles</span>
+            <span className="text-xs font-medium">{tr('Business Travel Miles')}</span>
             <MapPin className="w-4 h-4 text-cyan-400" />
           </div>
           <div className="text-2xl font-bold text-cyan-400">
-            {totalMileageMiles.toLocaleString('en-US')} <span className="text-xs font-normal text-slate-400">miles</span>
+            {totalMileageMiles.toLocaleString('en-US')} <span className="text-xs font-normal text-slate-400">{tr('miles')}</span>
           </div>
           <div className="text-[11px] text-slate-400 mt-1">
             Across {mileageLogs.filter((m) => m.tenantId === activeTenant.id).length} recorded trips
@@ -425,7 +414,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 onChange={(e) => setCategoryFilter(e.target.value)}
                 className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500"
               >
-                <option value="ALL">All Categories</option>
+                <option value="ALL">{tr('All Categories')}</option>
                 {categories.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -438,10 +427,10 @@ export const ExpenseTrackingView: React.FC = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-lg text-xs text-slate-300 focus:outline-none focus:border-emerald-500"
               >
-                <option value="ALL">All Statuses</option>
-                <option value="DRAFT">Draft / Unposted</option>
-                <option value="POSTED">Posted to GL</option>
-                <option value="REJECTED">Rejected</option>
+                <option value="ALL">{tr('All Statuses')}</option>
+                <option value="DRAFT">{tr('Draft / Unposted')}</option>
+                <option value="POSTED">{tr('Posted to GL')}</option>
+                <option value="REJECTED">{tr('Rejected')}</option>
               </select>
             </>
           )}
@@ -455,16 +444,16 @@ export const ExpenseTrackingView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Expense Date</th>
-                  <th className="px-4 py-3 font-semibold">Vendor / Merchant</th>
-                  <th className="px-4 py-3 font-semibold">Category</th>
-                  <th className="px-4 py-3 font-semibold">Receipt #</th>
-                  <th className="px-4 py-3 font-semibold">Paid By & Method</th>
-                  <th className="px-4 py-3 font-semibold text-right">Net Amount</th>
-                  <th className="px-4 py-3 font-semibold text-right">Tax / VAT</th>
-                  <th className="px-4 py-3 font-semibold text-right">Total</th>
-                  <th className="px-4 py-3 font-semibold text-center">Status</th>
-                  <th className="px-4 py-3 font-semibold text-center">Actions</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Expense Date')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Vendor / Merchant')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Category')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Receipt #')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Paid By & Method')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Net Amount')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Tax / VAT')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Total')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Status')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -513,14 +502,10 @@ export const ExpenseTrackingView: React.FC = () => {
                         <td className="px-4 py-3 text-center">
                           {isPosted ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-sans">
-                              <CheckCircle2 className="w-3 h-3" />
-                              GL Posted
-                            </span>
+                              <CheckCircle2 className="w-3 h-3" />{tr('GL Posted')}</span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/20 font-sans">
-                              <Clock className="w-3 h-3" />
-                              Draft
-                            </span>
+                              <Clock className="w-3 h-3" />{tr('Draft')}</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-center font-sans">
@@ -528,24 +513,22 @@ export const ExpenseTrackingView: React.FC = () => {
                             {!isPosted && (
                               <button
                                 onClick={() => postExpenseReceiptToGL(rcpt.id, '1010')}
-                                title="Post directly to General Ledger"
+                                title={tr('Post directly to General Ledger')}
                                 className="flex items-center gap-1 px-2.5 py-1 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-300 hover:text-white rounded text-[11px] font-medium border border-emerald-500/30 transition-all cursor-pointer"
                               >
-                                <BookOpenCheck className="w-3 h-3" />
-                                Post GL
-                              </button>
+                                <BookOpenCheck className="w-3 h-3" />{tr('Post GL')}</button>
                             )}
                             <button
                               onClick={() => setSelectedReceipt(rcpt)}
                               className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition-colors"
-                              title="View Details"
+                              title={tr('View Details')}
                             >
                               <FileText className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => deleteExpenseReceipt(rcpt.id)}
                               className="p-1.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded transition-colors"
-                              title="Delete"
+                              title={tr('Delete')}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -565,16 +548,16 @@ export const ExpenseTrackingView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950/60 text-[11px] uppercase tracking-wider text-slate-400 border-b border-slate-800">
                 <tr>
-                  <th className="px-4 py-3 font-semibold">Trip Date</th>
-                  <th className="px-4 py-3 font-semibold">Driver / Employee</th>
-                  <th className="px-4 py-3 font-semibold">Route (Origin → Destination)</th>
-                  <th className="px-4 py-3 font-semibold">Business Purpose</th>
-                  <th className="px-4 py-3 font-semibold">Vehicle</th>
-                  <th className="px-4 py-3 font-semibold text-right">Distance (mi)</th>
-                  <th className="px-4 py-3 font-semibold text-right">IRS Rate</th>
-                  <th className="px-4 py-3 font-semibold text-right">Deduction</th>
-                  <th className="px-4 py-3 font-semibold text-center">Status</th>
-                  <th className="px-4 py-3 font-semibold text-center">Actions</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Trip Date')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Driver / Employee')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Route (Origin → Destination)')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Business Purpose')}</th>
+                  <th className="px-4 py-3 font-semibold">{tr('Vehicle')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Distance (mi)')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('IRS Rate')}</th>
+                  <th className="px-4 py-3 font-semibold text-right">{tr('Deduction')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Status')}</th>
+                  <th className="px-4 py-3 font-semibold text-center">{tr('Actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -611,14 +594,10 @@ export const ExpenseTrackingView: React.FC = () => {
                         <td className="px-4 py-3 text-center">
                           {isPosted ? (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-sans">
-                              <CheckCircle2 className="w-3 h-3" />
-                              GL Posted
-                            </span>
+                              <CheckCircle2 className="w-3 h-3" />{tr('GL Posted')}</span>
                           ) : (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-700/50 text-slate-300 border border-slate-600 font-sans">
-                              <Clock className="w-3 h-3" />
-                              Logged
-                            </span>
+                              <Clock className="w-3 h-3" />{tr('Logged')}</span>
                           )}
                         </td>
                         <td className="px-4 py-3 text-center font-sans">
@@ -626,17 +605,15 @@ export const ExpenseTrackingView: React.FC = () => {
                             {!isPosted && (
                               <button
                                 onClick={() => postMileageLogToGL(log.id, '1010')}
-                                title="Post reimbursement to General Ledger"
+                                title={tr('Post reimbursement to General Ledger')}
                                 className="flex items-center gap-1 px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded text-[11px] font-medium border border-indigo-500/30 transition-all cursor-pointer"
                               >
-                                <BookOpenCheck className="w-3 h-3" />
-                                Post GL
-                              </button>
+                                <BookOpenCheck className="w-3 h-3" />{tr('Post GL')}</button>
                             )}
                             <button
                               onClick={() => deleteMileageLog(log.id)}
                               className="p-1.5 bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-400 rounded transition-colors"
-                              title="Delete"
+                              title={tr('Delete')}
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -659,12 +636,8 @@ export const ExpenseTrackingView: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <Receipt className="w-5 h-5 text-emerald-400" />
-                  Capture / Log Expense Receipt
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Record vendor receipt details, calculate deductible tax credits, and assign GL accounts.
-                </p>
+                  <Receipt className="w-5 h-5 text-emerald-400" />{tr('Capture / Log Expense Receipt')}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{tr('Record vendor receipt details, calculate deductible tax credits, and assign GL accounts.')}</p>
               </div>
               <button
                 onClick={() => setIsExpenseModalOpen(false)}
@@ -681,8 +654,8 @@ export const ExpenseTrackingView: React.FC = () => {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-semibold text-emerald-300">AI Receipt Auto-Scanner (OCR)</div>
-                  <div className="text-[11px] text-slate-400">Instantly extract Merchant, Tax & Total from digital bill</div>
+                  <div className="text-xs font-semibold text-emerald-300">{tr('AI Receipt Auto-Scanner (OCR)')}</div>
+                  <div className="text-[11px] text-slate-400">{tr('Instantly extract Merchant, Tax & Total from digital bill')}</div>
                 </div>
               </div>
               <button
@@ -693,14 +666,10 @@ export const ExpenseTrackingView: React.FC = () => {
               >
                 {isSimulatingOcr ? (
                   <>
-                    <Clock className="w-3.5 h-3.5 animate-spin" />
-                    Scanning...
-                  </>
+                    <Clock className="w-3.5 h-3.5 animate-spin" />{tr('Scanning...')}</>
                 ) : (
                   <>
-                    <Upload className="w-3.5 h-3.5" />
-                    Simulate OCR Scan
-                  </>
+                    <Upload className="w-3.5 h-3.5" />{tr('Simulate OCR Scan')}</>
                 )}
               </button>
             </div>
@@ -715,11 +684,11 @@ export const ExpenseTrackingView: React.FC = () => {
             <form onSubmit={handleSaveExpense} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Merchant / Vendor Name *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Merchant / Vendor Name *')}</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. AWS, Delta Airlines, Staples"
+                    placeholder={tr('e.g. AWS, Delta Airlines, Staples')}
                     value={vendorName}
                     onChange={(e) => setVendorName(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
@@ -727,7 +696,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Expense Category *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Expense Category *')}</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
@@ -742,7 +711,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Expense Date *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Expense Date *')}</label>
                   <input
                     type="date"
                     required
@@ -753,10 +722,10 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Receipt / Invoice Ref #</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Receipt / Invoice Ref #')}</label>
                   <input
                     type="text"
-                    placeholder="e.g. INV-98421"
+                    placeholder={tr('e.g. INV-98421')}
                     value={receiptNumber}
                     onChange={(e) => setReceiptNumber(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500 font-mono"
@@ -764,7 +733,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Net Amount ($) *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Net Amount ($) *')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -777,7 +746,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Sales Tax / VAT ($)</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Sales Tax / VAT ($)')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -789,21 +758,21 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Payment Method</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Payment Method')}</label>
                   <select
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value as any)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
                   >
-                    <option value="COMPANY_CARD">Corporate Credit Card</option>
-                    <option value="BANK_TRANSFER">Direct Wire / ACH</option>
-                    <option value="CREDIT_CARD">Personal Card (Reimbursable)</option>
-                    <option value="CASH">Petty Cash</option>
+                    <option value="COMPANY_CARD">{tr('Corporate Credit Card')}</option>
+                    <option value="BANK_TRANSFER">{tr('Direct Wire / ACH')}</option>
+                    <option value="CREDIT_CARD">{tr('Personal Card (Reimbursable)')}</option>
+                    <option value="CASH">{tr('Petty Cash')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Paid By / Employee</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Paid By / Employee')}</label>
                   <input
                     type="text"
                     value={paidBy}
@@ -814,21 +783,21 @@ export const ExpenseTrackingView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">General Ledger Expense Account Code</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">{tr('General Ledger Expense Account Code')}</label>
                 <input
                   type="text"
                   value={expenseAccountCode}
                   onChange={(e) => setExpenseAccountCode(e.target.value)}
-                  placeholder="5010 (Operating Expense)"
+                  placeholder={tr('5010 (Operating Expense)')}
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500 font-mono"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Business Purpose & Notes</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Business Purpose & Notes')}</label>
                 <textarea
                   rows={2}
-                  placeholder="Detailed business justification for accounting audit trail..."
+                  placeholder={tr('Detailed business justification for accounting audit trail...')}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
@@ -837,7 +806,7 @@ export const ExpenseTrackingView: React.FC = () => {
 
               {/* Total Calculation Preview */}
               <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Total Disbursement Amount:</span>
+                <span className="text-xs text-slate-400">{tr('Total Disbursement Amount:')}</span>
                 <span className="text-base font-bold text-emerald-400 font-mono">
                   ${(Number(amount) + Number(taxAmount)).toFixed(2)} {activeTenant.currency}
                 </span>
@@ -848,15 +817,11 @@ export const ExpenseTrackingView: React.FC = () => {
                   type="button"
                   onClick={() => setIsExpenseModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-colors"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-emerald-600/20 transition-all cursor-pointer"
-                >
-                  Save & Log Receipt
-                </button>
+                >{tr('Save & Log Receipt')}</button>
               </div>
             </form>
           </div>
@@ -870,12 +835,8 @@ export const ExpenseTrackingView: React.FC = () => {
             <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
               <div>
                 <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <Car className="w-5 h-5 text-indigo-400" />
-                  Log Business Mileage Trip
-                </h3>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  Record vehicle business travel distance for tax deductions and employee reimbursements.
-                </p>
+                  <Car className="w-5 h-5 text-indigo-400" />{tr('Log Business Mileage Trip')}</h3>
+                <p className="text-xs text-slate-400 mt-0.5">{tr('Record vehicle business travel distance for tax deductions and employee reimbursements.')}</p>
               </div>
               <button
                 onClick={() => setIsMileageModalOpen(false)}
@@ -888,7 +849,7 @@ export const ExpenseTrackingView: React.FC = () => {
             <form onSubmit={handleSaveMileage} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Driver / Employee Name *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Driver / Employee Name *')}</label>
                   <input
                     type="text"
                     required
@@ -899,7 +860,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Trip Date *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Trip Date *')}</label>
                   <input
                     type="date"
                     required
@@ -910,11 +871,11 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Starting Location (Origin) *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Starting Location (Origin) *')}</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. NYC Corporate HQ"
+                    placeholder={tr('e.g. NYC Corporate HQ')}
                     value={startLocation}
                     onChange={(e) => setStartLocation(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -922,11 +883,11 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Ending Location (Destination) *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Ending Location (Destination) *')}</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. JFK Airport Terminal 4"
+                    placeholder={tr('e.g. JFK Airport Terminal 4')}
                     value={endLocation}
                     onChange={(e) => setEndLocation(e.target.value)}
                     className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -934,7 +895,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Distance Driven (Miles) *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Distance Driven (Miles) *')}</label>
                   <input
                     type="number"
                     step="0.1"
@@ -947,7 +908,7 @@ export const ExpenseTrackingView: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">IRS Standard Rate ($/mi)</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('IRS Standard Rate ($/mi)')}</label>
                   <input
                     type="number"
                     step="0.01"
@@ -959,11 +920,11 @@ export const ExpenseTrackingView: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Business Purpose *</label>
+                <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Business Purpose *')}</label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Client executive meeting & site inspection"
+                  placeholder={tr('e.g. Client executive meeting & site inspection')}
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-lg text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
@@ -972,7 +933,7 @@ export const ExpenseTrackingView: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Vehicle Description</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Vehicle Description')}</label>
                   <input
                     type="text"
                     value={vehicle}
@@ -983,7 +944,7 @@ export const ExpenseTrackingView: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Odometer Start</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Odometer Start')}</label>
                     <input
                       type="number"
                       placeholder="e.g. 14200"
@@ -993,7 +954,7 @@ export const ExpenseTrackingView: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">Odometer End</label>
+                    <label className="block text-xs font-medium text-slate-300 mb-1">{tr('Odometer End')}</label>
                     <input
                       type="number"
                       placeholder="e.g. 14242"
@@ -1007,7 +968,7 @@ export const ExpenseTrackingView: React.FC = () => {
 
               {/* Total Deduction Preview */}
               <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 flex items-center justify-between">
-                <span className="text-xs text-slate-400">Total Tax Deduction Amount:</span>
+                <span className="text-xs text-slate-400">{tr('Total Tax Deduction Amount:')}</span>
                 <span className="text-base font-bold text-indigo-400 font-mono">
                   ${(Number(distanceMiles) * Number(ratePerMile)).toFixed(2)}
                 </span>
@@ -1018,15 +979,11 @@ export const ExpenseTrackingView: React.FC = () => {
                   type="button"
                   onClick={() => setIsMileageModalOpen(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium transition-colors"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold shadow-lg shadow-indigo-600/20 transition-all cursor-pointer"
-                >
-                  Save & Log Trip
-                </button>
+                >{tr('Save & Log Trip')}</button>
               </div>
             </form>
           </div>
@@ -1052,38 +1009,38 @@ export const ExpenseTrackingView: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Merchant / Vendor:</span>
+                <span className="text-slate-400">{tr('Merchant / Vendor:')}</span>
                 <span className="font-semibold text-slate-200">{selectedReceipt.vendorName}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Category:</span>
+                <span className="text-slate-400">{tr('Category:')}</span>
                 <span className="text-slate-200">{selectedReceipt.category}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Expense Date:</span>
+                <span className="text-slate-400">{tr('Expense Date:')}</span>
                 <span className="text-slate-200 font-mono">{selectedReceipt.expenseDate}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Paid By:</span>
+                <span className="text-slate-400">{tr('Paid By:')}</span>
                 <span className="text-slate-200">{selectedReceipt.paidBy}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">Payment Method:</span>
+                <span className="text-slate-400">{tr('Payment Method:')}</span>
                 <span className="text-slate-200">{selectedReceipt.paymentMethod}</span>
               </div>
               <div className="flex justify-between py-1 border-b border-slate-800/60">
-                <span className="text-slate-400">GL Account:</span>
+                <span className="text-slate-400">{tr('GL Account:')}</span>
                 <span className="font-mono text-slate-300">{selectedReceipt.expenseAccountCode || '5010'}</span>
               </div>
               {selectedReceipt.journalEntryId && (
                 <div className="flex justify-between py-1 border-b border-slate-800/60">
-                  <span className="text-slate-400">Linked Journal Entry:</span>
+                  <span className="text-slate-400">{tr('Linked Journal Entry:')}</span>
                   <span className="font-mono text-emerald-400">{selectedReceipt.journalEntryId}</span>
                 </div>
               )}
               {selectedReceipt.notes && (
                 <div className="py-1">
-                  <span className="text-slate-400 block mb-1">Notes:</span>
+                  <span className="text-slate-400 block mb-1">{tr('Notes:')}</span>
                   <p className="text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800">
                     {selectedReceipt.notes}
                   </p>
@@ -1092,15 +1049,15 @@ export const ExpenseTrackingView: React.FC = () => {
 
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 mt-4 space-y-1.5 font-mono">
                 <div className="flex justify-between text-slate-400">
-                  <span>Net Amount:</span>
+                  <span>{tr('Net Amount:')}</span>
                   <span>${selectedReceipt.amount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-slate-400">
-                  <span>Tax Credit / VAT:</span>
+                  <span>{tr('Tax Credit / VAT:')}</span>
                   <span>${(selectedReceipt.taxAmount || 0).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-emerald-400 pt-1.5 border-t border-slate-800">
-                  <span>Total Disbursement:</span>
+                  <span>{tr('Total Disbursement:')}</span>
                   <span>${selectedReceipt.totalAmount.toFixed(2)} {selectedReceipt.currency}</span>
                 </div>
               </div>
@@ -1110,9 +1067,7 @@ export const ExpenseTrackingView: React.FC = () => {
               <button
                 onClick={() => setSelectedReceipt(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-medium"
-              >
-                Close
-              </button>
+              >{tr('Close')}</button>
             </div>
           </div>
         </div>

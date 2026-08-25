@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   X,
   Calendar,
@@ -72,11 +73,11 @@ interface ParsedUploadRow {
   validationError?: string;
 }
 
-export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalProps> = ({
-  isOpen,
+export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalProps> = ({ isOpen,
   onClose,
   preSelectedCustomerId,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     customers,
@@ -605,17 +606,13 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-bold tracking-tight text-white">
-                  Customer FY Opening Balances
+                  {tr('Customer FY Opening Balances')}
                 </h2>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-400/30">
-                  Fiscal Year Cutover
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-400/30">
-                  DR (Receivable) / CR (Overpayment)
-                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-mono border border-amber-400/30">{tr('Fiscal Year Cutover')}</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono border border-emerald-400/30">{tr('DR (Receivable) / CR (Overpayment)')}</span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Establish outstanding receivables or customer credit advances with pre-populated customer lists and automated double-entry GL postings.
+                {tr('Establish outstanding receivables or customer credit advances with pre-populated customer lists and automated double-entry GL postings.')}
               </p>
             </div>
           </div>
@@ -634,7 +631,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                 }`}
               >
                 <Layers className="w-3.5 h-3.5" />
-                Quick Customer Grid
+                {tr('Quick Customer Grid')}
               </button>
               <button
                 type="button"
@@ -647,7 +644,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                 }`}
               >
                 <Upload className="w-3.5 h-3.5" />
-                Upload Template
+                {tr('Upload Template')}
               </button>
               <button
                 type="button"
@@ -660,7 +657,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                 }`}
               >
                 <Plus className="w-3.5 h-3.5" />
-                Single
+                {tr('Single')}
               </button>
             </div>
 
@@ -681,14 +678,11 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
               <FileSpreadsheet className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                Download Pre-Populated Customer Upload Template
-                <span className="text-[10px] px-1.5 py-0.2 bg-amber-200/60 text-amber-900 font-mono rounded">
-                  {customers.length} Customers Updated
+              <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">{tr('Download Pre-Populated Customer Upload Template')}<span className="text-[10px] px-1.5 py-0.2 bg-amber-200/60 text-amber-900 font-mono rounded">
+                  {customers.length} {tr('Customers')}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-600">
-                All existing customers are already listed. You only need to fill in the <strong>Opening Balance Amount</strong> and <strong>Credit / Debit Flag (DR/CR)</strong>!
+              <p className="text-[11px] text-slate-600">{tr('All existing customers are already listed. You only need to fill in the')}<strong>{tr('Opening Balance Amount')}</strong> {tr('and')} <strong>{tr('Credit / Debit Flag (DR/CR)')}</strong>!
               </p>
             </div>
           </div>
@@ -699,22 +693,18 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
               id="download-opening-template-excel-btn"
               onClick={handleDownloadExcelTemplate}
               className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
-              title="Download Excel spreadsheet (.xls) with all customers pre-populated"
+              title={tr('Download Excel spreadsheet (.xls) with all customers pre-populated')}
             >
-              <Download className="w-3.5 h-3.5" />
-              Download Excel Template (.xls)
-            </button>
+              <Download className="w-3.5 h-3.5" />{tr('Download Excel Template (.xls)')}</button>
 
             <button
               type="button"
               id="download-opening-template-csv-btn"
               onClick={handleDownloadCsvTemplate}
               className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 rounded-lg text-xs font-semibold shadow-2xs transition flex items-center gap-1.5 cursor-pointer"
-              title="Download CSV format template (.csv)"
+              title={tr('Download CSV format template (.csv)')}
             >
-              <FileDown className="w-3.5 h-3.5 text-slate-600" />
-              Download CSV (.csv)
-            </button>
+              <FileDown className="w-3.5 h-3.5 text-slate-600" />{tr('Download CSV (.csv)')}</button>
           </div>
         </div>
 
@@ -744,7 +734,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     type="text"
                     value={gridSearchTerm}
                     onChange={(e) => setGridSearchTerm(e.target.value)}
-                    placeholder="Filter customer name, code or ref # in table..."
+                    placeholder={tr('Filter customer name, code or ref # in table...')}
                     className="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 text-xs text-slate-800 placeholder-slate-400 focus:ring-1 focus:ring-amber-500"
                   />
                   {gridSearchTerm && (
@@ -752,9 +742,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                       type="button"
                       onClick={() => setGridSearchTerm('')}
                       className="text-slate-400 hover:text-slate-600 text-xs"
-                    >
-                      Clear
-                    </button>
+                    >{tr('Clear')}</button>
                   )}
                 </div>
 
@@ -766,7 +754,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                       onChange={(e) => setGridOnlyNonZero(e.target.checked)}
                       className="rounded border-slate-300 text-amber-600 focus:ring-amber-500"
                     />
-                    <span>Show only rows with Amount &gt; 0</span>
+                    <span>{tr('Show only rows with Amount &gt; 0')}</span>
                   </label>
 
                   <button
@@ -774,19 +762,15 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     onClick={handleAddBatchRow}
                     className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-lg font-semibold hover:bg-amber-100 flex items-center gap-1 transition"
                   >
-                    <Plus className="w-3 h-3" />
-                    Add Row
-                  </button>
+                    <Plus className="w-3 h-3" />{tr('Add Row')}</button>
 
                   <button
                     type="button"
                     onClick={handleResetToAllCustomers}
                     className="px-2.5 py-1 bg-white text-slate-700 border border-slate-200 rounded-lg font-semibold hover:bg-slate-100 flex items-center gap-1 transition"
-                    title="Reload all master customers"
+                    title={tr('Reload all master customers')}
                   >
-                    <RefreshCw className="w-3 h-3" />
-                    Reset List
-                  </button>
+                    <RefreshCw className="w-3 h-3" />{tr('Reset List')}</button>
                 </div>
               </div>
 
@@ -797,25 +781,23 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     <thead className="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200 sticky top-0 z-10">
                       <tr>
                         <th className="p-2.5 w-12 text-center text-slate-400">#</th>
-                        <th className="p-2.5 w-60">Customer Master</th>
-                        <th className="p-2.5 w-32">Original Ref #</th>
-                        <th className="p-2.5 w-28">As-of Date</th>
+                        <th className="p-2.5 w-60">{tr('Customer Master')}</th>
+                        <th className="p-2.5 w-32">{tr('Original Ref #')}</th>
+                        <th className="p-2.5 w-28">{tr('As-of Date')}</th>
                         <th className="p-2.5 w-36 text-right bg-amber-100/50 text-amber-900">
                           Amount ({activeTenant.currency}) *
                         </th>
                         <th className="p-2.5 w-32 text-center bg-amber-100/50 text-amber-900">
                           DR / CR Flag *
                         </th>
-                        <th className="p-2.5">Notes</th>
+                        <th className="p-2.5">{tr('Notes')}</th>
                         <th className="p-2.5 w-10 text-center"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white">
                       {filteredGridRows.length === 0 ? (
                         <tr>
-                          <td colSpan={8} className="p-8 text-center text-slate-400">
-                            No customer rows match the search filter.
-                          </td>
+                          <td colSpan={8} className="p-8 text-center text-slate-400">{tr('No customer rows match the search filter.')}</td>
                         </tr>
                       ) : (
                         filteredGridRows.map((row, idx) => {
@@ -844,7 +826,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                                   className="w-full px-2 py-1 bg-white border border-slate-300 rounded text-xs text-slate-900 font-medium truncate"
                                   required
                                 >
-                                  <option value="">-- Select Customer --</option>
+                                  <option value="">{tr('-- Select Customer --')}</option>
                                   {customers.map((c) => (
                                     <option key={c.id} value={c.id}>
                                       {c.name} {c.code ? `(${c.code})` : ''}
@@ -861,7 +843,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                                     handleBatchRowChange(row.id, { originalInvoiceNumber: e.target.value })
                                   }
                                   className="w-full px-2 py-1 bg-white border border-slate-300 rounded text-xs font-mono"
-                                  placeholder="OPN-..."
+                                  placeholder={tr('OPN-...')}
                                   required
                                 />
                               </td>
@@ -905,10 +887,8 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                                         ? 'bg-blue-600 text-white'
                                         : 'text-slate-600 hover:text-slate-900'
                                     }`}
-                                    title="Debit: Customer owes company money (Receivable)"
-                                  >
-                                    DR (Due)
-                                  </button>
+                                    title={tr('Debit: Customer owes company money (Receivable)')}
+                                  >{tr('DR (Due)')}</button>
                                   <button
                                     type="button"
                                     onClick={() => handleBatchRowChange(row.id, { balanceType: 'CR' })}
@@ -917,10 +897,8 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                                         ? 'bg-purple-600 text-white'
                                         : 'text-slate-600 hover:text-slate-900'
                                     }`}
-                                    title="Credit: Customer overpaid / has advance deposit"
-                                  >
-                                    CR (Overpaid)
-                                  </button>
+                                    title={tr('Credit: Customer overpaid / has advance deposit')}
+                                  >{tr('CR (Overpaid)')}</button>
                                 </div>
                               </td>
 
@@ -931,7 +909,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                                   onChange={(e) =>
                                     handleBatchRowChange(row.id, { notes: e.target.value })
                                   }
-                                  placeholder="Carryforward context"
+                                  placeholder={tr('Carryforward context')}
                                   className="w-full px-2 py-1 bg-white border border-slate-300 rounded text-xs text-slate-700"
                                 />
                               </td>
@@ -942,7 +920,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                                     type="button"
                                     onClick={() => handleRemoveBatchRow(row.id)}
                                     className="text-slate-400 hover:text-red-600 p-1"
-                                    title="Remove row"
+                                    title={tr('Remove row')}
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
@@ -961,19 +939,15 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-slate-900 text-white rounded-xl shadow-md">
                 <div className="flex flex-wrap items-center gap-6">
                   <div>
-                    <div className="text-[11px] text-slate-400 font-semibold uppercase">
-                      Updated Customers
-                    </div>
+                    <div className="text-[11px] text-slate-400 font-semibold uppercase">{tr('Updated Customers')}</div>
                     <div className="text-base font-bold text-white font-mono">
-                      {activeCountWithAmount} / {batchRows.length} with amount
+                      {activeCountWithAmount} / {batchRows.length} {tr('with amount')}
                     </div>
                   </div>
 
                   <div className="border-l border-slate-800 pl-4">
                     <div className="text-[11px] text-blue-300 font-semibold uppercase flex items-center gap-1">
-                      <ArrowUpRight className="w-3 h-3" />
-                      Total Debits (Receivable)
-                    </div>
+                      <ArrowUpRight className="w-3 h-3" />{tr('Total Debits (Receivable)')}</div>
                     <div className="text-base font-bold text-blue-400 font-mono">
                       +{activeTenant.currency} {totalGridDebit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
@@ -981,18 +955,14 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
 
                   <div className="border-l border-slate-800 pl-4">
                     <div className="text-[11px] text-purple-300 font-semibold uppercase flex items-center gap-1">
-                      <ArrowDownLeft className="w-3 h-3" />
-                      Total Credits (Overpayment)
-                    </div>
+                      <ArrowDownLeft className="w-3 h-3" />{tr('Total Credits (Overpayment)')}</div>
                     <div className="text-base font-bold text-purple-400 font-mono">
                       -{activeTenant.currency} {totalGridCredit.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
                   </div>
 
                   <div className="border-l border-slate-800 pl-4">
-                    <div className="text-[11px] text-amber-300 font-semibold uppercase">
-                      Net AR Impact
-                    </div>
+                    <div className="text-[11px] text-amber-300 font-semibold uppercase">{tr('Net AR Impact')}</div>
                     <div className="text-base font-bold text-amber-400 font-mono">
                       {activeTenant.currency} {netGridBalance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                     </div>
@@ -1004,9 +974,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     type="button"
                     onClick={onClose}
                     className="px-4 py-2 text-xs text-slate-400 hover:text-white"
-                  >
-                    Cancel
-                  </button>
+                  >{tr('Cancel')}</button>
                   <button
                     type="submit"
                     id="submit-grid-opening-btn"
@@ -1014,7 +982,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 text-slate-950 font-bold rounded-xl shadow transition flex items-center gap-2 text-xs cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4" />
-                    Post {activeCountWithAmount} Opening Balances
+                    {tr('Post')} {activeCountWithAmount} {tr('Opening Balances')}
                   </button>
                 </div>
               </div>
@@ -1057,19 +1025,15 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
 
                 <div>
                   <div className="text-sm font-bold text-slate-800">
-                    {uploadedFileName ? `Loaded: ${uploadedFileName}` : 'Drag & drop your completed template here, or browse files'}
+                    {uploadedFileName ? `${tr('Loaded:')} ${uploadedFileName}` : tr('Drag & drop your completed template here, or browse files')}
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
-                    Supports Microsoft Excel XML (.xls), CSV (.csv), and Tab-Delimited (.txt)
-                  </p>
+                  <p className="text-xs text-slate-500 mt-0.5">{tr('Supports Microsoft Excel XML (.xls), CSV (.csv), and Tab-Delimited (.txt)')}</p>
                 </div>
 
                 <button
                   type="button"
                   className="px-3.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 pointer-events-none"
-                >
-                  Select File from Computer
-                </button>
+                >{tr('Select File from Computer')}</button>
               </div>
 
               {uploadError && (
@@ -1085,10 +1049,10 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                   <div className="flex items-center justify-between">
                     <div className="text-xs font-bold text-slate-800 flex items-center gap-2">
                       <Check className="w-4 h-4 text-emerald-600" />
-                      Parsed {parsedRows.length} Rows from File (Preview & Validation)
+                      {tr('Parsed')} {parsedRows.length} {tr('Rows from File (Preview & Validation)')}
                     </div>
                     <div className="text-xs text-slate-500">
-                      {parsedRows.filter((r) => r.openingAmount > 0).length} rows with amounts
+                      {parsedRows.filter((r) => r.openingAmount > 0).length} {tr('rows with amounts')}
                     </div>
                   </div>
 
@@ -1096,14 +1060,14 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     <table className="w-full text-left text-xs border-collapse">
                       <thead className="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200 sticky top-0">
                         <tr>
-                          <th className="p-2 w-10 text-center">Status</th>
-                          <th className="p-2 w-28">Code</th>
-                          <th className="p-2">Customer Name</th>
-                          <th className="p-2 w-28">Ref #</th>
-                          <th className="p-2 w-28">As-of Date</th>
+                          <th className="p-2 w-10 text-center">{tr('Status')}</th>
+                          <th className="p-2 w-28">{tr('Code')}</th>
+                          <th className="p-2">{tr('Customer Name')}</th>
+                          <th className="p-2 w-28">{tr('Ref #')}</th>
+                          <th className="p-2 w-28">{tr('As-of Date')}</th>
                           <th className="p-2 w-28 text-right">Amount ({activeTenant.currency})</th>
-                          <th className="p-2 w-24 text-center">Flag</th>
-                          <th className="p-2">Notes</th>
+                          <th className="p-2 w-24 text-center">{tr('Flag')}</th>
+                          <th className="p-2">{tr('Notes')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 bg-white">
@@ -1111,7 +1075,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                           <tr key={r.id} className={r.openingAmount > 0 ? 'bg-amber-50/30' : ''}>
                             <td className="p-2 text-center">
                               {r.isValid ? (
-                                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" title="Valid"></span>
+                                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500" title={tr('Valid')}></span>
                               ) : (
                                 <span className="inline-block w-2 h-2 rounded-full bg-rose-500" title={r.validationError}></span>
                               )}
@@ -1143,9 +1107,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
 
                   {/* Confirm Commit */}
                   <div className="flex items-center justify-between p-4 bg-slate-900 text-white rounded-xl">
-                    <div className="text-xs text-slate-400">
-                      Ready to create opening invoices, advance credits, and initial GL journals for valid records.
-                    </div>
+                    <div className="text-xs text-slate-400">{tr('Ready to create opening invoices, advance credits, and initial GL journals for valid records.')}</div>
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
@@ -1154,18 +1116,14 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                           setUploadedFileName(null);
                         }}
                         className="px-3 py-1.5 text-xs text-slate-400 hover:text-white"
-                      >
-                        Discard
-                      </button>
+                      >{tr('Discard')}</button>
                       <button
                         type="button"
                         id="commit-upload-opening-btn"
                         onClick={handleCommitUpload}
                         className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow transition flex items-center gap-1.5 cursor-pointer"
                       >
-                        <CheckCircle2 className="w-4 h-4" />
-                        Import & Post Opening Balances
-                      </button>
+                        <CheckCircle2 className="w-4 h-4" />{tr('Import & Post Opening Balances')}</button>
                     </div>
                   </div>
                 </div>
@@ -1179,8 +1137,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                 {/* Customer */}
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Customer Master <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">{tr('Customer Master')}<span className="text-red-500">*</span>
                   </label>
                   <select
                     id="single-opening-customer"
@@ -1189,7 +1146,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-900 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     required
                   >
-                    <option value="">-- Select Customer --</option>
+                    <option value="">{tr('-- Select Customer --')}</option>
                     {customers.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name} {c.code ? `(${c.code})` : ''} - {c.category}
@@ -1200,8 +1157,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
 
                 {/* Fiscal Year */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Financial Year <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">{tr('Financial Year')}<span className="text-red-500">*</span>
                   </label>
                   <select
                     id="single-opening-fy"
@@ -1209,16 +1165,15 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                     onChange={(e) => setFiscalYear(e.target.value)}
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                   >
-                    <option value="FY 2026-2027">FY 2026-2027 (Current)</option>
-                    <option value="FY 2025-2026">FY 2025-2026 (Prior Year)</option>
-                    <option value="FY 2024-2025">FY 2024-2025</option>
+                    <option value="FY 2026-2027">{tr('FY 2026-2027 (Current)')}</option>
+                    <option value="FY 2025-2026">{tr('FY 2025-2026 (Prior Year)')}</option>
+                    <option value="FY 2024-2025">{tr('FY 2024-2025')}</option>
                   </select>
                 </div>
 
                 {/* As of Date */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    As-of Opening Date <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">{tr('As-of Opening Date')}<span className="text-red-500">*</span>
                   </label>
                   <input
                     id="single-opening-asof-date"
@@ -1233,14 +1188,14 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                 {/* Original Invoice # */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Prior Original Invoice / Ref # <span className="text-red-500">*</span>
+                    {tr('Prior Original Invoice / Ref #')} <span className="text-red-500">*</span>
                   </label>
                   <input
                     id="single-opening-inv-num"
                     type="text"
                     value={originalInvoiceNumber}
                     onChange={(e) => setOriginalInvoiceNumber(e.target.value)}
-                    placeholder="e.g. INV-2025-889"
+                    placeholder={tr('e.g. INV-2025-889')}
                     className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                     required
                   />
@@ -1248,8 +1203,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
 
                 {/* Balance Type (DR vs CR) */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Balance Type (DR / CR) <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">{tr('Balance Type (DR / CR)')}<span className="text-red-500">*</span>
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
@@ -1260,9 +1214,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                           ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
                           : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       }`}
-                    >
-                      Debit (Receivable)
-                    </button>
+                    >{tr('Debit (Receivable)')}</button>
                     <button
                       type="button"
                       onClick={() => setSingleBalanceType('CR')}
@@ -1271,16 +1223,14 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                           ? 'bg-purple-600 text-white border-purple-600 shadow-xs'
                           : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'
                       }`}
-                    >
-                      Credit (Overpayment)
-                    </button>
+                    >{tr('Credit (Overpayment)')}</button>
                   </div>
                 </div>
 
                 {/* Opening Amount */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Opening Amount ({activeTenant.currency}) <span className="text-red-500">*</span>
+                    {tr('Opening Amount')} ({activeTenant.currency}) <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <span className="absolute left-3 top-2.5 text-xs text-slate-400 font-semibold">
@@ -1302,8 +1252,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
 
                 {/* Due Date */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Payment Due Date <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">{tr('Payment Due Date')}<span className="text-red-500">*</span>
                   </label>
                   <input
                     id="single-opening-due-date"
@@ -1317,8 +1266,7 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
 
                 {/* Offset Equity Account */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Balancing Offset Account (GL Offset) <span className="text-red-500">*</span>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">{tr('Balancing Offset Account (GL Offset)')}<span className="text-red-500">*</span>
                   </label>
                   <select
                     id="single-opening-offset-account"
@@ -1331,23 +1279,21 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                         {a.code} - {a.name} ({a.type})
                       </option>
                     ))}
-                    <option value="3010">3010 - Opening Balance Equity</option>
-                    <option value="3200">3200 - Retained Earnings</option>
+                    <option value="3010">{tr('3010 - Opening Balance Equity')}</option>
+                    <option value="3200">{tr('3200 - Retained Earnings')}</option>
                   </select>
                 </div>
               </div>
 
               {/* Notes */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Arrears / Advance Description & Context
-                </label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">{tr('Arrears / Advance Description & Context')}</label>
                 <input
                   id="single-opening-notes"
                   type="text"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="e.g. Outstanding balance or customer advance transferred from legacy software."
+                  placeholder={tr('e.g. Outstanding balance or customer advance transferred from legacy software.')}
                   className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
                 />
               </div>
@@ -1356,17 +1302,17 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
               <div className="p-4 bg-amber-50/50 border border-amber-200 rounded-xl">
                 <div className="text-xs font-bold text-amber-900 flex items-center gap-1.5 mb-2">
                   <ShieldCheck className="w-4 h-4 text-amber-600" />
-                  Double-Entry Ledger Opening Impact Preview ({singleBalanceType === 'DR' ? 'Receivable' : 'Customer Overpayment Credit'})
+                  {tr('Double-Entry Ledger Opening Impact Preview')} ({singleBalanceType === 'DR' ? tr('Receivable') : tr('Customer Overpayment Credit')})
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-xs font-mono">
                   <div className="p-2.5 bg-white rounded-lg border border-amber-100">
                     <span className="text-slate-500 font-sans block text-[10px]">
-                      {singleBalanceType === 'DR' ? 'DEBIT ENTRY (Receivable Asset)' : 'DEBIT ENTRY (Balancing Equity)'}
+                      {singleBalanceType === 'DR' ? tr('DEBIT ENTRY (Receivable Asset)') : tr('DEBIT ENTRY (Balancing Equity)')}
                     </span>
                     <span className="font-bold text-slate-900">
                       {singleBalanceType === 'DR'
-                        ? '1100 - Trade Accounts Receivable'
-                        : `${offsetAccountCode} - Opening Balance Equity`}
+                        ? tr('1100 - Trade Accounts Receivable')
+                        : `${offsetAccountCode} - ${tr('Opening Balance Equity')}`}
                     </span>
                     <div className="text-emerald-700 font-bold mt-1">
                       +{activeTenant.currency} {openingAmount.toFixed(2)}
@@ -1374,12 +1320,12 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                   </div>
                   <div className="p-2.5 bg-white rounded-lg border border-amber-100">
                     <span className="text-slate-500 font-sans block text-[10px]">
-                      {singleBalanceType === 'DR' ? 'CREDIT ENTRY (Balancing Equity)' : 'CREDIT ENTRY (Advance / AR Liability)'}
+                      {singleBalanceType === 'DR' ? tr('CREDIT ENTRY (Balancing Equity)') : tr('CREDIT ENTRY (Advance / AR Liability)')}
                     </span>
                     <span className="font-bold text-slate-900">
                       {singleBalanceType === 'DR'
-                        ? `${offsetAccountCode} - Opening Balance Equity / Retained Earnings`
-                        : '1100 - Customer Advance Credit / AR'}
+                        ? `${offsetAccountCode} - ${tr('Opening Balance Equity / Retained Earnings')}`
+                        : tr('1100 - Customer Advance Credit / AR')}
                     </span>
                     <div className="text-slate-800 font-bold mt-1">
                       +{activeTenant.currency} {openingAmount.toFixed(2)}
@@ -1393,17 +1339,13 @@ export const CustomerOpeningBalanceModal: React.FC<CustomerOpeningBalanceModalPr
                   type="button"
                   onClick={onClose}
                   className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-xl"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   id="submit-single-opening-btn"
                   className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
-                  Save & Post Opening Balance
-                </button>
+                  <CheckCircle2 className="w-4 h-4" />{tr('Save & Post Opening Balance')}</button>
               </div>
             </form>
           )}

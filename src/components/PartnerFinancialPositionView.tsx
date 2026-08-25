@@ -1,3 +1,4 @@
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import React, { useState, useMemo } from 'react';
 import { useAccounting } from '../context/AccountingContext';
 import {
@@ -34,6 +35,7 @@ import {
 import { CustomerContact, VendorContact, CustomerInvoice, VendorBill, CustomerPaymentReceipt, Role } from '../types';
 
 export const PartnerFinancialPositionView: React.FC = () => {
+  const { t, tr, formatCurrency, formatNumber, formatDate } = useLanguage();
   const {
     activeTenant,
     activeRole,
@@ -351,29 +353,28 @@ export const PartnerFinancialPositionView: React.FC = () => {
             <div className="flex items-center flex-wrap gap-2.5">
               <span className="px-2.5 py-1 rounded-full text-xs font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30 flex items-center gap-1.5">
                 <Building2 className="w-3.5 h-3.5" />
-                {partnerType === 'CUSTOMER' ? 'CUSTOMER FINANCIAL POSITION' : 'VENDOR FINANCIAL POSITION'}
+                {partnerType === 'CUSTOMER' ? tr('CUSTOMER FINANCIAL POSITION') : tr('VENDOR FINANCIAL POSITION')}
               </span>
               <span className="px-2.5 py-1 rounded-full text-xs font-mono font-medium bg-slate-800 text-slate-300 border border-slate-700">
-                Entity: <span className="text-white font-semibold">{activeTenant.name}</span> ({activeTenant.code})
+                {tr('Entity:')} <span className="text-white font-semibold">{activeTenant.name}</span> ({activeTenant.code})
               </span>
               <span className="px-2.5 py-1 rounded-full text-xs font-mono text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> Real-time Double Entry Sync
-              </span>
+                <ShieldCheck className="w-3.5 h-3.5" />{tr('Real-time Double Entry Sync')}</span>
             </div>
 
             <div className="flex items-baseline gap-3">
               <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
-                {partnerType === 'CUSTOMER' ? currentCustomer?.name || 'Customer' : currentVendor?.name || 'Vendor'}
+                {partnerType === 'CUSTOMER' ? currentCustomer?.name || tr('Customer') : currentVendor?.name || tr('Vendor')}
               </h1>
               <span className="text-xs font-mono text-slate-400">
-                Code: {partnerType === 'CUSTOMER' ? currentCustomer?.code || 'CUST' : currentVendor?.code || 'VEND'}
+                {tr('Code:')} {partnerType === 'CUSTOMER' ? currentCustomer?.code || 'CUST' : currentVendor?.code || 'VEND'}
               </span>
             </div>
 
             <p className="text-xs md:text-sm text-slate-400 max-w-3xl leading-relaxed">
               {partnerType === 'CUSTOMER'
-                ? `Consolidated statement of account, receivables, payment receipts, and real-time ledger with respect to ${activeTenant.name}.`
-                : `Comprehensive accounts payable statement, submitted bills, disbursement status, and aging ledger with respect to ${activeTenant.name}.`}
+                ? tr('Consolidated statement of account, receivables, payment receipts, and real-time ledger with respect to entity.')
+                : tr('Comprehensive accounts payable statement, submitted bills, disbursement status, and aging ledger with respect to entity.')}
             </p>
           </div>
 
@@ -383,9 +384,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
               <>
                 <div className="flex items-center justify-between">
                   <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                    <Sliders className="w-3.5 h-3.5 text-indigo-400" />
-                    Partner Inspection
-                  </span>
+                    <Sliders className="w-3.5 h-3.5 text-indigo-400" />{tr('Partner Inspection')}</span>
                   <div className="flex bg-slate-800 rounded-lg p-0.5 border border-slate-700">
                     <button
                       onClick={() => setPartnerType('CUSTOMER')}
@@ -394,9 +393,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                           ? 'bg-blue-600 text-white font-semibold shadow'
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
-                    >
-                      Customer
-                    </button>
+                    >{tr('Customer')}</button>
                     <button
                       onClick={() => setPartnerType('VENDOR')}
                       className={`px-2.5 py-1 text-xs font-medium rounded-md transition ${
@@ -404,15 +401,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
                           ? 'bg-emerald-600 text-white font-semibold shadow'
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
-                    >
-                      Vendor
-                    </button>
+                    >{tr('Vendor')}</button>
                   </div>
                 </div>
 
                 {partnerType === 'CUSTOMER' ? (
                   <div>
-                    <label className="block text-[10px] text-slate-400 font-mono mb-1">Select Customer Account:</label>
+                    <label className="block text-[10px] text-slate-400 font-mono mb-1">{tr("Select Customer Account:")}</label>
                     <select
                       value={selectedCustomerId}
                       onChange={(e) => setSelectedCustomerId(e.target.value)}
@@ -427,7 +422,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   </div>
                 ) : (
                   <div>
-                    <label className="block text-[10px] text-slate-400 font-mono mb-1">Select Vendor Account:</label>
+                    <label className="block text-[10px] text-slate-400 font-mono mb-1">{tr("Select Vendor Account:")}</label>
                     <select
                       value={selectedVendorId}
                       onChange={(e) => setSelectedVendorId(e.target.value)}
@@ -445,8 +440,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
             ) : (
               <div className="space-y-1.5">
                 <div className="flex items-center gap-1.5 text-emerald-400 text-xs font-semibold">
-                  <Lock className="w-3.5 h-3.5" /> Single Portal Mode Active
-                </div>
+                  <Lock className="w-3.5 h-3.5" />{tr('Single Portal Mode Active')}</div>
                 <p className="text-[11px] text-slate-400 leading-snug">
                   You are authenticated as{' '}
                   <span className="text-slate-200 font-medium">{userEmail}</span>. Access is strictly scoped to this partner record.
@@ -459,19 +453,19 @@ export const PartnerFinancialPositionView: React.FC = () => {
         {/* Navigation Tabs */}
         <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-800/80 overflow-x-auto">
           {[
-            { id: 'OVERVIEW', label: 'Executive Overview & Aging', icon: Layers },
+            { id: 'OVERVIEW', label: tr('Executive Overview & Aging'), icon: Layers },
             {
               id: 'DOCUMENTS',
-              label: partnerType === 'CUSTOMER' ? `Invoices (${customerInvoices.length})` : `Bills (${vendorBillsList.length})`,
+              label: partnerType === 'CUSTOMER' ? `${tr('Invoices')} (${customerInvoices.length})` : `${tr('Bills')} (${vendorBillsList.length})`,
               icon: Receipt,
             },
             {
               id: 'SETTLEMENTS',
-              label: partnerType === 'CUSTOMER' ? `Receipts & Credits (${customerReceipts.length})` : 'Disbursements & Payments',
+              label: partnerType === 'CUSTOMER' ? `${tr('Receipts & Credits')} (${customerReceipts.length})` : tr('Disbursements & Payments'),
               icon: CreditCard,
             },
-            { id: 'STATEMENT', label: 'Double-Entry Statement (Ledger)', icon: FileSpreadsheet },
-            { id: 'PROFILE', label: 'Master Profile & Bank Terms', icon: Landmark },
+            { id: 'STATEMENT', label: tr('Double-Entry Statement (Ledger)'), icon: FileSpreadsheet },
+            { id: 'PROFILE', label: tr('Master Profile & Bank Terms'), icon: Landmark },
           ].map((tab) => {
             const Icon = tab.icon;
             const isActive = portalTab === tab.id;
@@ -500,7 +494,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
             {/* Card 1: Net Receivable Balance */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm relative overflow-hidden">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Net Receivable Balance</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Net Receivable Balance')}</span>
                 <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-400">
                   <DollarSign className="w-4 h-4" />
                 </span>
@@ -512,15 +506,15 @@ export const PartnerFinancialPositionView: React.FC = () => {
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
                 {customerKpis.unallocatedCredits > 0
-                  ? `Includes ${currency} ${customerKpis.unallocatedCredits.toLocaleString()} unallocated advance credit`
-                  : 'Total open unpaid invoices due from customer'}
+                  ? `${tr('Includes')} ${currency} ${customerKpis.unallocatedCredits.toLocaleString()} ${tr('unallocated advance credit')}`
+                  : tr('Total open unpaid invoices due from customer')}
               </p>
             </div>
 
             {/* Card 2: Total Invoiced (YTD) */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Total Billed / Invoiced</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Total Billed / Invoiced')}</span>
                 <span className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
                   <TrendingUp className="w-4 h-4" />
                 </span>
@@ -530,13 +524,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   {currency} {customerKpis.totalInvoiced.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Across {customerKpis.invoiceCount} invoices issued</p>
+              <p className="text-[11px] text-slate-400 mt-1">{tr('Across')} {customerKpis.invoiceCount} {tr('invoices issued')}</p>
             </div>
 
             {/* Card 3: Total Collections / Payments Received */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Settled Receipts</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Settled Receipts')}</span>
                 <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
                   <CheckCircle2 className="w-4 h-4" />
                 </span>
@@ -548,15 +542,15 @@ export const PartnerFinancialPositionView: React.FC = () => {
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
                 {customerKpis.totalInvoiced > 0
-                  ? `${Math.round((customerKpis.totalPaid / customerKpis.totalInvoiced) * 100)}% settlement clearance rate`
-                  : 'All payments settled'}
+                  ? `${Math.round((customerKpis.totalPaid / customerKpis.totalInvoiced) * 100)}% ${tr('settlement clearance rate')}`
+                  : tr('All payments settled')}
               </p>
             </div>
 
             {/* Card 4: Overdue Arrears */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Overdue Balance</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Overdue Balance')}</span>
                 <span className={`p-1.5 rounded-lg ${customerKpis.overdueAmount > 0 ? 'bg-rose-500/10 text-rose-400' : 'bg-slate-800 text-slate-400'}`}>
                   <AlertTriangle className="w-4 h-4" />
                 </span>
@@ -567,7 +561,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
-                {customerKpis.overdueAmount > 0 ? 'Past agreed payment due date' : 'No overdue invoices'}
+                {customerKpis.overdueAmount > 0 ? tr('Past agreed payment due date') : tr('No overdue invoices')}
               </p>
             </div>
           </>
@@ -576,7 +570,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
             {/* Vendor Card 1: Net Accounts Payable */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Net Accounts Payable</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Net Accounts Payable')}</span>
                 <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
                   <DollarSign className="w-4 h-4" />
                 </span>
@@ -586,13 +580,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   {currency} {vendorKpis.totalPayable.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Outstanding entity balance owed to vendor</p>
+              <p className="text-[11px] text-slate-400 mt-1">{tr('Outstanding entity balance owed to vendor')}</p>
             </div>
 
             {/* Vendor Card 2: Total Billed */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Total Billed by Vendor</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Total Billed by Vendor')}</span>
                 <span className="p-1.5 rounded-lg bg-indigo-500/10 text-indigo-400">
                   <TrendingUp className="w-4 h-4" />
                 </span>
@@ -602,13 +596,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   {currency} {vendorKpis.totalBilled.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Cumulative invoices from vendor ({vendorKpis.billCount} bills)</p>
+              <p className="text-[11px] text-slate-400 mt-1">{tr('Cumulative invoices from vendor')} ({vendorKpis.billCount} {tr('bills')})</p>
             </div>
 
             {/* Vendor Card 3: Total Disbursements Settled */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Disbursements Paid</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Disbursements Paid')}</span>
                 <span className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400">
                   <CheckCircle2 className="w-4 h-4" />
                 </span>
@@ -618,13 +612,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   {currency} {vendorKpis.totalDisbursed.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">Wire/ACH bank transfers executed</p>
+              <p className="text-[11px] text-slate-400 mt-1">{tr('Wire/ACH bank transfers executed')}</p>
             </div>
 
             {/* Vendor Card 4: Pending / Overdue */}
             <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 shadow-sm">
               <div className="flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-medium">Overdue Payables</span>
+                <span className="text-xs text-slate-400 font-medium">{tr('Overdue Payables')}</span>
                 <span className={`p-1.5 rounded-lg ${vendorKpis.overduePayable > 0 ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-800 text-slate-400'}`}>
                   <Clock className="w-4 h-4" />
                 </span>
@@ -635,7 +629,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
-                {vendorKpis.overduePayable > 0 ? 'Due for disbursement release' : 'All bills within payment terms'}
+                {vendorKpis.overduePayable > 0 ? tr('Due for disbursement release') : tr('All bills within payment terms')}
               </p>
             </div>
           </>
@@ -651,11 +645,11 @@ export const PartnerFinancialPositionView: React.FC = () => {
           <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-base font-bold text-white">Outstanding Aging Analysis</h3>
-                <p className="text-xs text-slate-400">Aging schedule categorized by invoice/bill due date</p>
+                <h3 className="text-base font-bold text-white">{tr('Outstanding Aging Analysis')}</h3>
+                <p className="text-xs text-slate-400">{tr('Aging schedule categorized by invoice/bill due date')}</p>
               </div>
               <span className="text-xs font-mono bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg border border-slate-700">
-                Terms: {partnerType === 'CUSTOMER' ? currentCustomer?.paymentTermsDays || 30 : currentVendor?.paymentTermsDays || 30} Days Net
+                {tr('Terms:')} {partnerType === 'CUSTOMER' ? currentCustomer?.paymentTermsDays || 30 : currentVendor?.paymentTermsDays || 30} {tr('Days Net')}
               </span>
             </div>
 
@@ -668,7 +662,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                 <div className="space-y-3 pt-2">
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-center">
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                      <span className="text-[11px] text-emerald-400 font-semibold block">Current (Not Due)</span>
+                      <span className="text-[11px] text-emerald-400 font-semibold block">{tr('Current (Not Due)')}</span>
                       <span className="text-sm font-bold font-mono text-white mt-1 block">
                         {currency} {agingData.current.toLocaleString()}
                       </span>
@@ -678,7 +672,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                      <span className="text-[11px] text-blue-400 font-semibold block">1 - 30 Days</span>
+                      <span className="text-[11px] text-blue-400 font-semibold block">{tr('1 - 30 Days')}</span>
                       <span className="text-sm font-bold font-mono text-white mt-1 block">
                         {currency} {agingData.d1_30.toLocaleString()}
                       </span>
@@ -688,7 +682,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                      <span className="text-[11px] text-amber-400 font-semibold block">31 - 60 Days</span>
+                      <span className="text-[11px] text-amber-400 font-semibold block">{tr('31 - 60 Days')}</span>
                       <span className="text-sm font-bold font-mono text-white mt-1 block">
                         {currency} {agingData.d31_60.toLocaleString()}
                       </span>
@@ -698,7 +692,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                      <span className="text-[11px] text-orange-400 font-semibold block">61 - 90 Days</span>
+                      <span className="text-[11px] text-orange-400 font-semibold block">{tr('61 - 90 Days')}</span>
                       <span className="text-sm font-bold font-mono text-white mt-1 block">
                         {currency} {agingData.d61_90.toLocaleString()}
                       </span>
@@ -708,7 +702,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                      <span className="text-[11px] text-rose-400 font-semibold block">90+ Days Past</span>
+                      <span className="text-[11px] text-rose-400 font-semibold block">{tr('90+ Days Past')}</span>
                       <span className="text-sm font-bold font-mono text-white mt-1 block">
                         {currency} {agingData.d90plus.toLocaleString()}
                       </span>
@@ -722,14 +716,14 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   <div className="h-3.5 w-full bg-slate-950 rounded-full flex overflow-hidden border border-slate-800">
                     {totalDue > 0 ? (
                       <>
-                        <div style={{ width: `${(agingData.current / totalDue) * 100}%` }} className="bg-emerald-500 h-full" title="Current" />
-                        <div style={{ width: `${(agingData.d1_30 / totalDue) * 100}%` }} className="bg-blue-500 h-full" title="1-30 Days" />
-                        <div style={{ width: `${(agingData.d31_60 / totalDue) * 100}%` }} className="bg-amber-500 h-full" title="31-60 Days" />
-                        <div style={{ width: `${(agingData.d61_90 / totalDue) * 100}%` }} className="bg-orange-500 h-full" title="61-90 Days" />
-                        <div style={{ width: `${(agingData.d90plus / totalDue) * 100}%` }} className="bg-rose-500 h-full" title="90+ Days" />
+                        <div style={{ width: `${(agingData.current / totalDue) * 100}%` }} className="bg-emerald-500 h-full" title={tr('Current')} />
+                        <div style={{ width: `${(agingData.d1_30 / totalDue) * 100}%` }} className="bg-blue-500 h-full" title={tr('1-30 Days')} />
+                        <div style={{ width: `${(agingData.d31_60 / totalDue) * 100}%` }} className="bg-amber-500 h-full" title={tr('31-60 Days')} />
+                        <div style={{ width: `${(agingData.d61_90 / totalDue) * 100}%` }} className="bg-orange-500 h-full" title={tr('61-90 Days')} />
+                        <div style={{ width: `${(agingData.d90plus / totalDue) * 100}%` }} className="bg-rose-500 h-full" title={tr('90+ Days')} />
                       </>
                     ) : (
-                      <div className="w-full bg-emerald-500/30 h-full text-center text-[9px] text-emerald-300 font-mono">0.00 Outstanding Balance</div>
+                      <div className="w-full bg-emerald-500/30 h-full text-center text-[9px] text-emerald-300 font-mono">{tr('0.00 Outstanding Balance')}</div>
                     )}
                   </div>
                 </div>
@@ -738,7 +732,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
 
             {/* Recent Transaction Activity Snippet */}
             <div className="mt-4 pt-4 border-t border-slate-800 space-y-2.5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">Recent Document Submissions</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">{tr('Recent Document Submissions')}</h4>
               <div className="space-y-2">
                 {partnerType === 'CUSTOMER' ? (
                   customerInvoices.slice(0, 3).map((inv) => (
@@ -767,7 +761,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-[11px] text-slate-400 mt-0.5">
-                            Issue: {inv.issueDate} • Due: {inv.dueDate}
+                            {tr('Issue:')} {inv.issueDate} • {tr('Due:')} {inv.dueDate}
                           </p>
                         </div>
                       </div>
@@ -776,7 +770,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                           {currency} {inv.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </span>
                         <span className="text-[10px] text-slate-400">
-                          Paid: {currency} {(inv.amountPaid || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          {tr('Paid:')} {currency} {(inv.amountPaid || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>
@@ -810,7 +804,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                             </span>
                           </div>
                           <p className="text-[11px] text-slate-400 mt-0.5">
-                            Bill Date: {b.billDate} • Due Date: {b.dueDate}
+                            {tr('Bill Date:')} {b.billDate} • {tr('Due Date:')} {b.dueDate}
                           </p>
                         </div>
                       </div>
@@ -819,7 +813,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                           {currency} {b.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </span>
                         <span className="text-[10px] text-slate-400">
-                          Disbursed: {currency} {(b.amountPaid || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          {tr('Disbursed:')} {currency} {(b.amountPaid || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </span>
                       </div>
                     </div>
@@ -833,50 +827,44 @@ export const PartnerFinancialPositionView: React.FC = () => {
           <div className="space-y-4">
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Landmark className="w-4 h-4 text-indigo-400" />
-                Entity Settlement Coordinates
-              </h3>
+                <Landmark className="w-4 h-4 text-indigo-400" />{tr('Entity Settlement Coordinates')}</h3>
 
               <div className="space-y-2.5 text-xs">
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono block">Remit-To Legal Name:</span>
+                  <span className="text-[10px] text-slate-400 font-mono block">{tr("Remit-To Legal Name:")}</span>
                   <span className="font-semibold text-white block">{activeTenant.name}</span>
-                  <span className="text-[11px] text-slate-400 font-mono">Tax ID: {activeTenant.country}-EIN-992014</span>
+                  <span className="text-[11px] text-slate-400 font-mono">{tr('Tax ID:')} {activeTenant.country}-EIN-992014</span>
                 </div>
 
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono block">Primary Clearing Bank:</span>
-                  <span className="font-semibold text-slate-200 block">JPMorgan Chase Bank, N.A.</span>
-                  <span className="text-[11px] text-slate-400 font-mono">Routing: 021000021 • Account: ••••4892</span>
+                  <span className="text-[10px] text-slate-400 font-mono block">{tr("Primary Clearing Bank:")}</span>
+                  <span className="font-semibold text-slate-200 block">{tr('JPMorgan Chase Bank, N.A.')}</span>
+                  <span className="text-[11px] text-slate-400 font-mono">{tr('Routing:')} 021000021 • {tr('Account:')} ••••4892</span>
                 </div>
 
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/80 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono block">Finance Contacts:</span>
+                  <span className="text-[10px] text-slate-400 font-mono block">{tr("Finance Contacts:")}</span>
                   <span className="text-slate-300 font-medium block">treasury.settlements@acme-us.com</span>
-                  <span className="text-[10px] text-slate-500">Automated Remittance Advice Generation Enabled</span>
+                  <span className="text-[10px] text-slate-500">{tr('Automated Remittance Advice Generation Enabled')}</span>
                 </div>
               </div>
             </div>
 
             {/* Quick Actions Card */}
             <div className="bg-gradient-to-br from-indigo-950/40 to-slate-900 border border-indigo-500/20 rounded-2xl p-5 shadow-sm space-y-3">
-              <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider block">Statement Operations</span>
-              <p className="text-xs text-slate-300">
-                Generate an official, printable financial statement with cryptographic double-entry balances.
-              </p>
+              <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider block">{tr('Statement Operations')}</span>
+              <p className="text-xs text-slate-300">{tr('Generate an official, printable financial statement with cryptographic double-entry balances.')}</p>
               <div className="flex flex-col gap-2 pt-1">
                 <button
                   onClick={() => setPortalTab('STATEMENT')}
                   className="w-full py-2 px-3 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-xs flex items-center justify-center gap-2 transition"
                 >
-                  <FileSpreadsheet className="w-3.5 h-3.5" /> View Running Ledger Statement
-                </button>
+                  <FileSpreadsheet className="w-3.5 h-3.5" />{tr('View Running Ledger Statement')}</button>
                 <button
                   onClick={() => window.print()}
                   className="w-full py-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition border border-slate-700"
                 >
-                  <Printer className="w-3.5 h-3.5" /> Print Position Summary
-                </button>
+                  <Printer className="w-3.5 h-3.5" />{tr('Print Position Summary')}</button>
               </div>
             </div>
           </div>
@@ -889,12 +877,12 @@ export const PartnerFinancialPositionView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-base font-bold text-white">
-                {partnerType === 'CUSTOMER' ? 'Invoices & Billing Register' : 'Vendor Submitted Bills & Approvals'}
+                {partnerType === 'CUSTOMER' ? tr('Invoices & Billing Register') : tr('Vendor Submitted Bills & Approvals')}
               </h3>
               <p className="text-xs text-slate-400">
                 {partnerType === 'CUSTOMER'
-                  ? 'All itemized customer invoices issued by this entity.'
-                  : 'All vendor bills submitted for review, approval, and settlement disbursement.'}
+                  ? tr('All itemized customer invoices issued by this entity.')
+                  : tr('All vendor bills submitted for review, approval, and settlement disbursement.')}
               </p>
             </div>
 
@@ -904,7 +892,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                 <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-2.5" />
                 <input
                   type="text"
-                  placeholder="Search number or line..."
+                  placeholder={tr('Search number or line...')}
                   value={searchDocQuery}
                   onChange={(e) => setSearchDocQuery(e.target.value)}
                   className="bg-slate-800 text-xs text-slate-200 pl-8 pr-3 py-1.5 rounded-xl border border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none w-48 sm:w-60"
@@ -916,12 +904,12 @@ export const PartnerFinancialPositionView: React.FC = () => {
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="bg-slate-800 text-xs text-slate-200 px-3 py-1.5 rounded-xl border border-slate-700 focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
               >
-                <option value="ALL">All Statuses</option>
-                <option value="PAID">Paid</option>
-                <option value="PARTIALLY_PAID">Partially Paid</option>
-                <option value="APPROVED">Approved</option>
-                <option value="OVERDUE">Overdue</option>
-                <option value="PENDING_APPROVAL">Pending Approval</option>
+                <option value="ALL">{tr('All Statuses')}</option>
+                <option value="PAID">{tr('Paid')}</option>
+                <option value="PARTIALLY_PAID">{tr('Partially Paid')}</option>
+                <option value="APPROVED">{tr('Approved')}</option>
+                <option value="OVERDUE">{tr('Overdue')}</option>
+                <option value="PENDING_APPROVAL">{tr('Pending Approval')}</option>
               </select>
             </div>
           </div>
@@ -931,15 +919,15 @@ export const PartnerFinancialPositionView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950 text-slate-400 font-mono text-[11px] uppercase tracking-wider border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Document #</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Due Date</th>
-                  <th className="py-3 px-4">Line Items / Services</th>
-                  <th className="py-3 px-4 text-right">Total Amount</th>
-                  <th className="py-3 px-4 text-right">Settled</th>
-                  <th className="py-3 px-4 text-right">Remaining Balance</th>
-                  <th className="py-3 px-4 text-center">Status</th>
-                  <th className="py-3 px-4 text-center">Action</th>
+                  <th className="py-3 px-4">{tr('Document #')}</th>
+                  <th className="py-3 px-4">{tr('Date')}</th>
+                  <th className="py-3 px-4">{tr('Due Date')}</th>
+                  <th className="py-3 px-4">{tr('Line Items / Services')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Total Amount')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Settled')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Remaining Balance')}</th>
+                  <th className="py-3 px-4 text-center">{tr('Status')}</th>
+                  <th className="py-3 px-4 text-center">{tr('Action')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80 bg-slate-900/60 font-mono">
@@ -981,7 +969,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                             <button
                               onClick={() => setSelectedDocForModal({ type: 'INVOICE', data: inv })}
                               className="p-1.5 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition"
-                              title="View Invoice Details"
+                              title={tr('View Invoice Details')}
                             >
                               <Eye className="w-3.5 h-3.5" />
                             </button>
@@ -991,9 +979,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                     })
                   ) : (
                     <tr>
-                      <td colSpan={9} className="py-8 text-center text-slate-500 font-sans">
-                        No matching customer invoices found.
-                      </td>
+                      <td colSpan={9} className="py-8 text-center text-slate-500 font-sans">{tr('No matching customer invoices found.')}</td>
                     </tr>
                   )
                 ) : filteredVendorBills.length > 0 ? (
@@ -1035,7 +1021,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                           <button
                             onClick={() => setSelectedDocForModal({ type: 'BILL', data: b })}
                             className="p-1.5 hover:bg-slate-700 text-slate-300 hover:text-white rounded-lg transition"
-                            title="View Bill Details"
+                            title={tr('View Bill Details')}
                           >
                             <Eye className="w-3.5 h-3.5" />
                           </button>
@@ -1045,9 +1031,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan={9} className="py-8 text-center text-slate-500 font-sans">
-                      No matching vendor bills found.
-                    </td>
+                    <td colSpan={9} className="py-8 text-center text-slate-500 font-sans">{tr('No matching vendor bills found.')}</td>
                   </tr>
                 )}
               </tbody>
@@ -1062,31 +1046,29 @@ export const PartnerFinancialPositionView: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h3 className="text-base font-bold text-white">
-                {partnerType === 'CUSTOMER' ? 'Payment Receipts & Remittance History' : 'Disbursement Vouchers & Wire Clearances'}
+                {partnerType === 'CUSTOMER' ? tr('Payment Receipts & Remittance History') : tr('Disbursement Vouchers & Wire Clearances')}
               </h3>
               <p className="text-xs text-slate-400">
                 {partnerType === 'CUSTOMER'
-                  ? 'Audit log of cash receipts, check clearances, and wire payments recorded for this customer.'
-                  : 'Entity payments disbursed to vendor settlement accounts.'}
+                  ? tr('Audit log of cash receipts, check clearances, and wire payments recorded for this customer.')
+                  : tr('Entity payments disbursed to vendor settlement accounts.')}
               </p>
             </div>
-            <span className="text-xs font-mono text-slate-400 bg-slate-800 px-3 py-1 rounded-xl border border-slate-700">
-              Audit-Ready Vouchers
-            </span>
+            <span className="text-xs font-mono text-slate-400 bg-slate-800 px-3 py-1 rounded-xl border border-slate-700">{tr('Audit-Ready Vouchers')}</span>
           </div>
 
           <div className="overflow-x-auto rounded-xl border border-slate-800">
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950 text-slate-400 font-mono text-[11px] uppercase tracking-wider border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Receipt / Voucher #</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Method</th>
-                  <th className="py-3 px-4">Reference / UTR</th>
-                  <th className="py-3 px-4 text-right">Amount Received</th>
-                  <th className="py-3 px-4 text-right">Allocated</th>
-                  <th className="py-3 px-4 text-right">Advance Credit</th>
-                  <th className="py-3 px-4 text-center">Status</th>
+                  <th className="py-3 px-4">{tr('Receipt / Voucher #')}</th>
+                  <th className="py-3 px-4">{tr('Date')}</th>
+                  <th className="py-3 px-4">{tr('Method')}</th>
+                  <th className="py-3 px-4">{tr('Reference / UTR')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Amount Received')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Allocated')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Advance Credit')}</th>
+                  <th className="py-3 px-4 text-center">{tr('Status')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80 bg-slate-900/60 font-mono">
@@ -1101,7 +1083,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                             {rct.paymentMethod}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-slate-400">{rct.referenceNumber || 'N/A'}</td>
+                        <td className="py-3 px-4 text-slate-400">{rct.referenceNumber || tr('N/A')}</td>
                         <td className="py-3 px-4 text-right font-bold text-emerald-400">
                           {currency} {rct.totalAmountReceived.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
@@ -1120,9 +1102,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-slate-500 font-sans">
-                        No payment receipts found for this customer.
-                      </td>
+                      <td colSpan={8} className="py-8 text-center text-slate-500 font-sans">{tr('No payment receipts found for this customer.')}</td>
                     </tr>
                   )
                 ) : (
@@ -1131,9 +1111,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                       <td className="py-3 px-4 font-bold text-white">DISB-{b.billNumber}</td>
                       <td className="py-3 px-4 text-slate-400">{b.dueDate || b.billDate}</td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-200 border border-slate-700">
-                          DIRECT ACH / WIRE
-                        </span>
+                        <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-200 border border-slate-700">{tr('DIRECT ACH / WIRE')}</span>
                       </td>
                       <td className="py-3 px-4 text-slate-400">WT-SETTLE-{b.billNumber.replace(/\D/g, '')}</td>
                       <td className="py-3 px-4 text-right font-bold text-teal-400">
@@ -1144,9 +1122,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                       </td>
                       <td className="py-3 px-4 text-right text-slate-500">0.00</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
-                          SETTLED
-                        </span>
+                        <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">{tr('SETTLED')}</span>
                       </td>
                     </tr>
                   ))
@@ -1163,14 +1139,10 @@ export const PartnerFinancialPositionView: React.FC = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-800">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">Official Statement of Account</h3>
-                <span className="text-[10px] font-mono uppercase bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30">
-                  Double-Entry Ledger
-                </span>
+                <h3 className="text-base font-bold text-white">{tr('Official Statement of Account')}</h3>
+                <span className="text-[10px] font-mono uppercase bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded border border-indigo-500/30">{tr('Double-Entry Ledger')}</span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Complete chronological transaction history with debits, credits, and running net balance.
-              </p>
+              <p className="text-xs text-slate-400 mt-0.5">{tr('Complete chronological transaction history with debits, credits, and running net balance.')}</p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -1178,8 +1150,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                 onClick={() => window.print()}
                 className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition border border-slate-700"
               >
-                <Printer className="w-3.5 h-3.5" /> Print Statement
-              </button>
+                <Printer className="w-3.5 h-3.5" />{tr('Print Statement')}</button>
             </div>
           </div>
 
@@ -1188,13 +1159,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
             <table className="w-full text-left text-xs text-slate-300">
               <thead className="bg-slate-950 text-slate-400 font-mono text-[11px] uppercase tracking-wider border-b border-slate-800">
                 <tr>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Type</th>
-                  <th className="py-3 px-4">Reference</th>
-                  <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4 text-right">Debit ({currency})</th>
-                  <th className="py-3 px-4 text-right">Credit ({currency})</th>
-                  <th className="py-3 px-4 text-right">Running Net Balance ({currency})</th>
+                  <th className="py-3 px-4">{tr('Date')}</th>
+                  <th className="py-3 px-4">{tr('Type')}</th>
+                  <th className="py-3 px-4">{tr('Reference')}</th>
+                  <th className="py-3 px-4">{tr('Description')}</th>
+                  <th className="py-3 px-4 text-right">{tr('Debit')} ({currency})</th>
+                  <th className="py-3 px-4 text-right">{tr('Credit')} ({currency})</th>
+                  <th className="py-3 px-4 text-right">{tr('Running Net Balance')} ({currency})</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/80 bg-slate-900/60 font-mono">
@@ -1231,9 +1202,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={7} className="py-8 text-center text-slate-500 font-sans">
-                        No statement records found.
-                      </td>
+                      <td colSpan={7} className="py-8 text-center text-slate-500 font-sans">{tr('No statement records found.')}</td>
                     </tr>
                   )
                 ) : vendorLedgerStatement.length > 0 ? (
@@ -1264,9 +1233,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={7} className="py-8 text-center text-slate-500 font-sans">
-                      No vendor ledger records found.
-                    </td>
+                    <td colSpan={7} className="py-8 text-center text-slate-500 font-sans">{tr('No vendor ledger records found.')}</td>
                   </tr>
                 )}
               </tbody>
@@ -1280,13 +1247,11 @@ export const PartnerFinancialPositionView: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-blue-400" />
-              Partner Registration & Legal Profile
-            </h3>
+              <Building2 className="w-4 h-4 text-blue-400" />{tr('Partner Registration & Legal Profile')}</h3>
 
             <div className="space-y-3 text-xs font-sans">
               <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                <span className="text-[10px] text-slate-400 font-mono">Company / Contact Name</span>
+                <span className="text-[10px] text-slate-400 font-mono">{tr('Company / Contact Name')}</span>
                 <p className="text-sm font-bold text-white">
                   {partnerType === 'CUSTOMER' ? currentCustomer?.name : currentVendor?.name}
                 </p>
@@ -1294,13 +1259,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono">Email Address</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{tr('Email Address')}</span>
                   <p className="text-xs font-medium text-slate-200 truncate">
                     {partnerType === 'CUSTOMER' ? currentCustomer?.email : currentVendor?.email}
                   </p>
                 </div>
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono">Phone Number</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{tr('Phone Number')}</span>
                   <p className="text-xs font-medium text-slate-200">
                     {partnerType === 'CUSTOMER' ? currentCustomer?.phone : currentVendor?.phone}
                   </p>
@@ -1308,7 +1273,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
               </div>
 
               <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                <span className="text-[10px] text-slate-400 font-mono">Billing & Registered Address</span>
+                <span className="text-[10px] text-slate-400 font-mono">{tr('Billing & Registered Address')}</span>
                 <p className="text-xs text-slate-300">
                   {partnerType === 'CUSTOMER' ? currentCustomer?.address : currentVendor?.address}
                 </p>
@@ -1316,15 +1281,15 @@ export const PartnerFinancialPositionView: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono">Tax / EIN / VAT Number</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{tr('Tax / EIN / VAT Number')}</span>
                   <p className="text-xs font-mono font-semibold text-slate-200">
-                    {partnerType === 'CUSTOMER' ? currentCustomer?.taxId || 'N/A' : currentVendor?.taxId || 'N/A'}
+                    {partnerType === 'CUSTOMER' ? currentCustomer?.taxId || tr('N/A') : currentVendor?.taxId || tr('N/A')}
                   </p>
                 </div>
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono">Agreed Payment Terms</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{tr('Agreed Payment Terms')}</span>
                   <p className="text-xs font-mono font-semibold text-indigo-400">
-                    Net {partnerType === 'CUSTOMER' ? currentCustomer?.paymentTermsDays || 30 : currentVendor?.paymentTermsDays || 30} Days
+                    {tr('Net')} {partnerType === 'CUSTOMER' ? currentCustomer?.paymentTermsDays || 30 : currentVendor?.paymentTermsDays || 30} {tr('Days')}
                   </p>
                 </div>
               </div>
@@ -1333,39 +1298,32 @@ export const PartnerFinancialPositionView: React.FC = () => {
 
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
             <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Landmark className="w-4 h-4 text-emerald-400" />
-              Banking & Direct Settlement Configuration
-            </h3>
+              <Landmark className="w-4 h-4 text-emerald-400" />{tr('Banking & Direct Settlement Configuration')}</h3>
 
             {partnerType === 'VENDOR' && currentVendor?.bankDetails ? (
               <div className="space-y-3 text-xs">
                 <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                  <span className="text-[10px] text-slate-400 font-mono">Disbursement Bank Name</span>
+                  <span className="text-[10px] text-slate-400 font-mono">{tr('Disbursement Bank Name')}</span>
                   <p className="text-sm font-bold text-white">{currentVendor.bankDetails.bankName}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                    <span className="text-[10px] text-slate-400 font-mono">Account Number</span>
+                    <span className="text-[10px] text-slate-400 font-mono">{tr('Account Number')}</span>
                     <p className="text-xs font-mono font-semibold text-slate-200">••••{currentVendor.bankDetails.accountNumber.slice(-4)}</p>
                   </div>
                   <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-1">
-                    <span className="text-[10px] text-slate-400 font-mono">Routing Number (ABA)</span>
+                    <span className="text-[10px] text-slate-400 font-mono">{tr('Routing Number (ABA)')}</span>
                     <p className="text-xs font-mono font-semibold text-slate-200">{currentVendor.bankDetails.routingNumber}</p>
                   </div>
                 </div>
-                <p className="text-[11px] text-slate-400 leading-relaxed">
-                  Direct Wire and ACH transfers for approved bills are executed to this verified corporate bank account.
-                </p>
+                <p className="text-[11px] text-slate-400 leading-relaxed">{tr('Direct Wire and ACH transfers for approved bills are executed to this verified corporate bank account.')}</p>
               </div>
             ) : (
               <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 text-xs">
-                <span className="text-[11px] font-bold text-slate-300 block">Electronic Payment Methods Supported</span>
-                <p className="text-slate-400 leading-relaxed">
-                  This entity accepts payment via ACH Direct Debit, Fedwire Electronic Wire, Corporate Credit Card, and Verified Check clearance.
-                </p>
+                <span className="text-[11px] font-bold text-slate-300 block">{tr('Electronic Payment Methods Supported')}</span>
+                <p className="text-slate-400 leading-relaxed">{tr('This entity accepts payment via ACH Direct Debit, Fedwire Electronic Wire, Corporate Credit Card, and Verified Check clearance.')}</p>
                 <div className="pt-2 flex items-center gap-2 text-emerald-400 font-mono text-[11px]">
-                  <CheckCircle2 className="w-4 h-4" /> PCI-DSS & SOC-2 Certified Settlement Processing
-                </div>
+                  <CheckCircle2 className="w-4 h-4" />{tr('PCI-DSS & SOC-2 Certified Settlement Processing')}</div>
               </div>
             )}
           </div>
@@ -1379,7 +1337,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div>
                 <span className="text-[10px] font-mono uppercase bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">
-                  {selectedDocForModal.type === 'INVOICE' ? 'Customer Invoice Voucher' : 'Vendor Bill Voucher'}
+                  {selectedDocForModal.type === 'INVOICE' ? tr('Customer Invoice Voucher') : tr('Vendor Bill Voucher')}
                 </span>
                 <h3 className="text-lg font-bold text-white font-mono mt-1">
                   {selectedDocForModal.type === 'INVOICE'
@@ -1397,13 +1355,13 @@ export const PartnerFinancialPositionView: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 text-xs font-mono">
               <div>
-                <span className="text-[10px] text-slate-500 block">Issue / Bill Date:</span>
+                <span className="text-[10px] text-slate-500 block">{tr("Issue / Bill Date:")}</span>
                 <span className="text-slate-200">
                   {selectedDocForModal.type === 'INVOICE' ? selectedDocForModal.data.issueDate : selectedDocForModal.data.billDate}
                 </span>
               </div>
               <div>
-                <span className="text-[10px] text-slate-500 block">Due Date:</span>
+                <span className="text-[10px] text-slate-500 block">{tr("Due Date:")}</span>
                 <span className="text-slate-200">{selectedDocForModal.data.dueDate}</span>
               </div>
             </div>
@@ -1413,8 +1371,8 @@ export const PartnerFinancialPositionView: React.FC = () => {
               <table className="w-full text-left text-xs text-slate-300">
                 <thead className="bg-slate-950 text-slate-400 font-mono text-[10px] uppercase">
                   <tr>
-                    <th className="py-2.5 px-3">Description</th>
-                    <th className="py-2.5 px-3 text-right">Amount ({currency})</th>
+                    <th className="py-2.5 px-3">{tr('Description')}</th>
+                    <th className="py-2.5 px-3 text-right">{tr('Amount')} ({currency})</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/60 bg-slate-900/60 font-mono">
@@ -1433,19 +1391,19 @@ export const PartnerFinancialPositionView: React.FC = () => {
             {/* Total and Paid amounts */}
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5 text-xs font-mono">
               <div className="flex justify-between text-slate-400">
-                <span>Total Amount:</span>
+                <span>{tr("Total Amount:")}</span>
                 <span className="text-white font-bold">
                   {currency} {selectedDocForModal.data.totalAmount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between text-emerald-400">
-                <span>Amount Paid / Disbursed:</span>
+                <span>{tr("Amount Paid / Disbursed:")}</span>
                 <span className="font-bold">
                   {currency} {(selectedDocForModal.data.amountPaid || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between text-blue-400 font-bold pt-1 border-t border-slate-800">
-                <span>Remaining Balance:</span>
+                <span>{tr("Remaining Balance:")}</span>
                 <span>
                   {currency}{' '}
                   {Math.max(0, selectedDocForModal.data.totalAmount - (selectedDocForModal.data.amountPaid || 0)).toLocaleString(
@@ -1460,9 +1418,7 @@ export const PartnerFinancialPositionView: React.FC = () => {
               <button
                 onClick={() => setSelectedDocForModal(null)}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl transition"
-              >
-                Close
-              </button>
+              >{tr('Close')}</button>
             </div>
           </div>
         </div>

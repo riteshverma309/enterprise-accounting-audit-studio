@@ -16,7 +16,7 @@ import {
   FileSpreadsheet,
 } from 'lucide-react';
 import { VendorContact } from '../types';
-import { useLanguage } from '../context/LanguageContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 
 interface BillLineItemRow {
   id: string;
@@ -28,7 +28,7 @@ interface BillLineItemRow {
 export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null }> = ({
   preSelectedVendor,
 }) => {
-  const { t, tr } = useLanguage();
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     vendorBills,
@@ -127,7 +127,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
   const totalAp = tenantBills.reduce((sum, b) => sum + (b.totalAmount - b.amountPaid), 0);
   const paidAp = tenantBills.reduce((sum, b) => sum + b.amountPaid, 0);
   const overdueAp = tenantBills
-    .filter((b) => b.status === 'OVERDUE' || (b.status !== 'PAID' && new Date(b.dueDate) < new Date()))
+    .filter((b) => (b.status === 'OVERDUE' || (b.status !== 'PAID' && new Date(b.dueDate) < new Date())))
     .reduce((sum, b) => sum + (b.totalAmount - b.amountPaid), 0);
 
   const handleCreateBill = (e: React.FormEvent) => {
@@ -273,7 +273,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                           <button
                             onClick={() => setExpandedBillId(isExpanded ? null : bill.id)}
                             className="p-1 hover:bg-slate-800 rounded text-slate-400 hover:text-white cursor-pointer"
-                            title="Toggle itemized expense lines"
+                            title={tr('Toggle itemized expense lines')}
                           >
                             {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                           </button>
@@ -319,11 +319,9 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                                 setPaymentAmount(String(bill.totalAmount - bill.amountPaid));
                               }}
                               className="px-2.5 py-1 bg-purple-600 hover:bg-purple-500 text-white rounded text-[11px] font-semibold shadow transition cursor-pointer"
-                            >
-                              Pay Bill
-                            </button>
+                            >{tr('Pay Bill')}</button>
                           ) : (
-                            <span className="text-slate-500 text-[11px]">Settled</span>
+                            <span className="text-slate-500 text-[11px]">{tr('Settled')}</span>
                           )}
                         </td>
                       </tr>
@@ -361,9 +359,9 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                                 <thead className="bg-slate-900 text-slate-400 uppercase font-mono text-[9px]">
                                   <tr>
                                     <th className="p-2">#</th>
-                                    <th className="p-2">Expense Line Description</th>
-                                    <th className="p-2">GL Expense Account</th>
-                                    <th className="p-2 text-right">Line Amount</th>
+                                    <th className="p-2">{tr('Expense Line Description')}</th>
+                                    <th className="p-2">{tr('GL Expense Account')}</th>
+                                    <th className="p-2 text-right">{tr('Line Amount')}</th>
                                   </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-800/60 font-mono">
@@ -380,9 +378,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                                     ))
                                   ) : (
                                     <tr>
-                                      <td colSpan={4} className="p-2 text-center text-slate-500">
-                                        Single summary item
-                                      </td>
+                                      <td colSpan={4} className="p-2 text-center text-slate-500">{tr('Single summary item')}</td>
                                     </tr>
                                   )}
                                 </tbody>
@@ -407,12 +403,8 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-purple-400" />
-                  Enter New Vendor Liability Bill
-                </h3>
-                <p className="text-xs text-slate-400">
-                  Select from Vendor Directory or enter supplier details with line item GL distribution.
-                </p>
+                  <CreditCard className="w-5 h-5 text-purple-400" />{tr('Enter New Vendor Liability Bill')}</h3>
+                <p className="text-xs text-slate-400">{tr('Select from Vendor Directory or enter supplier details with line item GL distribution.')}</p>
               </div>
               <button
                 onClick={() => setShowCreateModal(false)}
@@ -427,9 +419,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
               <div className="bg-slate-950/80 border border-slate-800 p-3.5 rounded-xl space-y-3">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
-                    <User className="w-4 h-4" />
-                    Vendor Directory Selector
-                  </label>
+                    <User className="w-4 h-4" />{tr('Vendor Directory Selector')}</label>
                   <span className="text-[11px] text-slate-400">
                     {availableVendors.length} master suppliers available
                   </span>
@@ -442,7 +432,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                       onChange={(e) => handleSelectVendor(e.target.value)}
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 font-semibold focus:outline-none focus:border-purple-500"
                     >
-                      <option value="">-- Manual / Custom Vendor --</option>
+                      <option value="">{tr('-- Manual / Custom Vendor --')}</option>
                       {availableVendors.map((v) => (
                         <option key={v.id} value={v.id}>
                           [{v.code}] {v.name} ({v.category || 'Supplier'})
@@ -455,7 +445,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                     <input
                       type="text"
                       required
-                      placeholder="Vendor / Supplier Name"
+                      placeholder={tr('Vendor / Supplier Name')}
                       value={vendorName}
                       onChange={(e) => setVendorName(e.target.value)}
                       className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-purple-500"
@@ -483,7 +473,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">Bill Payment Due Date</label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Bill Payment Due Date')}</label>
                 <input
                   type="date"
                   required
@@ -500,7 +490,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                     <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">
                       Bill Expense Allocation Lines ({billLineItems.length})
                     </h4>
-                    <p className="text-[11px] text-slate-400">Allocate expenses to specific General Ledger accounts.</p>
+                    <p className="text-[11px] text-slate-400">{tr('Allocate expenses to specific General Ledger accounts.')}</p>
                   </div>
                   <button
                     type="button"
@@ -508,7 +498,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                     className="px-3 py-1.5 bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border border-purple-500/30 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer"
                   >
                     <Plus className="w-3.5 h-3.5" />
-                    <span>Add Expense Line</span>
+                    <span>{tr('Add Expense Line')}</span>
                   </button>
                 </div>
 
@@ -516,8 +506,8 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                   <table className="w-full text-left text-xs text-slate-300 min-w-[500px]">
                     <thead className="text-[10px] font-mono text-slate-400 uppercase border-b border-slate-800">
                       <tr>
-                        <th className="pb-2 pl-2">Line Description</th>
-                        <th className="pb-2 w-48">GL Expense Account</th>
+                        <th className="pb-2 pl-2">{tr('Line Description')}</th>
+                        <th className="pb-2 w-48">{tr('GL Expense Account')}</th>
                         <th className="pb-2 w-32 text-right pr-2">Amount ({activeTenant.currency})</th>
                         <th className="pb-2 w-10 text-center"></th>
                       </tr>
@@ -541,10 +531,10 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                               onChange={(e) => updateBillLineItem(item.id, 'expenseAccountCode', e.target.value)}
                               className="w-full bg-slate-900 border border-slate-800 rounded-lg p-1.5 text-xs text-slate-100 font-mono focus:outline-none focus:border-purple-500"
                             >
-                              <option value="5010">5010 - Hosting & Infrastructure</option>
-                              <option value="5020">5020 - Engineering Staff & Personnel</option>
-                              <option value="5030">5030 - Office, Transport & Facilities</option>
-                              <option value="5040">5040 - Professional Legal & Advisory</option>
+                              <option value="5010">{tr('5010 - Hosting & Infrastructure')}</option>
+                              <option value="5020">{tr('5020 - Engineering Staff & Personnel')}</option>
+                              <option value="5030">{tr('5030 - Office, Transport & Facilities')}</option>
+                              <option value="5040">{tr('5040 - Professional Legal & Advisory')}</option>
                             </select>
                           </td>
                           <td className="py-2 px-1">
@@ -568,7 +558,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
                                   ? 'text-slate-700 cursor-not-allowed'
                                   : 'text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 cursor-pointer'
                               }`}
-                              title="Remove line"
+                              title={tr('Remove line')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -581,7 +571,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
 
                 {/* TOTAL SUMMARY */}
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex justify-between items-center text-xs font-mono">
-                  <span className="text-slate-400">Total Vendor Payable Liability:</span>
+                  <span className="text-slate-400">{tr('Total Vendor Payable Liability:')}</span>
                   <span className="text-purple-400 font-bold text-sm">
                     {activeTenant.currency} {calculatedBillTotal.toLocaleString()}
                   </span>
@@ -589,23 +579,18 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
               </div>
 
               <div className="p-3 bg-purple-950/30 border border-purple-800/40 rounded-xl text-[11px] text-purple-300">
-                <span className="font-semibold">Automated Double-Entry Posting:</span> Debit Selected Expense Accounts, Credit Accounts Payable (2010).
-              </div>
+                <span className="font-semibold">{tr('Automated Double-Entry Posting:')}</span>{tr('Debit Selected Expense Accounts, Credit Accounts Payable (2010).')}</div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/20 cursor-pointer"
-                >
-                  Record & Post Bill
-                </button>
+                >{tr('Record & Post Bill')}</button>
               </div>
             </form>
           </div>
@@ -617,9 +602,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-emerald-400" />
-              Disburse Payment for Vendor Bill
-            </h3>
+              <DollarSign className="w-5 h-5 text-emerald-400" />{tr('Disburse Payment for Vendor Bill')}</h3>
 
             <form onSubmit={handlePayBillSubmit} className="space-y-4">
               <div>
@@ -637,9 +620,7 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  Disburse From Bank Account
-                </label>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">{tr('Disburse From Bank Account')}</label>
                 <select
                   value={bankAccountId}
                   onChange={(e) => setBankAccountId(e.target.value)}
@@ -656,23 +637,18 @@ export const PayablesApView: React.FC<{ preSelectedVendor?: VendorContact | null
               </div>
 
               <div className="p-3 bg-purple-950/30 border border-purple-800/40 rounded-xl text-[11px] text-purple-300">
-                <span className="font-semibold">Automated Double-Entry Posting:</span> Debit Accounts Payable (2010), Credit Selected Bank Account.
-              </div>
+                <span className="font-semibold">{tr('Automated Double-Entry Posting:')}</span>{tr('Debit Accounts Payable (2010), Credit Selected Bank Account.')}</div>
 
               <div className="flex justify-end gap-3 pt-2">
                 <button
                   type="button"
                   onClick={() => setPayModalBill(null)}
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer"
-                >
-                  Cancel
-                </button>
+                >{tr('Cancel')}</button>
                 <button
                   type="submit"
                   className="px-5 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-purple-600/20 cursor-pointer"
-                >
-                  Disburse & Post Payment
-                </button>
+                >{tr('Disburse & Post Payment')}</button>
               </div>
             </form>
           </div>

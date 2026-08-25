@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   DownloadCloud,
   UploadCloud,
@@ -33,6 +34,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
   onClose,
   initialTab = 'backup',
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     tenants,
@@ -202,20 +204,20 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                Company Data Backup & Restore
+                {tr('Company Data Backup & Restore')}
                 <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   1-Click Snapshot
                 </span>
               </h2>
               <p className="text-xs text-slate-400">
-                Export complete company financials and sub-ledgers, or restore the system to an exact point in time.
+                {tr('Export complete company financials and sub-ledgers, or restore the system to an exact point in time.')}
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition"
+            className="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -229,14 +231,14 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
               setRestoreError(null);
               setRestoreSuccess(null);
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition border-t border-x ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition border-t border-x cursor-pointer ${
               activeTab === 'backup'
                 ? 'bg-slate-900 text-indigo-400 border-slate-800 border-b-transparent shadow'
                 : 'text-slate-400 hover:text-slate-200 border-transparent'
             }`}
           >
             <HardDriveDownload className="w-4 h-4" />
-            <span>Download Company Backup</span>
+            <span>{tr('Download Company Backup')}</span>
           </button>
 
           <button
@@ -244,14 +246,14 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
               setActiveTab('restore');
               setDownloadSuccess(null);
             }}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition border-t border-x ${
+            className={`flex items-center gap-2 px-4 py-2.5 text-xs font-semibold rounded-t-xl transition border-t border-x cursor-pointer ${
               activeTab === 'restore'
                 ? 'bg-slate-900 text-indigo-400 border-slate-800 border-b-transparent shadow'
                 : 'text-slate-400 hover:text-slate-200 border-transparent'
             }`}
           >
             <RotateCcw className="w-4 h-4" />
-            <span>Restore from Point-in-Time Backup</span>
+            <span>{tr('Restore from Point-in-Time Backup')}</span>
           </button>
         </div>
 
@@ -305,29 +307,29 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                 {/* Live Entities Preview Grid */}
                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
                   <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">Chart of Accounts</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Chart of Accounts')}</span>
                     <p className="text-base font-bold text-slate-100 font-mono mt-0.5">{activeStats.accounts}</p>
                   </div>
                   <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">Journal Entries</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Journal Entries')}</span>
                     <p className="text-base font-bold text-slate-100 font-mono mt-0.5">{activeStats.journals}</p>
                   </div>
                   <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">AR Invoices</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('AR Invoices')}</span>
                     <p className="text-base font-bold text-slate-100 font-mono mt-0.5">{activeStats.invoices}</p>
                   </div>
                   <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">AP Bills</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('AP Bills')}</span>
                     <p className="text-base font-bold text-slate-100 font-mono mt-0.5">{activeStats.bills}</p>
                   </div>
                   <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">Customers & Vend</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Customers & Vend')}</span>
                     <p className="text-base font-bold text-slate-100 font-mono mt-0.5">
                       {activeStats.customers + activeStats.vendors}
                     </p>
                   </div>
                   <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 text-center">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold">Inventory & Payroll</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Inventory & Payroll')}</span>
                     <p className="text-base font-bold text-slate-100 font-mono mt-0.5">
                       {activeStats.inventory + activeStats.payroll}
                     </p>
@@ -337,7 +339,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
 
               {/* Scope Selection */}
               <div className="space-y-3">
-                <label className="text-xs font-semibold text-slate-300">Backup Export Scope</label>
+                <label className="text-xs font-semibold text-slate-300">{tr('Backup Export Scope')}</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div
                     onClick={() => setBackupScope('single_company')}
@@ -381,7 +383,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                 <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-center gap-3 text-emerald-300">
                   <CheckCircle2 className="w-5 h-5 shrink-0 text-emerald-400" />
                   <div className="text-xs">
-                    <p className="font-bold text-emerald-200">Company Data Backup Downloaded Successfully!</p>
+                    <p className="font-bold text-emerald-200">{tr('Company Data Backup Downloaded Successfully!')}</p>
                     <p className="text-emerald-300/80 font-mono mt-0.5">
                       File: {downloadSuccess.fileName} ({downloadSuccess.recordCount} total records exported)
                     </p>
@@ -396,7 +398,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                     <FileJson className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-slate-200">Self-Contained JSON Backup Archive</h4>
+                    <h4 className="text-xs font-bold text-slate-200">{tr('Self-Contained JSON Backup Archive')}</h4>
                     <p className="text-[11px] text-slate-400">
                       Standardized schema format compatible with immediate 1-click restore.
                     </p>
@@ -408,7 +410,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                   className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2 transition cursor-pointer"
                 >
                   <DownloadCloud className="w-4 h-4" />
-                  <span>Download Company Data Now</span>
+                  <span>{tr('Download Company Data Now')}</span>
                 </button>
               </div>
             </div>
@@ -458,7 +460,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                   <h3 className="text-sm font-bold text-slate-200">
                     Drag and drop your company backup JSON file here
                   </h3>
-                  <p className="text-xs text-slate-400 mt-1">or click to browse files from your computer</p>
+                  <p className="text-xs text-slate-400 mt-1">{tr('or click to browse files from your computer')}</p>
                   <span className="inline-block mt-3 text-[10px] font-mono uppercase px-2.5 py-1 rounded bg-slate-800 text-slate-400 border border-slate-700">
                     Supports: *.json (schema v1.0)
                   </span>
@@ -478,7 +480,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                     <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                       <div className="flex items-center gap-2">
                         <FileCheck className="w-5 h-5 text-emerald-400" />
-                        <h4 className="text-sm font-bold text-slate-100">Backup Inspection & Integrity Check</h4>
+                        <h4 className="text-sm font-bold text-slate-100">{tr('Backup Inspection & Integrity Check')}</h4>
                       </div>
                       <div className="flex items-center gap-2">
                         <span
@@ -505,28 +507,28 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                     {/* Metadata summary */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
                       <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Target Company</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Target Company')}</span>
                         <p className="font-bold text-slate-100 mt-0.5">
                           {validationResult.metadata.tenantName} ({validationResult.metadata.tenantCode})
                         </p>
                       </div>
 
                       <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Exported At</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Exported At')}</span>
                         <p className="font-mono text-slate-200 mt-0.5 text-[11px]">
                           {new Date(validationResult.metadata.exportedAt).toLocaleString()}
                         </p>
                       </div>
 
                       <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Exported By</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Exported By')}</span>
                         <p className="font-mono text-slate-200 mt-0.5 text-[11px] truncate">
                           {validationResult.metadata.exportedBy}
                         </p>
                       </div>
 
                       <div className="bg-slate-900/80 p-3 rounded-lg border border-slate-800">
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Ledger Status</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">{tr('Ledger Status')}</span>
                         <p
                           className={`font-semibold mt-0.5 ${
                             validationResult.metadata.isBalanced ? 'text-emerald-400' : 'text-amber-400'
@@ -579,7 +581,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                     <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 text-xs text-rose-300 space-y-1">
                       <div className="flex items-center gap-2 font-bold text-rose-200">
                         <AlertTriangle className="w-4 h-4 text-rose-400" />
-                        <span>Validation Errors Detected</span>
+                        <span>{tr('Validation Errors Detected')}</span>
                       </div>
                       <ul className="list-disc list-inside space-y-0.5 text-[11px]">
                         {validationResult.errors.map((err, idx) => (
@@ -592,7 +594,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                   {/* Restore Options */}
                   {validationResult.isValid && (
                     <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-5 space-y-4">
-                      <h4 className="text-xs font-bold text-slate-200">Restoration Mode</h4>
+                      <h4 className="text-xs font-bold text-slate-200">{tr('Restoration Mode')}</h4>
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         <div
@@ -623,7 +625,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                           }`}
                         >
                           <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs font-bold text-slate-100">Restore as New Cloned Entity</span>
+                            <span className="text-xs font-bold text-slate-100">{tr('Restore as New Cloned Entity')}</span>
                             <Sparkles className="w-4 h-4 text-emerald-400" />
                           </div>
                           <p className="text-[11px] text-slate-400">
@@ -681,12 +683,12 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                           {isRestoring ? (
                             <>
                               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                              <span>Restoring Company State...</span>
+                              <span>{tr('Restoring Company State...')}</span>
                             </>
                           ) : (
                             <>
                               <RotateCcw className="w-4 h-4" />
-                              <span>Execute Restore to this Point</span>
+                              <span>{tr('Execute Restore to this Point')}</span>
                             </>
                           )}
                         </button>
@@ -701,7 +703,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
                 <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-5 space-y-2 text-emerald-300">
                   <div className="flex items-center gap-2 font-bold text-emerald-200 text-sm">
                     <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <span>Company Successfully Restored & Loaded!</span>
+                    <span>{tr('Company Successfully Restored & Loaded!')}</span>
                   </div>
                   <p className="text-xs text-emerald-300/90">
                     The accounting suite has been successfully reverted to the selected snapshot for{' '}
@@ -734,7 +736,7 @@ export const CompanyBackupModal: React.FC<CompanyBackupModalProps> = ({
         <div className="px-6 py-3.5 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
           <div className="flex items-center gap-2 font-mono text-[11px]">
             <ShieldCheck className="w-4 h-4 text-indigo-400" />
-            <span>SOX 404 & GAAP Audit Compliant Snapshots</span>
+            <span>{tr('SOX 404 & GAAP Audit Compliant Snapshots')}</span>
           </div>
 
           <button

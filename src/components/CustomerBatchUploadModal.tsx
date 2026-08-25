@@ -1,4 +1,5 @@
 import React, { useState, useRef, useMemo } from 'react';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import {
   UploadCloud,
   FileSpreadsheet,
@@ -41,11 +42,11 @@ interface CustomerBatchUploadModalProps {
   onSuccess?: () => void;
 }
 
-export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> = ({
-  isOpen,
+export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> = ({ isOpen,
   onClose,
   onSuccess,
 }) => {
+  const { tr, t } = useLanguage();
   const {
     activeTenant,
     customers,
@@ -329,12 +330,8 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-100">
-                    Customer Batch Upload & Directory Importer
-                  </h3>
-                  <span className="text-[10px] font-mono uppercase bg-indigo-950 text-indigo-300 border border-indigo-600/40 px-2 py-0.5 rounded-full font-semibold">
-                    Dynamic Schema Aware
-                  </span>
+                  <h3 className="text-base font-bold text-slate-100">{tr('Customer Batch Upload & Directory Importer')}</h3>
+                  <span className="text-[10px] font-mono uppercase bg-indigo-950 text-indigo-300 border border-indigo-600/40 px-2 py-0.5 rounded-full font-semibold">{tr('Dynamic Schema Aware')}</span>
                 </div>
                 <p className="text-xs text-slate-400">
                   Bulk import client records with full support for on-the-fly custom attributes ({customerAttributes.length} active custom fields).
@@ -347,10 +344,10 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                 id="btn-add-attr-inside-upload"
                 onClick={() => setIsAddAttrModalOpen(true)}
                 className="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/30 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
-                title="Add a new custom field to schema without leaving this upload view"
+                title={tr('Add a new custom field to schema without leaving this upload view')}
               >
                 <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                <span>+ Add Attribute On The Fly</span>
+                <span>{tr('+ Add Attribute On The Fly')}</span>
               </button>
 
               <button
@@ -373,16 +370,12 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                 onClick={handleDownloadCsvTemplate}
                 className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-medium border border-slate-700 flex items-center gap-1 transition cursor-pointer"
               >
-                <Download className="w-3 h-3 text-indigo-400" />
-                Download CSV Template
-              </button>
+                <Download className="w-3 h-3 text-indigo-400" />{tr('Download CSV Template')}</button>
               <button
                 onClick={handleDownloadJsonTemplate}
                 className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-medium border border-slate-700 flex items-center gap-1 transition cursor-pointer"
               >
-                <Download className="w-3 h-3 text-emerald-400" />
-                Download JSON Template
-              </button>
+                <Download className="w-3 h-3 text-emerald-400" />{tr('Download JSON Template')}</button>
               <button
                 onClick={handleExportExistingToCsv}
                 className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-[11px] font-medium border border-slate-700 flex items-center gap-1 transition cursor-pointer"
@@ -401,9 +394,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                     ? 'bg-indigo-600 text-white shadow-xs'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-              >
-                File Upload
-              </button>
+              >{tr('File Upload')}</button>
               <button
                 onClick={() => setInputMode('paste')}
                 className={`px-3 py-1 rounded-lg text-[11px] font-semibold transition cursor-pointer ${
@@ -411,9 +402,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                     ? 'bg-indigo-600 text-white shadow-xs'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-              >
-                Copy & Paste Text
-              </button>
+              >{tr('Copy & Paste Text')}</button>
               <button
                 onClick={() => {
                   setInputMode('manual');
@@ -424,9 +413,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                     ? 'bg-indigo-600 text-white shadow-xs'
                     : 'text-slate-400 hover:text-slate-200'
                 }`}
-              >
-                Interactive Grid Entry
-              </button>
+              >{tr('Interactive Grid Entry')}</button>
             </div>
           </div>
 
@@ -471,15 +458,11 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                 <h4 className="font-bold text-slate-200 text-sm">
                   {fileName ? `Selected: ${fileName}` : 'Drag & Drop CSV, Excel/TSV, or JSON File here'}
                 </h4>
-                <p className="text-slate-400 text-xs mt-1">
-                  Supports .csv, .tsv, .json with auto-detection of standard fields and <span className="text-emerald-400 font-mono">attr_&lt;key&gt;</span> custom attribute headers.
-                </p>
+                <p className="text-slate-400 text-xs mt-1">{tr('Supports .csv, .tsv, .json with auto-detection of standard fields and')}<span className="text-emerald-400 font-mono">{tr('attr_&lt;key&gt;')}</span>{tr('custom attribute headers.')}</p>
                 <button
                   type="button"
                   className="mt-3 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-indigo-300 font-semibold rounded-lg text-xs border border-slate-700 shadow-xs"
-                >
-                  Browse Local Files
-                </button>
+                >{tr('Browse Local Files')}</button>
               </div>
             )}
 
@@ -491,7 +474,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                     Paste Tabular Data from Excel, Sheets, or Raw CSV / JSON:
                   </label>
                   <div className="flex items-center gap-2">
-                    <span className="text-[11px] text-slate-400">Format:</span>
+                    <span className="text-[11px] text-slate-400">{tr('Format:')}</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -501,9 +484,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                       className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                         format === 'csv' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'
                       }`}
-                    >
-                      CSV / TSV
-                    </button>
+                    >{tr('CSV / TSV')}</button>
                     <button
                       type="button"
                       onClick={() => {
@@ -513,9 +494,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                       className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
                         format === 'json' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'
                       }`}
-                    >
-                      JSON
-                    </button>
+                    >{tr('JSON')}</button>
                   </div>
                 </div>
                 <textarea
@@ -526,7 +505,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                     handleParseContent(e.target.value, format);
                   }}
                   className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 font-mono text-xs text-slate-200 focus:border-indigo-500 focus:outline-none placeholder-slate-600"
-                  placeholder="Paste rows here (e.g. code, name, email, phone, billingAddress, attr_flat_no, attr_carpet_area...)"
+                  placeholder={tr('Paste rows here (e.g. code, name, email, phone, billingAddress, attr_flat_no, attr_carpet_area...)')}
                 />
               </div>
             )}
@@ -537,7 +516,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                 {/* Total card */}
                 <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-slate-400">Total Rows</span>
+                    <span className="text-[10px] uppercase font-bold text-slate-400">{tr('Total Rows')}</span>
                     <div className="text-base font-bold text-slate-100">{parsedRows.length}</div>
                   </div>
                   <Layers className="w-5 h-5 text-indigo-400" />
@@ -546,7 +525,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                 {/* Valid card */}
                 <div className="p-3 bg-emerald-950/30 rounded-xl border border-emerald-800/40 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-emerald-400">Ready to Import</span>
+                    <span className="text-[10px] uppercase font-bold text-emerald-400">{tr('Ready to Import')}</span>
                     <div className="text-base font-bold text-emerald-300">{validRowCount}</div>
                   </div>
                   <CheckCircle2 className="w-5 h-5 text-emerald-400" />
@@ -555,7 +534,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                 {/* Errors card */}
                 <div className="p-3 bg-rose-950/30 rounded-xl border border-rose-800/40 flex items-center justify-between">
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-rose-400">Validation Errors</span>
+                    <span className="text-[10px] uppercase font-bold text-rose-400">{tr('Validation Errors')}</span>
                     <div className="text-base font-bold text-rose-300">{errorRowCount}</div>
                   </div>
                   <AlertTriangle className="w-5 h-5 text-rose-400" />
@@ -563,7 +542,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
 
                 {/* Strategy Selector */}
                 <div className="p-2.5 bg-slate-950/60 rounded-xl border border-slate-800 flex flex-col justify-between space-y-1">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Merge Strategy:</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">{tr('Merge Strategy:')}</span>
                   <div className="flex items-center gap-1">
                     <button
                       type="button"
@@ -573,10 +552,8 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                           ? 'bg-emerald-600 text-white'
                           : 'bg-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
-                      title="Update existing customer code matches and insert new ones"
-                    >
-                      Upsert / Merge
-                    </button>
+                      title={tr('Update existing customer code matches and insert new ones')}
+                    >{tr('Upsert / Merge')}</button>
                     <button
                       type="button"
                       onClick={() => setImportStrategy('append')}
@@ -585,10 +562,8 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                           ? 'bg-indigo-600 text-white'
                           : 'bg-slate-800 text-slate-400 hover:text-slate-200'
                       }`}
-                      title="Insert new customer records only"
-                    >
-                      Append Only
-                    </button>
+                      title={tr('Insert new customer records only')}
+                    >{tr('Append Only')}</button>
                   </div>
                 </div>
               </div>
@@ -669,7 +644,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                         type="text"
                         value={searchFilter}
                         onChange={(e) => setSearchFilter(e.target.value)}
-                        placeholder="Search staging rows..."
+                        placeholder={tr('Search staging rows...')}
                         className="pl-7 pr-2 py-1 bg-slate-950 border border-slate-800 rounded-lg text-[11px] text-slate-200 focus:border-indigo-500 focus:outline-none"
                       />
                     </div>
@@ -678,9 +653,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                       onClick={handleAddBlankRow}
                       className="px-2.5 py-1 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white border border-indigo-500/30 rounded-lg text-[11px] font-semibold transition cursor-pointer flex items-center gap-1"
                     >
-                      <Plus className="w-3 h-3" />
-                      Add Staging Row
-                    </button>
+                      <Plus className="w-3 h-3" />{tr('Add Staging Row')}</button>
                   </div>
                 </div>
 
@@ -689,14 +662,14 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                     <thead className="bg-slate-950 text-slate-400 font-semibold border-b border-slate-800 sticky top-0 z-10">
                       <tr>
                         <th className="py-2 px-3 w-12 text-center">#</th>
-                        <th className="py-2 px-3 w-20 text-center">Status</th>
-                        <th className="py-2 px-3 min-w-[100px]">Code *</th>
-                        <th className="py-2 px-3 min-w-[160px]">Customer Name *</th>
-                        <th className="py-2 px-3 min-w-[160px]">Email Address *</th>
-                        <th className="py-2 px-3 min-w-[120px]">Phone</th>
-                        <th className="py-2 px-3 min-w-[140px]">Category</th>
-                        <th className="py-2 px-3 min-w-[140px]">Tax ID / SSN</th>
-                        <th className="py-2 px-3 min-w-[160px]">Billing Address</th>
+                        <th className="py-2 px-3 w-20 text-center">{tr('Status')}</th>
+                        <th className="py-2 px-3 min-w-[100px]">{tr('Code *')}</th>
+                        <th className="py-2 px-3 min-w-[160px]">{tr('Customer Name *')}</th>
+                        <th className="py-2 px-3 min-w-[160px]">{tr('Email Address *')}</th>
+                        <th className="py-2 px-3 min-w-[120px]">{tr('Phone')}</th>
+                        <th className="py-2 px-3 min-w-[140px]">{tr('Category')}</th>
+                        <th className="py-2 px-3 min-w-[140px]">{tr('Tax ID / SSN')}</th>
+                        <th className="py-2 px-3 min-w-[160px]">{tr('Billing Address')}</th>
 
                         {/* Dynamic Custom Attribute Columns */}
                         {customerAttributes.map((attr) => (
@@ -719,8 +692,8 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                           </th>
                         ))}
 
-                        <th className="py-2 px-3 min-w-[180px]">Validation Notes</th>
-                        <th className="py-2 px-3 w-12 text-right">Actions</th>
+                        <th className="py-2 px-3 min-w-[180px]">{tr('Validation Notes')}</th>
+                        <th className="py-2 px-3 w-12 text-right">{tr('Actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-800 text-slate-200">
@@ -741,14 +714,10 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                             <td className="py-2 px-3 text-center">
                               {row.isValid ? (
                                 <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center justify-center gap-0.5">
-                                  <Check className="w-2.5 h-2.5" />
-                                  Valid
-                                </span>
+                                  <Check className="w-2.5 h-2.5" />{tr('Valid')}</span>
                               ) : (
                                 <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30 flex items-center justify-center gap-0.5">
-                                  <X className="w-2.5 h-2.5" />
-                                  Error
-                                </span>
+                                  <X className="w-2.5 h-2.5" />{tr('Error')}</span>
                               )}
                             </td>
 
@@ -851,9 +820,9 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                                       }}
                                       className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-100 text-[11px] focus:border-indigo-500 focus:outline-none"
                                     >
-                                      <option value="">(None)</option>
-                                      <option value="true">TRUE / Yes</option>
-                                      <option value="false">FALSE / No</option>
+                                      <option value="">{tr('(None)')}</option>
+                                      <option value="true">{tr('TRUE / Yes')}</option>
+                                      <option value="false">{tr('FALSE / No')}</option>
                                     </select>
                                   ) : attr.dataType === 'date' ? (
                                     <input
@@ -883,7 +852,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                                       }
                                       className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-slate-100 text-[11px] focus:border-indigo-500 focus:outline-none"
                                     >
-                                      <option value="">Select option</option>
+                                      <option value="">{tr('Select option')}</option>
                                       {attr.options.map((opt) => (
                                         <option key={opt} value={opt}>
                                           {opt}
@@ -941,7 +910,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                                 type="button"
                                 onClick={() => handleDeleteRow(originalIdx)}
                                 className="p-1 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded transition cursor-pointer"
-                                title="Delete staging row"
+                                title={tr('Delete staging row')}
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -970,9 +939,7 @@ export const CustomerBatchUploadModal: React.FC<CustomerBatchUploadModalProps> =
                 type="button"
                 onClick={onClose}
                 className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition cursor-pointer"
-              >
-                Cancel
-              </button>
+              >{tr('Cancel')}</button>
 
               <button
                 type="button"

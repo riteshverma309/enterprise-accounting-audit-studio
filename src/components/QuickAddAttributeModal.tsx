@@ -3,18 +3,16 @@ import {
   Sparkles,
   X,
   Plus,
-  SlidersHorizontal,
   Calendar,
   ToggleLeft,
   Type,
   Hash,
   DollarSign,
   List,
-  CheckCircle2,
   AlertCircle,
-  HelpCircle,
 } from 'lucide-react';
 import { useAccounting } from '../context/AccountingContext';
+import { useLanguage, tr, t } from '../context/LanguageContext';
 import { CustomAttributeDefinition, CustomAttributeDataType } from '../types';
 import { slugifyAttributeKey } from '../utils/customerImportExport';
 
@@ -31,6 +29,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
   onAttributeCreated,
   defaultTargetEntity = 'CUSTOMER',
 }) => {
+  const { tr, t } = useLanguage();
   const { activeTenant, createCustomAttribute } = useAccounting();
 
   const [name, setName] = useState('');
@@ -75,12 +74,12 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
     const finalKey = (key.trim() || slugifyAttributeKey(trimmedName));
 
     if (!trimmedName) {
-      setErrorMsg('Please provide an Attribute Display Name.');
+      setErrorMsg(tr('Please provide an Attribute Display Name.'));
       return;
     }
 
     if (!finalKey) {
-      setErrorMsg('Please specify a valid attribute Key.');
+      setErrorMsg(tr('Please specify a valid attribute Key.'));
       return;
     }
 
@@ -91,7 +90,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
       if (opts.length === 0) {
-        setErrorMsg('Please enter at least one dropdown option separated by commas.');
+        setErrorMsg(tr('Please enter at least one dropdown option separated by commas.'));
         return;
       }
       parsedOptions = opts;
@@ -128,7 +127,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
       }
       onClose();
     } else {
-      setErrorMsg(result.error || 'Failed to save attribute.');
+      setErrorMsg(result.error || tr('Failed to save attribute.'));
     }
   };
 
@@ -195,14 +194,12 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-100">
-                  Add Attribute On The Fly
+                  {tr('Quick Add Custom Attribute')}
                 </h3>
-                <span className="text-[10px] font-mono uppercase bg-emerald-950 text-emerald-300 border border-emerald-600/40 px-2 py-0.2 rounded-full font-semibold">
-                  Dynamic EAV
-                </span>
+                <span className="text-[10px] font-mono uppercase bg-emerald-950 text-emerald-300 border border-emerald-600/40 px-2 py-0.2 rounded-full font-semibold">{tr('Dynamic EAV')}</span>
               </div>
               <p className="text-xs text-slate-400">
-                Instantly extend customer profiles & data schema with zero downtime.
+                {tr('Instantly extend customer profiles & data schema with zero downtime.')}
               </p>
             </div>
           </div>
@@ -227,7 +224,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-slate-300 font-semibold mb-1">
-                Attribute Display Name *
+                {tr('Attribute Display Name')} *
               </label>
               <input
                 type="text"
@@ -236,14 +233,14 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                 value={name}
                 onChange={(e) => handleNameChange(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 placeholder-slate-500 focus:border-emerald-500 focus:outline-none"
-                placeholder="e.g. Carpet Area, Flat No, Admission Date"
+                placeholder={tr('e.g. Carpet Area, Flat No, Admission Date')}
               />
             </div>
 
             <div>
               <label className="block text-slate-300 font-semibold mb-1 flex items-center justify-between">
-                <span>Unique Schema Key *</span>
-                <span className="text-[10px] text-slate-500 font-mono">attr_key</span>
+                <span>{tr('Unique Schema Key')} *</span>
+                <span className="text-[10px] text-slate-500 font-mono">{tr('attr_key')}</span>
               </label>
               <input
                 type="text"
@@ -254,7 +251,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                   setIsKeyManuallyEdited(true);
                 }}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-indigo-300 font-mono text-[11px] focus:border-indigo-500 focus:outline-none"
-                placeholder="carpet_area"
+                placeholder={tr('carpet_area')}
               />
             </div>
           </div>
@@ -262,7 +259,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
           {/* Data Type Selector Grid */}
           <div className="space-y-2">
             <label className="block text-slate-300 font-semibold">
-              Attribute Data Type *
+              {tr('Attribute Data Type')} *
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {dataTypesList.map((dt) => {
@@ -282,11 +279,11 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                     <div className="flex items-center gap-1.5 mb-1">
                       <Icon className="w-4 h-4" />
                       <span className="font-bold text-[11px] text-slate-200">
-                        {dt.label.split(' ')[0]}
+                        {tr(dt.label.split(' ')[0])}
                       </span>
                     </div>
                     <span className="text-[10px] text-slate-400 line-clamp-2 leading-tight">
-                      {dt.description}
+                      {tr(dt.description)}
                     </span>
                   </button>
                 );
@@ -298,7 +295,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
           {dataType === 'select' && (
             <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-800 space-y-1.5">
               <label className="block text-slate-300 font-semibold">
-                Dropdown Options (Comma-Separated) *
+                {tr('Dropdown Options (Comma-Separated)')} *
               </label>
               <input
                 type="text"
@@ -306,10 +303,10 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                 value={optionsText}
                 onChange={(e) => setOptionsText(e.target.value)}
                 className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
-                placeholder="Tier 1, Tier 2, Tier 3, VIP"
+                placeholder={tr('Tier 1, Tier 2, Tier 3, VIP')}
               />
               <p className="text-[10px] text-slate-500">
-                Enter allowed values separated by commas.
+                {tr('Enter allowed values separated by commas.')}
               </p>
             </div>
           )}
@@ -318,20 +315,20 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-slate-300 font-semibold mb-1">
-                Unit / Suffix (Optional)
+                {tr('Unit / Suffix (Optional)')}
               </label>
               <input
                 type="text"
                 value={unitOrSuffix}
                 onChange={(e) => setUnitOrSuffix(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
-                placeholder="e.g. sq ft, days, %, $, bays, units"
+                placeholder={tr('e.g. sq ft, days, %, $, bays, units')}
               />
             </div>
 
             <div>
               <label className="block text-slate-300 font-semibold mb-1">
-                Default Value (Optional)
+                {tr('Default Value (Optional)')}
               </label>
               {dataType === 'boolean' ? (
                 <div className="flex items-center gap-3 h-9 pt-1">
@@ -343,7 +340,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                       onChange={() => setDefaultValue(true)}
                       className="text-emerald-500"
                     />
-                    <span>True / Yes</span>
+                    <span>{tr('True / Yes')}</span>
                   </label>
                   <label className="flex items-center gap-1.5 text-slate-300 cursor-pointer">
                     <input
@@ -353,7 +350,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                       onChange={() => setDefaultValue(false)}
                       className="text-emerald-500"
                     />
-                    <span>False / No</span>
+                    <span>{tr('False / No')}</span>
                   </label>
                 </div>
               ) : dataType === 'date' ? (
@@ -378,7 +375,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                   value={defaultValue}
                   onChange={(e) => setDefaultValue(e.target.value)}
                   className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
-                  placeholder="Default text"
+                  placeholder={tr('Default text')}
                 />
               )}
             </div>
@@ -388,24 +385,24 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
           <div className="space-y-3">
             <div>
               <label className="block text-slate-300 font-semibold mb-1">
-                Field Description / User Tooltip (Optional)
+                {tr('Field Description / User Tooltip (Optional)')}
               </label>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-slate-100 focus:border-emerald-500 focus:outline-none"
-                placeholder="Brief hint on how this field should be utilized."
+                placeholder={tr('Brief hint on how this field should be utilized.')}
               />
             </div>
 
             <div className="flex items-center justify-between p-3 bg-slate-950/60 rounded-xl border border-slate-800">
               <div>
                 <span className="text-slate-200 font-semibold block">
-                  Mandatory Required Field
+                  {tr('Mandatory Required Field')}
                 </span>
                 <span className="text-[10px] text-slate-500">
-                  Enforce non-empty value during Customer Creation and Batch Import validation.
+                  {tr('Enforce non-empty value during Customer Creation and Batch Import validation.')}
                 </span>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -423,7 +420,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
           {/* Target Entity */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             <label className="block text-slate-400 font-semibold mb-1 col-span-2">
-              Apply Attribute To:
+              {tr('Apply Attribute To:')}
             </label>
             <button
               type="button"
@@ -434,7 +431,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                   : 'bg-slate-950/50 border-slate-800 text-slate-400'
               }`}
             >
-              Customers / Clients Only
+              {tr('Customers / Clients Only')}
             </button>
             <button
               type="button"
@@ -445,7 +442,7 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
                   : 'bg-slate-950/50 border-slate-800 text-slate-400'
               }`}
             >
-              Both Customers & Vendors
+              {tr('Both Customers & Vendors')}
             </button>
           </div>
 
@@ -456,14 +453,14 @@ export const QuickAddAttributeModal: React.FC<QuickAddAttributeModalProps> = ({
               onClick={onClose}
               className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition cursor-pointer"
             >
-              Cancel
+              {tr('Cancel')}
             </button>
             <button
               type="submit"
               className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-emerald-600/20 transition cursor-pointer flex items-center gap-1.5"
             >
               <Plus className="w-4 h-4" />
-              Save & Register Attribute
+              {tr('Save Changes')}
             </button>
           </div>
         </form>
